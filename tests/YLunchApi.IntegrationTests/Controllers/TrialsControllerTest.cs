@@ -1,4 +1,3 @@
-using System;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -109,7 +108,7 @@ public class TrialsControllerTest : ControllerTestBase
         var response = await Client.GetAsync("trials/authenticated");
 
         // Assert
-        await AssertUnauthorizedResponse(response);
+        await AssertResponseUtils.AssertUnauthorizedResponse(response);
     }
 
     [Fact]
@@ -123,6 +122,6 @@ public class TrialsControllerTest : ControllerTestBase
         var response = await Client.GetAsync("trials/authenticated");
 
         // Assert
-        await AssertUnauthorizedResponse(response);
+        await AssertResponseUtils.AssertUnauthorizedResponse(response);
     }
 }
