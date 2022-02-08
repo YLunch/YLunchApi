@@ -82,4 +82,14 @@ public abstract class ControllerTestBase : IClassFixture<WebApplicationFactory<P
         applicationSecurityToken.UserEmail.Should().Be(userCreateDto.Email);
         return applicationSecurityToken;
     }
+
+    protected async Task AssertUnauthorizedResponse(HttpResponseMessage response)
+    {
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        var content = await ResponseUtils.DeserializeContentAsync(response);
+
+        // Assert
+        content.Should()
+            .Contain("Please login and use provided tokens");
+    }
 }

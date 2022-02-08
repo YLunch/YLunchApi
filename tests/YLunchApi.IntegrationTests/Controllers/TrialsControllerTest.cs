@@ -107,12 +107,9 @@ public class TrialsControllerTest : ControllerTestBase
     {
         // Act
         var response = await Client.GetAsync("trials/authenticated");
-        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
-        var content = await ResponseUtils.DeserializeContentAsync(response);
 
         // Assert
-        content.Should()
-            .Contain("Please login and use provided tokens");
+        await AssertUnauthorizedResponse(response);
     }
 
     [Fact]
@@ -124,11 +121,8 @@ public class TrialsControllerTest : ControllerTestBase
 
         // Act
         var response = await Client.GetAsync("trials/authenticated");
-        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
-        var content = await ResponseUtils.DeserializeContentAsync(response);
 
         // Assert
-        content.Should()
-            .Contain("Please login and use provided tokens");
+        await AssertUnauthorizedResponse(response);
     }
 }
