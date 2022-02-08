@@ -68,8 +68,8 @@ builder.Services.AddAuthentication(options =>
                 context.Response.OnStarting(async () =>
                 {
                     context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    context.Response.ContentType = "text/html";
-                    await context.Response.WriteAsync("Please login and use provided tokens");
+                    context.Response.ContentType = "application/json";
+                    await context.Response.WriteAsJsonAsync(new { Message = "Please login and use provided tokens" });
                 });
 
                 return Task.CompletedTask;
@@ -139,8 +139,8 @@ else
         errorApp.Run(async context =>
         {
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
-            context.Response.ContentType = "text/html";
-            await context.Response.WriteAsync("Something went wrong, try again later");
+            context.Response.ContentType = "application/json";
+            await context.Response.WriteAsJsonAsync(new { Message = "Something went wrong, try again later"});
         });
     });
 }
