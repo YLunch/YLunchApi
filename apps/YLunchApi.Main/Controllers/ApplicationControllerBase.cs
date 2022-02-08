@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace YLunchApi.Main.Controllers;
 
-public class ApplicationControllerBase : ControllerBase
+public abstract class ApplicationControllerBase : ControllerBase
 {
     protected string CurrentUserId => HttpContext.User.FindFirst(x => x.Type == "Id")!.Value;
 
