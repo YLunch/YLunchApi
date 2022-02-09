@@ -97,15 +97,17 @@ public class JwtService : IJwtService
 
         var key = Encoding.ASCII.GetBytes(_jwtConfig.Secret);
 
+        var authClaims = new List<Claim>
+        {
+            new("Id", authenticatedUser.Id),
+            new(JwtRegisteredClaimNames.Sub, authenticatedUser.UserName),
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+        };
+        authClaims.AddRange(authenticatedUser.Roles.Select(userRole => new Claim(ClaimTypes.Role, userRole)));
+
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            Subject = new ClaimsIdentity(new[]
-            {
-                new Claim("Id", authenticatedUser.Id),
-                new Claim(JwtRegisteredClaimNames.Sub, authenticatedUser.UserName),
-                new Claim("Roles", string.Join(";", authenticatedUser.Roles)),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            }),
+            Subject = new ClaimsIdentity(authClaims),
             Expires = DateTime.UtcNow.AddMinutes(5),
             SigningCredentials =
                 new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
