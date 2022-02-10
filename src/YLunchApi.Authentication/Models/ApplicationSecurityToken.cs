@@ -1,10 +1,15 @@
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
+using YLunchApi.Domain.UserAggregate;
 
 namespace YLunchApi.Authentication.Models;
 
-public sealed class ApplicationSecurityToken : JwtSecurityToken
+public class ApplicationSecurityToken : JwtSecurityToken
 {
+    public string AccessToken { get; }
+    public string UserId { get; }
+    public string UserEmail { get; }
+    public List<string> UserRoles { get; }
+
     public ApplicationSecurityToken(string jwtEncodedString) : base(jwtEncodedString)
     {
         var handler = new JwtSecurityTokenHandler();
@@ -12,18 +17,7 @@ public sealed class ApplicationSecurityToken : JwtSecurityToken
         AccessToken = jwtEncodedString;
         UserId = jwtSecurityToken.Claims.First(x => x.Type.Equals("Id")).Value;
         UserEmail = jwtSecurityToken.Claims.First(x => x.Type.Equals(JwtRegisteredClaimNames.Sub)).Value;
-        var userRolesStr = jwtSecurityToken.Claims.First(x => x.Type.Equals("role")).Value;
-        UserRoles = userRolesStr.Split(",").ToList();
+        var roles = jwtSecurityToken.Claims.First(x => x.Type.Equals("role")).Value;
+        UserRoles = Roles.StringToList(roles);
     }
-
-    public ApplicationSecurityToken(string jwtEncodedString, string? refreshToken) : this(jwtEncodedString)
-    {
-        RefreshToken = refreshToken;
-    }
-
-    public string AccessToken { get; }
-    public string? RefreshToken { get; }
-    public string UserId { get; }
-    public string UserEmail { get; }
-    public List<string> UserRoles { get; }
 }

@@ -19,7 +19,7 @@ public class TrialsController : ApplicationControllerBase
     public ActionResult<string> GetAuthenticatedTry()
     {
         return Ok(
-            $"YLunchApi is running, you are authenticated as {CurrentUserEmail} with Id: {CurrentUserId} and Roles: {string.Join(",", CurrentUserRoles)}");
+            $"YLunchApi is running, you are authenticated as {CurrentUserEmail} with Id: {CurrentUserId} and Roles: {Roles.ListToString(CurrentUserRoles)}");
     }
 
     [HttpGet("authenticated-customer")]
@@ -27,7 +27,7 @@ public class TrialsController : ApplicationControllerBase
     public ActionResult<string> GetAuthenticatedCustomerTry()
     {
         return Ok(
-            $"YLunchApi is running, you are authenticated as {CurrentUserEmail} with Id: {CurrentUserId} and Roles: {string.Join(",", CurrentUserRoles)}");
+            $"YLunchApi is running, you are authenticated as {CurrentUserEmail} with Id: {CurrentUserId} and Roles: {Roles.ListToString(CurrentUserRoles)}");
     }
 
     [HttpGet("authenticated-restaurant-admin")]
@@ -35,6 +35,6 @@ public class TrialsController : ApplicationControllerBase
     public ActionResult<string> GetAuthenticatedRestaurantAdminTry()
     {
         return Ok(
-            $"YLunchApi is running, you are authenticated as {CurrentUserEmail} with Id: {CurrentUserId} and Roles: {string.Join(",", CurrentUserRoles)}");
+            $"YLunchApi is running, you are authenticated as {CurrentUserEmail} with Id: {CurrentUserId} and Roles: {Roles.ListToString(CurrentUserRoles)}");
     }
 }

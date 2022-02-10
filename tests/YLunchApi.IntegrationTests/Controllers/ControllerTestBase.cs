@@ -12,6 +12,7 @@ using YLunchApi.Domain.UserAggregate;
 using YLunchApi.Domain.UserAggregate.Dto;
 using YLunchApi.IntegrationTests.Core;
 using YLunchApi.IntegrationTests.Core.Utils;
+using YLunchApi.IntegrationTests.Models;
 
 namespace YLunchApi.IntegrationTests.Controllers;
 
@@ -25,7 +26,7 @@ public abstract class ControllerTestBase : IClassFixture<WebApplicationFactory<P
         Client = webApplication.CreateClient();
     }
 
-    protected async Task<ApplicationSecurityToken> Authenticate(CustomerCreateDto customerCreateDto)
+    protected async Task<AuthenticatedUserInfo> Authenticate(CustomerCreateDto customerCreateDto)
     {
         var customerCreationRequestBody = new
         {
@@ -38,12 +39,12 @@ public abstract class ControllerTestBase : IClassFixture<WebApplicationFactory<P
 
         _ = await Client.PostAsJsonAsync("customers", customerCreationRequestBody);
 
-        var applicationSecurityToken = await AuthenticateUser(customerCreateDto);
-        applicationSecurityToken.UserRoles.Should().BeEquivalentTo(new List<string> { Roles.Customer });
-        return applicationSecurityToken;
+        var authenticatedUserInfo = await AuthenticateUser(customerCreateDto);
+        authenticatedUserInfo.UserRoles.Should().BeEquivalentTo(new List<string> { Roles.Customer });
+        return authenticatedUserInfo;
     }
 
-    protected async Task<ApplicationSecurityToken> Authenticate(RestaurantAdminCreateDto restaurantAdminCreateDto)
+    protected async Task<AuthenticatedUserInfo> Authenticate(RestaurantAdminCreateDto restaurantAdminCreateDto)
     {
         var restaurantAdminCreationRequestBody = new
         {
@@ -56,12 +57,12 @@ public abstract class ControllerTestBase : IClassFixture<WebApplicationFactory<P
 
         _ = await Client.PostAsJsonAsync("restaurant-admins", restaurantAdminCreationRequestBody);
 
-        var applicationSecurityToken = await AuthenticateUser(restaurantAdminCreateDto);
-        applicationSecurityToken.UserRoles.Should().BeEquivalentTo(new List<string> { Roles.RestaurantAdmin });
-        return applicationSecurityToken;
+        var authenticatedUserInfo = await AuthenticateUser(restaurantAdminCreateDto);
+        authenticatedUserInfo.UserRoles.Should().BeEquivalentTo(new List<string> { Roles.RestaurantAdmin });
+        return authenticatedUserInfo;
     }
 
-    private async Task<ApplicationSecurityToken> AuthenticateUser(UserCreateDto userCreateDto)
+    private async Task<AuthenticatedUserInfo> AuthenticateUser(UserCreateDto userCreateDto)
     {
         // Arrange
         var userLoginRequestBody = new
@@ -78,8 +79,8 @@ public abstract class ControllerTestBase : IClassFixture<WebApplicationFactory<P
         var tokens = await ResponseUtils.DeserializeContentAsync<TokenReadDto>(loginResponse);
         Assert.IsType<string>(tokens.AccessToken);
         Assert.IsType<string>(tokens.RefreshToken);
-        var applicationSecurityToken = new ApplicationSecurityToken(tokens.AccessToken, tokens.RefreshToken);
+        var applicationSecurityToken = new ApplicationSecurityToken(tokens.AccessToken);
         applicationSecurityToken.UserEmail.Should().Be(userCreateDto.Email);
-        return applicationSecurityToken;
+        return new AuthenticatedUserInfo(tokens.AccessToken, tokens.RefreshToken);
     }
 }

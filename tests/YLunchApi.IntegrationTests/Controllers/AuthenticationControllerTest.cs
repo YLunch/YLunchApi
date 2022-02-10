@@ -65,12 +65,12 @@ public class AuthenticationControllerTest : ControllerTestBase
     public async Task Refresh_Tokens_Should_Return_A_200Ok()
     {
         // Arrange
-        var applicationSecurityToken = await Authenticate(UserMocks.CustomerCreateDto);
+        var authenticatedUserInfo = await Authenticate(UserMocks.CustomerCreateDto);
 
         var refreshTokensBody = new
         {
-            applicationSecurityToken.AccessToken,
-            applicationSecurityToken.RefreshToken
+            authenticatedUserInfo.AccessToken,
+            authenticatedUserInfo.RefreshToken
         };
 
         // Act
