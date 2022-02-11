@@ -2,9 +2,11 @@ using System;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Moq;
 using NSubstitute;
 using Xunit;
 using YLunchApi.Application.UserAggregate;
@@ -75,7 +77,7 @@ public class AuthenticationControllerTest
             tokenValidationParameter,
             _userRepository
         );
-        _authenticationController = new AuthenticationController(_jwtService, _userService);
+        _authenticationController = new AuthenticationController(_jwtService, _userService, new Mock<IHttpContextAccessor>().Object);
     }
 
     [Fact]

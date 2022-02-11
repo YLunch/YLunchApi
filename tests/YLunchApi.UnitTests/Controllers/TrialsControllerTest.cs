@@ -1,5 +1,7 @@
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Moq;
 using Xunit;
 using YLunchApi.Main.Controllers;
 
@@ -11,7 +13,7 @@ public class TrialsControllerTest
 
     public TrialsControllerTest()
     {
-        _trialsController = new TrialsController();
+        _trialsController = new TrialsController(new Mock<IHttpContextAccessor>().Object);
     }
 
     [Fact]

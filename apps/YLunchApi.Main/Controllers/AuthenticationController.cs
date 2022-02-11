@@ -14,7 +14,7 @@ public class AuthenticationController : ApplicationControllerBase
     private readonly IJwtService _jwtService;
     private readonly IUserService _userService;
 
-    public AuthenticationController(IJwtService jwtService, IUserService userService)
+    public AuthenticationController(IJwtService jwtService, IUserService userService, IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
     {
         _jwtService = jwtService;
         _userService = userService;

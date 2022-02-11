@@ -8,6 +8,10 @@ namespace YLunchApi.Main.Controllers;
 [Route("[controller]")]
 public class TrialsController : ApplicationControllerBase
 {
+    public TrialsController(IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
+    {
+    }
+
     [HttpGet("anonymous")]
     public ActionResult<string> GetAnonymousTry()
     {

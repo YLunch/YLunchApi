@@ -11,7 +11,7 @@ public class UsersController : ApplicationControllerBase
 {
     private readonly IUserService _userService;
 
-    public UsersController(IUserService userService)
+    public UsersController(IUserService userService, IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
     {
         _userService = userService;
     }

@@ -1,6 +1,8 @@
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Moq;
 using Xunit;
 using YLunchApi.Application.UserAggregate;
 using YLunchApi.Domain.UserAggregate.Dto;
@@ -25,7 +27,7 @@ public class UsersControllerTest
         var userRepository = new UserRepository(context, userManagerMock.Object, roleManagerMock.Object);
         var userService = new UserService(userRepository);
 
-        _usersController = new UsersController(userService);
+        _usersController = new UsersController(userService, new Mock<IHttpContextAccessor>().Object);
     }
 
     [Fact]
