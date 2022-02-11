@@ -53,6 +53,7 @@ public class AuthenticationController : ApplicationControllerBase
         }
     }
 
+    [HttpGet("current-user")]
     [Authorize]
     public async Task<ActionResult<UserReadDto>> GetCurrentUser()
     {

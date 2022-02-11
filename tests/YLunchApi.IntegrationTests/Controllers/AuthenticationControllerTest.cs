@@ -4,7 +4,10 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
 using YLunchApi.Authentication.Models.Dto;
+using YLunchApi.Domain.UserAggregate.Dto;
+using YLunchApi.IntegrationTests.Core.Extensions;
 using YLunchApi.IntegrationTests.Core.Utils;
+using YLunchApi.UnitTests.Application.Authentication;
 using YLunchApi.UnitTests.Application.UserAggregate;
 
 namespace YLunchApi.IntegrationTests.Controllers;
@@ -62,7 +65,7 @@ public class AuthenticationControllerTest : ControllerTestBase
     }
 
     [Fact]
-    public async Task Refresh_Tokens_Should_Return_A_200Ok()
+    public async Task RefreshTokens_Should_Return_A_200Ok()
     {
         // Arrange
         var authenticatedUserInfo = await Authenticate(UserMocks.CustomerCreateDto);
@@ -84,7 +87,7 @@ public class AuthenticationControllerTest : ControllerTestBase
     }
 
     [Fact]
-    public async Task Refresh_Tokens_Should_Return_A_400BadRequest_When_Missing_Fields()
+    public async Task RefreshTokens_Should_Return_A_400BadRequest_When_Missing_Fields()
     {
         // Arrange, Act and Assert
         var body = new
@@ -106,7 +109,7 @@ public class AuthenticationControllerTest : ControllerTestBase
     }
 
     [Fact]
-    public async Task Refresh_Tokens_Should_Return_A_401Unauthorized()
+    public async Task RefreshTokens_Should_Return_A_401Unauthorized()
     {
         // Arrange, Act and Assert
         var body = new
@@ -122,5 +125,46 @@ public class AuthenticationControllerTest : ControllerTestBase
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         var content = await ResponseUtils.DeserializeContentAsync(response);
         content.Should().Be("Invalid tokens, please login to generate new valid tokens");
+    }
+
+    [Fact]
+    public async Task GetCurrentUser_Should_Return_A_200Ok()
+    {
+        // Arrange
+        var authenticatedUserInfo = await Authenticate(UserMocks.CustomerCreateDto);
+        Client.SetAuthorizationHeader(authenticatedUserInfo.AccessToken);
+
+        // Act
+        var response = await Client.GetAsync("authentication/current-user");
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var responseBody = await ResponseUtils.DeserializeContentAsync<UserReadDto>(response);
+
+        // Assert
+        responseBody.Should().BeEquivalentTo(UserMocks.CustomerUserReadDto(authenticatedUserInfo.UserId));
+    }
+
+    [Fact]
+    public async Task GetCurrentUser_Should_Return_A_401Unauthorized_When_No_Header()
+    {
+        // Act
+        var response = await Client.GetAsync("authentication/current-user");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        await AssertResponseUtils.AssertUnauthorizedResponse(response);
+    }
+
+    [Fact]
+    public async Task GetCurrentUser_Should_Return_A_401Unauthorized_When_User_Not_Found()
+    {
+        // Arrange
+        Client.SetAuthorizationHeader(TokenMocks.ValidCustomerAccessToken);
+
+        // Act
+        var response = await Client.GetAsync("authentication/current-user");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        await AssertResponseUtils.AssertUnauthorizedResponse(response);
     }
 }

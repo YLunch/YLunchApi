@@ -1,11 +1,11 @@
 using System.Net;
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
 using YLunchApi.Authentication.Models.Dto;
 using YLunchApi.Domain.UserAggregate;
+using YLunchApi.IntegrationTests.Core.Extensions;
 using YLunchApi.IntegrationTests.Core.Utils;
 using YLunchApi.UnitTests.Application.UserAggregate;
 
@@ -29,8 +29,7 @@ public class TrialsControllerTest : ControllerTestBase
     {
         // Arrange
         var authenticatedUserInfo = await Authenticate(UserMocks.CustomerCreateDto);
-        Client.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", authenticatedUserInfo.AccessToken);
+        Client.SetAuthorizationHeader(authenticatedUserInfo.AccessToken);
 
         // Act
         var authenticatedTrialResponse = await Client.GetAsync("trials/authenticated");
@@ -52,8 +51,7 @@ public class TrialsControllerTest : ControllerTestBase
         refreshTokensResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var refreshedTokens = await ResponseUtils.DeserializeContentAsync<TokenReadDto>(refreshTokensResponse);
 
-        Client.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", refreshedTokens.AccessToken);
+        Client.SetAuthorizationHeader(refreshedTokens.AccessToken);
         var authenticatedTrialRefreshedTokensResponse = await Client.GetAsync("trials/authenticated");
         authenticatedTrialRefreshedTokensResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var authenticatedTrialWithExpiredTokensResponseContent =
@@ -68,8 +66,7 @@ public class TrialsControllerTest : ControllerTestBase
     {
         // Arrange
         var authenticatedUserInfo = await Authenticate(UserMocks.RestaurantAdminCreateDto);
-        Client.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", authenticatedUserInfo.AccessToken);
+        Client.SetAuthorizationHeader(authenticatedUserInfo.AccessToken);
 
         // Act
         var authenticatedTrialResponse = await Client.GetAsync("trials/authenticated");
@@ -91,8 +88,7 @@ public class TrialsControllerTest : ControllerTestBase
         refreshTokensResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var refreshedTokens = await ResponseUtils.DeserializeContentAsync<TokenReadDto>(refreshTokensResponse);
 
-        Client.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", refreshedTokens.AccessToken);
+        Client.SetAuthorizationHeader(refreshedTokens.AccessToken);
         var authenticatedTrialRefreshedTokensResponse = await Client.GetAsync("trials/authenticated");
         authenticatedTrialRefreshedTokensResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var authenticatedTrialWithExpiredTokensResponseContent =
@@ -116,8 +112,7 @@ public class TrialsControllerTest : ControllerTestBase
     public async Task GetAuthenticatedTry_Should_Return_A_401Unauthorized_When_Invalid_Token()
     {
         // Arrange
-        Client.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", "Invalid token");
+        Client.SetAuthorizationHeader("Invalid token");
 
         // Act
         var response = await Client.GetAsync("trials/authenticated");
@@ -132,8 +127,7 @@ public class TrialsControllerTest : ControllerTestBase
     {
         // Arrange
         var authenticatedUserInfo = await Authenticate(UserMocks.RestaurantAdminCreateDto);
-        Client.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", authenticatedUserInfo.AccessToken);
+        Client.SetAuthorizationHeader(authenticatedUserInfo.AccessToken);
 
         // Act
         var response = await Client.GetAsync("trials/authenticated-restaurant-admin");
@@ -150,8 +144,7 @@ public class TrialsControllerTest : ControllerTestBase
     {
         // Arrange
         var authenticatedUserInfo = await Authenticate(UserMocks.CustomerCreateDto);
-        Client.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", authenticatedUserInfo.AccessToken);
+        Client.SetAuthorizationHeader(authenticatedUserInfo.AccessToken);
 
         // Act
         var response = await Client.GetAsync("trials/authenticated-restaurant-admin");
@@ -165,8 +158,7 @@ public class TrialsControllerTest : ControllerTestBase
     {
         // Arrange
         var authenticatedUserInfo = await Authenticate(UserMocks.CustomerCreateDto);
-        Client.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", authenticatedUserInfo.AccessToken);
+        Client.SetAuthorizationHeader(authenticatedUserInfo.AccessToken);
 
         // Act
         var response = await Client.GetAsync("trials/authenticated-customer");
@@ -183,8 +175,7 @@ public class TrialsControllerTest : ControllerTestBase
     {
         // Arrange
         var authenticatedUserInfo = await Authenticate(UserMocks.RestaurantAdminCreateDto);
-        Client.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", authenticatedUserInfo.AccessToken);
+        Client.SetAuthorizationHeader(authenticatedUserInfo.AccessToken);
 
         // Act
         var response = await Client.GetAsync("trials/authenticated-customer");
