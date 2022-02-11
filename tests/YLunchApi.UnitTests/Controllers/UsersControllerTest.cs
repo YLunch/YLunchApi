@@ -1,8 +1,6 @@
 using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Moq;
 using Xunit;
 using YLunchApi.Application.UserAggregate;
 using YLunchApi.Domain.UserAggregate.Dto;
@@ -10,6 +8,7 @@ using YLunchApi.Infrastructure.Database.Repositories;
 using YLunchApi.Main.Controllers;
 using YLunchApi.UnitTests.Application.UserAggregate;
 using YLunchApi.UnitTests.Core;
+using YLunchApi.UnitTests.Core.Mockers;
 
 namespace YLunchApi.UnitTests.Controllers;
 
@@ -27,7 +26,7 @@ public class UsersControllerTest
         var userRepository = new UserRepository(context, userManagerMock.Object, roleManagerMock.Object);
         var userService = new UserService(userRepository);
 
-        _usersController = new UsersController(userService, new Mock<IHttpContextAccessor>().Object);
+        _usersController = new UsersController(userService, HttpContextAccessorMocker.GetWithoutAuthorization());
     }
 
     [Fact]

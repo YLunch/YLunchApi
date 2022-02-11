@@ -8,7 +8,7 @@ using Moq;
 using YLunchApi.Domain.UserAggregate;
 using YLunchApi.Infrastructure.Database;
 
-namespace YLunchApi.UnitTests.Core;
+namespace YLunchApi.UnitTests.Core.Mockers;
 
 public static class ManagerMocker
 {

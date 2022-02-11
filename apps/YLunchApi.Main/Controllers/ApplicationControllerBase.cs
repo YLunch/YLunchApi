@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
 using YLunchApi.Authentication.Models;
 
@@ -11,7 +12,9 @@ public abstract class ApplicationControllerBase : ControllerBase
         if (httpContext == null) return;
 
         var authorizationHeaderValue = httpContext.Request.Headers.Authorization;
-        if (authorizationHeaderValue.ToString() == "") return;
+        var authorizationHeaderValueIsToken =
+            !new Regex(@"^Bearer [^ ]+\.[^ ]+\.[^ ]+$").IsMatch(authorizationHeaderValue.ToString());
+        if (authorizationHeaderValueIsToken) return;
 
         var accessToken = authorizationHeaderValue.ToString().Replace("Bearer ", "");
         var applicationSecurityToken = new ApplicationSecurityToken(accessToken);

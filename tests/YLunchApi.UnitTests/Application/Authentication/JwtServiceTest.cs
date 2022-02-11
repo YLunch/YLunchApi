@@ -17,6 +17,7 @@ using YLunchApi.Domain.UserAggregate;
 using YLunchApi.Infrastructure.Database;
 using YLunchApi.Infrastructure.Database.Repositories;
 using YLunchApi.UnitTests.Core;
+using YLunchApi.UnitTests.Core.Mockers;
 
 namespace YLunchApi.UnitTests.Application.Authentication;
 

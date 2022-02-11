@@ -2,11 +2,9 @@ using System;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Moq;
 using NSubstitute;
 using Xunit;
 using YLunchApi.Application.UserAggregate;
@@ -18,32 +16,30 @@ using YLunchApi.Authentication.Services;
 using YLunchApi.AuthenticationShared.Repositories;
 using YLunchApi.Domain.UserAggregate;
 using YLunchApi.Domain.UserAggregate.Dto;
-using YLunchApi.Infrastructure.Database;
 using YLunchApi.Infrastructure.Database.Repositories;
 using YLunchApi.Main.Controllers;
 using YLunchApi.UnitTests.Application.Authentication;
 using YLunchApi.UnitTests.Application.UserAggregate;
 using YLunchApi.UnitTests.Core;
+using YLunchApi.UnitTests.Core.Mockers;
 
 namespace YLunchApi.UnitTests.Controllers;
 
 public class AuthenticationControllerTest
 {
     private readonly AuthenticationController _authenticationController;
-    private readonly ApplicationDbContext _context;
-    private readonly IJwtService _jwtService;
     private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly IUserRepository _userRepository;
     private readonly IUserService _userService;
 
     public AuthenticationControllerTest()
     {
-        _context = ContextBuilder.BuildContext();
+        var context = ContextBuilder.BuildContext();
 
-        var roleManagerMock = ManagerMocker.GetRoleManagerMock(_context);
-        var userManagerMock = ManagerMocker.GetUserManagerMock(_context);
+        var roleManagerMock = ManagerMocker.GetRoleManagerMock(context);
+        var userManagerMock = ManagerMocker.GetUserManagerMock(context);
 
-        _userRepository = new UserRepository(_context, userManagerMock.Object, roleManagerMock.Object);
+        _userRepository = new UserRepository(context, userManagerMock.Object, roleManagerMock.Object);
         _userService = new UserService(_userRepository);
 
         const string jwtSecret = "JsonWebTokenSecretForTests";
@@ -69,15 +65,16 @@ public class AuthenticationControllerTest
             ClockSkew = TimeSpan.Zero
         };
 
-        _refreshTokenRepository = new RefreshTokenRepository(_context);
+        _refreshTokenRepository = new RefreshTokenRepository(context);
 
-        _jwtService = new JwtService(
+        IJwtService jwtService = new JwtService(
             _refreshTokenRepository,
             optionsMonitorMock,
             tokenValidationParameter,
             _userRepository
         );
-        _authenticationController = new AuthenticationController(_jwtService, _userService, new Mock<IHttpContextAccessor>().Object);
+        _authenticationController =
+            new AuthenticationController(jwtService, _userService, HttpContextAccessorMocker.GetWithoutAuthorization());
     }
 
     [Fact]

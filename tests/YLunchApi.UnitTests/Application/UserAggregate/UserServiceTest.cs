@@ -10,6 +10,7 @@ using YLunchApi.Domain.UserAggregate.Dto;
 using YLunchApi.Infrastructure.Database;
 using YLunchApi.Infrastructure.Database.Repositories;
 using YLunchApi.UnitTests.Core;
+using YLunchApi.UnitTests.Core.Mockers;
 
 namespace YLunchApi.UnitTests.Application.UserAggregate;
 

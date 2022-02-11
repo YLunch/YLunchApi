@@ -15,7 +15,7 @@ public class ApplicationSecurityTokenTest
     {
         // Arrange
         var user = UserMocks.RestaurantAdminUserReadDto("095f0658-8192-442d-9a3a-2b78c4268aa3");
-        const string token = TokenMocks.ValidAccessToken;
+        const string token = TokenMocks.ValidRestaurantAdminAccessToken;
         var expected = new ApplicationSecurityToken(token);
 
         // Act
