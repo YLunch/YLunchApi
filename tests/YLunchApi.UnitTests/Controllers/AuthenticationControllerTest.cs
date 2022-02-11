@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -19,6 +20,7 @@ using YLunchApi.Domain.UserAggregate;
 using YLunchApi.Domain.UserAggregate.Dto;
 using YLunchApi.Infrastructure.Database.Repositories;
 using YLunchApi.Main.Controllers;
+using YLunchApi.TestsShared.Models;
 using YLunchApi.UnitTests.Application.Authentication;
 using YLunchApi.UnitTests.Application.UserAggregate;
 using YLunchApi.UnitTests.Core;
@@ -28,10 +30,10 @@ namespace YLunchApi.UnitTests.Controllers;
 
 public class AuthenticationControllerTest
 {
-    private readonly AuthenticationController _authenticationController;
     private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly IUserRepository _userRepository;
     private readonly IUserService _userService;
+    private readonly JwtService _jwtService;
 
     public AuthenticationControllerTest()
     {
@@ -68,24 +70,26 @@ public class AuthenticationControllerTest
 
         _refreshTokenRepository = new RefreshTokenRepository(context);
 
-        IJwtService jwtService = new JwtService(
+        _jwtService = new JwtService(
             _refreshTokenRepository,
             optionsMonitorMock,
             tokenValidationParameter,
             _userRepository,
             new JwtSecurityTokenHandler()
         );
-        _authenticationController =
-            new AuthenticationController(jwtService, _userService, HttpContextAccessorMocker.GetWithoutAuthorization());
     }
 
-    [Fact]
-    public async Task Login_Should_Return_A_200Ok_Containing_Tokens()
+    private AuthenticationController CreateAuthenticationController(
+        IHttpContextAccessor httpContextAccessor)
+    {
+        return new AuthenticationController(_jwtService, _userService,
+            httpContextAccessor);
+    }
+
+    private async Task<AuthenticatedUserInfo> Login(UserCreateDto user, string role)
     {
         // Arrange
-        var user = UserMocks.RestaurantAdminCreateDto;
-
-        await _userService.Create(user, Roles.RestaurantAdmin);
+        await _userService.Create(user, role);
         var userDb = await _userRepository.GetByEmail(user.Email);
         userDb = Assert.IsType<User>(userDb);
 
@@ -94,15 +98,26 @@ public class AuthenticationControllerTest
             Email = user.Email,
             Password = user.Password
         };
+        var controller = CreateAuthenticationController(HttpContextAccessorMocker.GetWithoutAuthorization());
 
         // Act
-        var response = await _authenticationController.Login(loginRequestDto);
+        var response = await controller.Login(loginRequestDto);
         var responseResult = Assert.IsType<OkObjectResult>(response.Result);
         var responseBody = Assert.IsType<TokenReadDto>(responseResult.Value);
         var jwtSecurityToken = new ApplicationSecurityToken(responseBody.AccessToken);
 
+        // Assert
         jwtSecurityToken.UserId.Should().BeEquivalentTo(userDb.Id);
         jwtSecurityToken.Subject.Should().BeEquivalentTo(userDb.Email);
+
+        return new AuthenticatedUserInfo(responseBody.AccessToken, responseBody.RefreshToken);
+    }
+
+    [Fact]
+    public async Task Login_Should_Return_A_200Ok_Containing_Tokens()
+    {
+        // Arrange, Act & Assert
+        _ = await Login(UserMocks.RestaurantAdminCreateDto, Roles.RestaurantAdmin);
     }
 
     [Fact]
@@ -116,52 +131,40 @@ public class AuthenticationControllerTest
             Email = user.Email,
             Password = user.Password
         };
+        var controller = CreateAuthenticationController(HttpContextAccessorMocker.GetWithoutAuthorization());
 
         // Act
-        var response = await _authenticationController.Login(loginRequestDto);
+        var response = await controller.Login(loginRequestDto);
         var responseResult = Assert.IsType<UnauthorizedObjectResult>(response.Result);
         var responseBody = Assert.IsType<string>(responseResult.Value);
         responseBody.Should().Be("Please login with valid credentials");
     }
 
-
     [Fact]
     public async Task RefreshTokens_Should_Return_A_200Ok_Containing_Tokens()
     {
         // Arrange
-        var user = UserMocks.RestaurantAdminCreateDto;
+        var controller = CreateAuthenticationController(HttpContextAccessorMocker.GetWithoutAuthorization());
 
-        await _userService.Create(user, Roles.RestaurantAdmin);
-        var userDb = await _userRepository.GetByEmail(user.Email);
-        userDb = Assert.IsType<User>(userDb);
-
-        var loginRequestDto = new LoginRequestDto
-        {
-            Email = user.Email,
-            Password = user.Password
-        };
-
-        var loginResponse = await _authenticationController.Login(loginRequestDto);
-
-        var loginResponseResult = Assert.IsType<OkObjectResult>(loginResponse.Result);
-        var loginTokens = Assert.IsType<TokenReadDto>(loginResponseResult.Value);
+        var authenticatedUserInfo = await Login(UserMocks.RestaurantAdminCreateDto, Roles.RestaurantAdmin);
 
         var refreshTokensRequest = new TokenUpdateDto
         {
-            AccessToken = loginTokens.AccessToken,
-            RefreshToken = loginTokens.RefreshToken
+            AccessToken = authenticatedUserInfo.AccessToken,
+            RefreshToken = authenticatedUserInfo.RefreshToken
         };
 
         // Act
-        var response = await _authenticationController.RefreshTokens(refreshTokensRequest);
+        var response = await controller.RefreshTokens(refreshTokensRequest);
 
         // Assert
         var responseResult = Assert.IsType<OkObjectResult>(response.Result);
         var responseBody = Assert.IsType<TokenReadDto>(responseResult.Value);
 
-        var jwtSecurityToken = new ApplicationSecurityToken(responseBody.AccessToken);
-        jwtSecurityToken.UserId.Should().BeEquivalentTo(userDb.Id);
-        jwtSecurityToken.Subject.Should().BeEquivalentTo(userDb.Email);
+        var newAuthenticatedUserInfo = new AuthenticatedUserInfo(responseBody.AccessToken, responseBody.RefreshToken);
+        newAuthenticatedUserInfo.RefreshToken.Should().Be(responseBody.RefreshToken);
+        newAuthenticatedUserInfo.UserId.Should().BeEquivalentTo(authenticatedUserInfo.UserId);
+        newAuthenticatedUserInfo.Subject.Should().BeEquivalentTo(authenticatedUserInfo.UserEmail);
 
         var oldRefreshToken = await _refreshTokenRepository.GetByToken(refreshTokensRequest.RefreshToken);
         oldRefreshToken = Assert.IsType<RefreshToken>(oldRefreshToken);
@@ -169,8 +172,8 @@ public class AuthenticationControllerTest
 
         var newRefreshToken = await _refreshTokenRepository.GetByToken(responseBody.RefreshToken);
         newRefreshToken = Assert.IsType<RefreshToken>(newRefreshToken);
-        newRefreshToken.UserId.Should().Be(jwtSecurityToken.UserId);
-        newRefreshToken.JwtId.Should().Be(jwtSecurityToken.Id);
+        newRefreshToken.UserId.Should().Be(newAuthenticatedUserInfo.UserId);
+        newRefreshToken.JwtId.Should().Be(newAuthenticatedUserInfo.Id);
         newRefreshToken.IsRevoked.Should().BeFalse();
         newRefreshToken.IsUsed.Should().BeFalse();
         newRefreshToken.CreationDateTime.Should().BeAfter(DateTime.UtcNow.AddSeconds(-1));
@@ -193,9 +196,10 @@ public class AuthenticationControllerTest
             AccessToken = TokenMocks.ExpiredAccessToken,
             RefreshToken = TokenMocks.RefreshToken.Token
         };
+        var controller = CreateAuthenticationController(HttpContextAccessorMocker.GetWithoutAuthorization());
 
         // Act
-        var response = await _authenticationController.RefreshTokens(refreshTokensRequest);
+        var response = await controller.RefreshTokens(refreshTokensRequest);
 
         // Assert
         var responseResult = Assert.IsType<UnauthorizedObjectResult>(response.Result);
@@ -213,11 +217,48 @@ public class AuthenticationControllerTest
             AccessToken = TokenMocks.ExpiredAccessToken,
             RefreshToken = TokenMocks.RefreshToken.Token
         };
+        var controller = CreateAuthenticationController(HttpContextAccessorMocker.GetWithoutAuthorization());
 
         // Act
-        async Task Act() => await _authenticationController.RefreshTokens(refreshTokensRequest);
+        async Task Act() => await controller.RefreshTokens(refreshTokensRequest);
 
         // Assert
         await Assert.ThrowsAsync<RefreshTokenNotFoundException>(Act);
+    }
+
+    [Fact]
+    public async Task GetCurrentUser_Should_Return_A_200Ok_Containing_Current_User()
+    {
+        // Arrange
+        var authenticatedUserInfo = await Login(UserMocks.RestaurantAdminCreateDto, Roles.RestaurantAdmin);
+
+        var controller =
+            CreateAuthenticationController(
+                HttpContextAccessorMocker.GetWithAuthorization(authenticatedUserInfo.AccessToken));
+
+        // Act
+        var response = await controller.GetCurrentUser();
+
+        // Assert
+        var responseResult = Assert.IsType<OkObjectResult>(response.Result);
+        var responseBody = Assert.IsType<UserReadDto>(responseResult.Value);
+
+        responseBody.Should().BeEquivalentTo(UserMocks.RestaurantAdminUserReadDto(authenticatedUserInfo.UserId));
+    }
+
+    [Fact]
+    public async Task GetCurrentUser_Should_Return_A_401Unauthorized_When_User_Not_Found()
+    {
+        var controller =
+            CreateAuthenticationController(
+                HttpContextAccessorMocker.GetWithAuthorization(TokenMocks.ValidCustomerAccessToken));
+
+        // Act
+        var response = await controller.GetCurrentUser();
+
+        // Assert
+        var responseResult = Assert.IsType<UnauthorizedObjectResult>(response.Result);
+        var responseBody = Assert.IsType<string>(responseResult.Value);
+        responseBody.Should().Be("Invalid tokens, please login to generate new valid tokens");
     }
 }

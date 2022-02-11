@@ -5,7 +5,6 @@ using YLunchApi.Authentication.Models;
 using YLunchApi.Domain.UserAggregate;
 using YLunchApi.Main.Controllers;
 using YLunchApi.UnitTests.Application.Authentication;
-using YLunchApi.UnitTests.Core;
 using YLunchApi.UnitTests.Core.Mockers;
 
 namespace YLunchApi.UnitTests.Controllers;
@@ -52,7 +51,8 @@ public class TrialsControllerTest
     {
         // Arrange
         var controller =
-            new TrialsController(HttpContextAccessorMocker.GetWithAuthorization(TokenMocks.ValidRestaurantAdminAccessToken));
+            new TrialsController(
+                HttpContextAccessorMocker.GetWithAuthorization(TokenMocks.ValidRestaurantAdminAccessToken));
 
         // Act
         var response = controller.GetAuthenticatedRestaurantAdminTry();

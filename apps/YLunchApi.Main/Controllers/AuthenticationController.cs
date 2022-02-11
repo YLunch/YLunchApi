@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using YLunchApi.Authentication.Models.Dto;
 using YLunchApi.Authentication.Services;
 using YLunchApi.Domain.Core.Utils;
+using YLunchApi.Domain.Exceptions;
 using YLunchApi.Domain.UserAggregate;
 using YLunchApi.Domain.UserAggregate.Dto;
 
@@ -14,7 +16,8 @@ public class AuthenticationController : ApplicationControllerBase
     private readonly IJwtService _jwtService;
     private readonly IUserService _userService;
 
-    public AuthenticationController(IJwtService jwtService, IUserService userService, IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
+    public AuthenticationController(IJwtService jwtService, IUserService userService,
+        IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
     {
         _jwtService = jwtService;
         _userService = userService;
@@ -46,6 +49,19 @@ public class AuthenticationController : ApplicationControllerBase
         {
             if (EnvironmentUtils.IsDevelopment) throw;
 
+            return Unauthorized("Invalid tokens, please login to generate new valid tokens");
+        }
+    }
+
+    [Authorize]
+    public async Task<ActionResult<UserReadDto>> GetCurrentUser()
+    {
+        try
+        {
+            return Ok(await _userService.GetById(CurrentUserId!));
+        }
+        catch (EntityNotFoundException)
+        {
             return Unauthorized("Invalid tokens, please login to generate new valid tokens");
         }
     }

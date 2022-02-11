@@ -38,4 +38,13 @@ public class UserService : IUserService
         var roles = await _userRepository.GetUserRoles(user);
         return new AuthenticatedUser(user, roles);
     }
+
+    public async Task<UserReadDto> GetById(string id)
+    {
+        var user = await _userRepository.GetById(id);
+        if (user == null) throw new EntityNotFoundException($"User {id} not found");
+
+        var roles = await _userRepository.GetUserRoles(user);
+        return new UserReadDto(user, roles);
+    }
 }

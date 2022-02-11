@@ -22,6 +22,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YLunchApi.Authentication", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YLunchApi.AuthenticationShared", "src\YLunchApi.AuthenticationShared\YLunchApi.AuthenticationShared.csproj", "{8B5B9B0A-E9DC-428B-8418-4A15B7F59DA9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YLunchApi.TestsShared", "tests\YLunchApi.TestsShared\YLunchApi.TestsShared.csproj", "{E0DC9137-D8F9-4454-A91F-5207EEEFB471}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -60,6 +62,10 @@ Global
 		{8B5B9B0A-E9DC-428B-8418-4A15B7F59DA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8B5B9B0A-E9DC-428B-8418-4A15B7F59DA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8B5B9B0A-E9DC-428B-8418-4A15B7F59DA9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0DC9137-D8F9-4454-A91F-5207EEEFB471}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0DC9137-D8F9-4454-A91F-5207EEEFB471}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0DC9137-D8F9-4454-A91F-5207EEEFB471}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0DC9137-D8F9-4454-A91F-5207EEEFB471}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{18FD960E-79FC-4D98-8727-CD0619848D4D} = {75241C3F-2EA9-485F-A3A9-2DE705136CCF}
@@ -70,5 +76,6 @@ Global
 		{EE9819B4-D52B-4922-AB2C-D3D06A082051} = {5958C9D7-CAD2-4286-B6FA-C198878F4431}
 		{94869801-50AD-416E-8824-11D0C822F7E4} = {75241C3F-2EA9-485F-A3A9-2DE705136CCF}
 		{8B5B9B0A-E9DC-428B-8418-4A15B7F59DA9} = {75241C3F-2EA9-485F-A3A9-2DE705136CCF}
+		{E0DC9137-D8F9-4454-A91F-5207EEEFB471} = {5958C9D7-CAD2-4286-B6FA-C198878F4431}
 	EndGlobalSection
 EndGlobal

@@ -12,7 +12,7 @@ using YLunchApi.Domain.UserAggregate;
 using YLunchApi.Domain.UserAggregate.Dto;
 using YLunchApi.IntegrationTests.Core;
 using YLunchApi.IntegrationTests.Core.Utils;
-using YLunchApi.IntegrationTests.Models;
+using YLunchApi.TestsShared.Models;
 
 namespace YLunchApi.IntegrationTests.Controllers;
 

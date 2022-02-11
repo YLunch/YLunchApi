@@ -1,6 +1,6 @@
 using YLunchApi.Authentication.Models;
 
-namespace YLunchApi.IntegrationTests.Models;
+namespace YLunchApi.TestsShared.Models;
 
 public class AuthenticatedUserInfo : ApplicationSecurityToken
 {

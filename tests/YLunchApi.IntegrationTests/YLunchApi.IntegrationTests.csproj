@@ -24,6 +24,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\apps\YLunchApi.Main\YLunchApi.Main.csproj" />
+        <ProjectReference Include="..\YLunchApi.TestsShared\YLunchApi.TestsShared.csproj"/>
         <ProjectReference Include="..\YLunchApi.UnitTests\YLunchApi.UnitTests.csproj" />
     </ItemGroup>
 
