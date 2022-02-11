@@ -1,8 +1,10 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using YLunchApi.Application.UserAggregate;
 using YLunchApi.Authentication.Models;
@@ -15,7 +17,9 @@ using YLunchApi.Infrastructure.Database.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddUserSecrets<Program>(true);
+
 // Add services to the container.
+builder.Services.TryAddScoped(_ => new JwtSecurityTokenHandler());
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 

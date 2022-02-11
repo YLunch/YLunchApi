@@ -7,7 +7,7 @@
 	<s:Boolean x:Key="/Default/Environment/Filtering/FileMasksToExclude/=_002A_002A_002FYLunchApi_002EMain_002FProgram_002Ecs/@EntryIndexRemoved">True</s:Boolean>
 	<s:String x:Key="/Default/Environment/Highlighting/HighlightingSourceSnapshotLocation/@EntryValue">/Users/rael/Library/Caches/JetBrains/Rider2021.3/resharper-host/temp/Rider/vAny/CoverageData/_YLunchApi.-1617738941/Snapshot/snapshot.utdcvr</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=e65e5503_002Dfbaf_002D4abe_002Dbf52_002D3c0a97e5922a/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from &amp;lt;tests&amp;gt;\&amp;lt;YLunchApi.UnitTests&amp;gt;" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
-  &lt;Project Location="/Users/rael/Documents/perso-code/csharp/YLunchApi/tests/YLunchApi.UnitTests" Presentation="&amp;lt;tests&amp;gt;\&amp;lt;YLunchApi.UnitTests&amp;gt;" /&gt;
+  &lt;Project Location="/Users/rael/Documents/perso-code/csharp/YLunchApi" Presentation="&amp;lt;tests&amp;gt;" /&gt;
 &lt;/SessionState&gt;</s:String>
 	
 	

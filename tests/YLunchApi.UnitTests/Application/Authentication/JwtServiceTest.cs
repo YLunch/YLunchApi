@@ -1,4 +1,6 @@
 using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +15,6 @@ using YLunchApi.Authentication.Models.Dto;
 using YLunchApi.Authentication.Repositories;
 using YLunchApi.Authentication.Services;
 using YLunchApi.AuthenticationShared.Repositories;
-using YLunchApi.Domain.UserAggregate;
 using YLunchApi.Infrastructure.Database;
 using YLunchApi.Infrastructure.Database.Repositories;
 using YLunchApi.UnitTests.Core;
@@ -24,8 +25,10 @@ namespace YLunchApi.UnitTests.Application.Authentication;
 public class JwtServiceTest
 {
     private readonly ApplicationDbContext _context;
-    private readonly IJwtService _jwtService;
     private readonly Mock<IRefreshTokenRepository> _refreshTokenRepositoryMock;
+    private readonly IOptionsMonitor<JwtConfig> _optionsMonitorMock;
+    private readonly UserRepository _userRepository;
+    private readonly TokenValidationParameters _tokenValidationParameter;
 
     public JwtServiceTest()
     {
@@ -34,18 +37,18 @@ public class JwtServiceTest
         var roleManagerMock = ManagerMocker.GetRoleManagerMock(_context);
         var userManagerMock = ManagerMocker.GetUserManagerMock(_context);
 
-        IUserRepository userRepository = new UserRepository(_context, userManagerMock.Object, roleManagerMock.Object);
+        _userRepository = new UserRepository(_context, userManagerMock.Object, roleManagerMock.Object);
 
         const string jwtSecret = "JsonWebTokenSecretForTests";
-        var optionsMonitorMock = Substitute.For<IOptionsMonitor<JwtConfig>>();
-        optionsMonitorMock.CurrentValue.Returns(new JwtConfig
+        _optionsMonitorMock = Substitute.For<IOptionsMonitor<JwtConfig>>();
+        _optionsMonitorMock.CurrentValue.Returns(new JwtConfig
         {
             Secret = jwtSecret
         });
 
         var key = Encoding.ASCII.GetBytes(jwtSecret);
 
-        var tokenValidationParameter = new TokenValidationParameters
+        _tokenValidationParameter = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(key),
@@ -68,13 +71,63 @@ public class JwtServiceTest
                         .FirstOrDefaultAsync(x => x.Token.Equals(refreshTokenString));
                 }
             );
+    }
 
-        _jwtService = new JwtService(
+    private IJwtService CreateJwtService(Mock<JwtSecurityTokenHandler>? jwtSecurityTokenHandlerMock = null)
+    {
+        return new JwtService(
             _refreshTokenRepositoryMock.Object,
-            optionsMonitorMock,
-            tokenValidationParameter,
-            userRepository
+            _optionsMonitorMock,
+            _tokenValidationParameter,
+            _userRepository,
+            jwtSecurityTokenHandlerMock == null ? new JwtSecurityTokenHandler() : jwtSecurityTokenHandlerMock.Object
         );
+    }
+
+    [Fact]
+    public async Task RefreshJwtToken_Should_Throw_InvalidTokenException_When_ValidatedToken_Is_Null()
+    {
+        // Arrange
+        var refreshTokensRequest = new TokenUpdateDto
+        {
+            AccessToken = TokenMocks.BadAlgorithmAccessToken,
+            RefreshToken = TokenMocks.RefreshToken.Token
+        };
+        SecurityToken validatedToken;
+        var jwtSecurityTokenHandlerMock = new Mock<JwtSecurityTokenHandler>();
+        jwtSecurityTokenHandlerMock
+            .Setup(x =>
+                x.ValidateToken(It.IsAny<string>(), It.IsAny<TokenValidationParameters>(), out validatedToken))
+            .Returns(new ClaimsPrincipal());
+
+        // Act
+        async Task Act() => await CreateJwtService(jwtSecurityTokenHandlerMock).RefreshJwtToken(refreshTokensRequest);
+
+        // Assert
+        await Assert.ThrowsAsync<InvalidTokenException>(Act);
+    }
+
+    [Fact]
+    public async Task RefreshJwtToken_Should_Throw_InvalidTokenException_When_TokenInValidation_Is_Null()
+    {
+        // Arrange
+        var refreshTokensRequest = new TokenUpdateDto
+        {
+            AccessToken = TokenMocks.BadAlgorithmAccessToken,
+            RefreshToken = TokenMocks.RefreshToken.Token
+        };
+        SecurityToken validatedToken = new JwtSecurityToken();
+        var jwtSecurityTokenHandlerMock = new Mock<JwtSecurityTokenHandler>();
+        jwtSecurityTokenHandlerMock
+            .Setup(x =>
+                x.ValidateToken(It.IsAny<string>(), It.IsAny<TokenValidationParameters>(), out validatedToken))
+            .Returns<ClaimsPrincipal>(null);
+
+        // Act
+        async Task Act() => await CreateJwtService(jwtSecurityTokenHandlerMock).RefreshJwtToken(refreshTokensRequest);
+
+        // Assert
+        await Assert.ThrowsAsync<InvalidTokenException>(Act);
     }
 
     [Fact]
@@ -88,7 +141,7 @@ public class JwtServiceTest
         };
 
         // Act
-        async Task Act() => await _jwtService.RefreshJwtToken(refreshTokensRequest);
+        async Task Act() => await CreateJwtService().RefreshJwtToken(refreshTokensRequest);
 
         // Assert
         await Assert.ThrowsAsync<InvalidTokenException>(Act);
@@ -105,7 +158,7 @@ public class JwtServiceTest
         };
 
         // Act
-        async Task Act() => await _jwtService.RefreshJwtToken(refreshTokensRequest);
+        async Task Act() => await CreateJwtService().RefreshJwtToken(refreshTokensRequest);
 
         // Assert
         await Assert.ThrowsAsync<RefreshTokenNotFoundException>(Act);
@@ -127,7 +180,7 @@ public class JwtServiceTest
         };
 
         // Act
-        async Task Act() => await _jwtService.RefreshJwtToken(refreshTokensRequest);
+        async Task Act() => await CreateJwtService().RefreshJwtToken(refreshTokensRequest);
 
         // Assert
         await Assert.ThrowsAsync<RefreshTokenExpiredException>(Act);
@@ -150,7 +203,7 @@ public class JwtServiceTest
         };
 
         // Act
-        async Task Act() => await _jwtService.RefreshJwtToken(refreshTokensRequest);
+        async Task Act() => await CreateJwtService().RefreshJwtToken(refreshTokensRequest);
 
         // Assert
         await Assert.ThrowsAsync<RefreshTokenAlreadyUsedException>(Act);
@@ -172,7 +225,7 @@ public class JwtServiceTest
         };
 
         // Act
-        async Task Act() => await _jwtService.RefreshJwtToken(refreshTokensRequest);
+        async Task Act() => await CreateJwtService().RefreshJwtToken(refreshTokensRequest);
 
         // Assert
         await Assert.ThrowsAsync<RefreshTokenRevokedException>(Act);
@@ -194,7 +247,7 @@ public class JwtServiceTest
         };
 
         // Act
-        async Task Act() => await _jwtService.RefreshJwtToken(refreshTokensRequest);
+        async Task Act() => await CreateJwtService().RefreshJwtToken(refreshTokensRequest);
 
         // Assert
         await Assert.ThrowsAsync<AccessAndRefreshTokensNotMatchException>(Act);

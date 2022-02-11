@@ -19,15 +19,17 @@ public class JwtService : IJwtService
     private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly TokenValidationParameters _tokenValidationParameters;
     private readonly IUserRepository _userRepository;
+    private readonly JwtSecurityTokenHandler _jwtSecurityTokenHandler;
 
     public JwtService(IRefreshTokenRepository refreshTokenRepository,
         IOptionsMonitor<JwtConfig> jwtConfig, TokenValidationParameters tokenValidationParameters,
-        IUserRepository userRepository)
+        IUserRepository userRepository, JwtSecurityTokenHandler jwtSecurityTokenHandler)
     {
         _refreshTokenRepository = refreshTokenRepository;
         _tokenValidationParameters = tokenValidationParameters;
         _userRepository = userRepository;
         _jwtConfig = jwtConfig.CurrentValue;
+        _jwtSecurityTokenHandler = jwtSecurityTokenHandler;
     }
 
     public async Task<TokenReadDto> GenerateJwtToken(AuthenticatedUser authenticatedUser)
@@ -41,13 +43,12 @@ public class JwtService : IJwtService
 
     public async Task<TokenReadDto> RefreshJwtToken(TokenUpdateDto tokenUpdateDto)
     {
-        var jwtTokenHandler = new JwtSecurityTokenHandler();
         var tokenValidationParameters = _tokenValidationParameters.Clone();
         tokenValidationParameters.ValidateLifetime = false;
 
 
         // Validation 1 - jwt format
-        var tokenInValidation = jwtTokenHandler.ValidateToken(
+        var tokenInValidation = _jwtSecurityTokenHandler.ValidateToken(
             tokenUpdateDto.AccessToken,
             tokenValidationParameters,
             out var validatedToken

@@ -1,4 +1,5 @@
 using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -71,7 +72,8 @@ public class AuthenticationControllerTest
             _refreshTokenRepository,
             optionsMonitorMock,
             tokenValidationParameter,
-            _userRepository
+            _userRepository,
+            new JwtSecurityTokenHandler()
         );
         _authenticationController =
             new AuthenticationController(jwtService, _userService, HttpContextAccessorMocker.GetWithoutAuthorization());
