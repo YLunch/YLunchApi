@@ -17,6 +17,7 @@ using YLunchApi.Authentication.Services;
 using YLunchApi.AuthenticationShared.Repositories;
 using YLunchApi.Infrastructure.Database;
 using YLunchApi.Infrastructure.Database.Repositories;
+using YLunchApi.TestsShared.Mocks;
 using YLunchApi.UnitTests.Core;
 using YLunchApi.UnitTests.Core.Mockers;
 

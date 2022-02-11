@@ -4,7 +4,7 @@ using Xunit;
 using YLunchApi.Authentication.Models;
 using YLunchApi.Domain.UserAggregate;
 using YLunchApi.Main.Controllers;
-using YLunchApi.UnitTests.Application.Authentication;
+using YLunchApi.TestsShared.Mocks;
 using YLunchApi.UnitTests.Core.Mockers;
 
 namespace YLunchApi.UnitTests.Controllers;

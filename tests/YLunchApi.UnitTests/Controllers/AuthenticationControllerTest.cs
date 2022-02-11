@@ -20,9 +20,8 @@ using YLunchApi.Domain.UserAggregate;
 using YLunchApi.Domain.UserAggregate.Dto;
 using YLunchApi.Infrastructure.Database.Repositories;
 using YLunchApi.Main.Controllers;
+using YLunchApi.TestsShared.Mocks;
 using YLunchApi.TestsShared.Models;
-using YLunchApi.UnitTests.Application.Authentication;
-using YLunchApi.UnitTests.Application.UserAggregate;
 using YLunchApi.UnitTests.Core;
 using YLunchApi.UnitTests.Core.Mockers;
 

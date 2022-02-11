@@ -5,7 +5,7 @@ using FluentAssertions;
 using Xunit;
 using YLunchApi.Domain.UserAggregate.Dto;
 using YLunchApi.IntegrationTests.Core.Utils;
-using YLunchApi.UnitTests.Application.UserAggregate;
+using YLunchApi.TestsShared.Mocks;
 
 namespace YLunchApi.IntegrationTests.Controllers;
 

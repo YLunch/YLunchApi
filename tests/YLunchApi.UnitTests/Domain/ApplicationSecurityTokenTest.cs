@@ -3,8 +3,7 @@ using FluentAssertions;
 using Xunit;
 using YLunchApi.Authentication.Models;
 using YLunchApi.Domain.UserAggregate;
-using YLunchApi.UnitTests.Application.Authentication;
-using YLunchApi.UnitTests.Application.UserAggregate;
+using YLunchApi.TestsShared.Mocks;
 
 namespace YLunchApi.UnitTests.Domain;
 

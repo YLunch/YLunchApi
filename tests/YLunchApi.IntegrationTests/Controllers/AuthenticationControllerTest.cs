@@ -7,8 +7,7 @@ using YLunchApi.Authentication.Models.Dto;
 using YLunchApi.Domain.UserAggregate.Dto;
 using YLunchApi.IntegrationTests.Core.Extensions;
 using YLunchApi.IntegrationTests.Core.Utils;
-using YLunchApi.UnitTests.Application.Authentication;
-using YLunchApi.UnitTests.Application.UserAggregate;
+using YLunchApi.TestsShared.Mocks;
 
 namespace YLunchApi.IntegrationTests.Controllers;
 

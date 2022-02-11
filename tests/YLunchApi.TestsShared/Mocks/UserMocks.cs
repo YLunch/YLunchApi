@@ -1,9 +1,8 @@
-using System.Collections.Generic;
 using YLunchApi.Domain.Core.Utils;
 using YLunchApi.Domain.UserAggregate;
 using YLunchApi.Domain.UserAggregate.Dto;
 
-namespace YLunchApi.UnitTests.Application.UserAggregate;
+namespace YLunchApi.TestsShared.Mocks;
 
 public static class UserMocks
 {
