@@ -241,7 +241,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserCreateDto'
+              $ref: '#/components/schemas/RestaurantAdminCreateDto'
       responses:
         '201':
           description: user created
@@ -266,7 +266,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserCreateDto'
+              $ref: '#/components/schemas/CustomerCreateDto'
       responses:
         '201':
           description: user created
@@ -327,7 +327,34 @@ components:
         refreshToken:
           type: string
           example: abcdefghij-a00000e0-aaa0-000a-0000-00e00aa00e00
-    UserCreateDto:
+    RestaurantAdminCreateDto:
+      required:
+        - email
+        - firstname
+        - lastname
+        - password
+        - phoneNumber
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: admin@restaurant.com
+        firstname:
+          type: string
+          example: Jean-Marc
+        lastname:
+          type: string
+          example: Dupont Henri
+        phoneNumber:
+          type: string
+          format: phone
+          example: '0612345678'
+        password:
+          type: string
+          format: password
+          example: Password1234.
+    CustomerCreateDto:
       required:
         - email
         - firstname
