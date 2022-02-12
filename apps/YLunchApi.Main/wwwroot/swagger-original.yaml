@@ -31,25 +31,118 @@ paths:
       tags:
         - trials
       summary: Tries the api as anonymous
+      description: |
+        - Authorization header: **no**
       operationId: getAnonymousTry
       responses:
-        "200":
+        '200':
           description: |
             Success:
             - The anonymous trial Json object
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnonymousTrialDto'
-        "400":
+                $ref: '#/components/schemas/AnonymousTryDto'
+        '400':
           description: |
             Bad request:
             - Something went wrong, please try again later
+  /trials/authenticated:
+    get:
+      tags:
+        - trials
+      summary: Tries the api as authenticated based on accessToken in headers
+      description: |
+        - Authorization header: **yes**
+        - Granted roles: 
+          - All
+      operationId: getAuthenticatedTry
+      responses:
+        '200':
+          description: |
+            Success:
+            - The authenticated trial Json object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticatedTryDto'
+        '400':
+          description: |
+            Bad request:
+            - Something went wrong, please try again later
+        '401':
+          description: |
+            Unauthorized:
+            - Please login and use provided tokens
+  /trials/authenticated-customer:
+    get:
+      tags:
+        - trials
+      summary: Tries the api as authenticated based on accessToken in headers
+      description: |
+        - Authorization header: **yes**
+        - Granted roles: 
+          - Customer
+      operationId: getAuthenticatedCustomerTry
+      responses:
+        '200':
+          description: |
+            Success:
+            - The authenticated trial Json object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticatedTryDto'
+        '400':
+          description: |
+            Bad request:
+            - Something went wrong, please try again later
+        '401':
+          description: |
+            Unauthorized:
+            - Please login and use provided tokens
+        '403':
+          description: |
+            Forbidden:
+            - User has not granted roles
+  /trials/authenticated-restaurant-admin:
+    get:
+      tags:
+        - trials
+      summary: Tries the api as authenticated based on accessToken in headers
+      description: |
+        - Authorization header: **yes**
+        - Granted roles: 
+          - RestaurantAdmin
+      operationId: getAuthenticatedRestaurantAdminTry
+      responses:
+        '200':
+          description: |
+            Success:
+            - The authenticated trial Json object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticatedTryDto'
+        '400':
+          description: |
+            Bad request:
+            - Something went wrong, please try again later
+        '401':
+          description: |
+            Unauthorized:
+            - Please login and use provided tokens
+        '403':
+          description: |
+            Forbidden:
+            - User has not granted roles
   /authentication/login:
     post:
       tags:
         - authentication
       summary: Login a user and returns access and refresh tokens as Json Web Token
+      description: |
+        - Authorization header: **no**
       operationId: login
       requestBody:
         required: true
@@ -75,11 +168,73 @@ paths:
           description: |
             Unauthorized:
             - Please login and use provided tokens
+  /authentication/refresh-tokens:
+    post:
+      tags:
+        - authentication
+      summary: Refresh user's tokens and returns access and refresh tokens as Json Web Token
+      description: |
+        - Authorization header: **no**
+      operationId: refreshTokens
+      requestBody:
+        required: true
+        description: A JSON object that contains the access and refresh tokens
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenUpdateDto'
+      responses:
+        '200':
+          description: |
+            Success:
+            - The new access and refresh tokens
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenReadDto'
+        '400':
+          description: |
+            Bad request:
+            - Something went wrong, please try again later
+            - invalid input, object invalid
+        '401':
+          description: |
+            Unauthorized:
+            - Please login and use provided tokens
+  /authentication/current-user:
+    get:
+      tags:
+        - authentication
+      summary: Gets the current user based on the access token in headers
+      description: |
+        - Authorization header: **yes**
+        - Granted roles: 
+          - All
+      operationId: getCurrentUser
+      responses:
+        '200':
+          description: |
+            Success:
+            - The current user Json object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserReadDto'
+        '400':
+          description: |
+            Bad request:
+            - Something went wrong, please try again later
+        '401':
+          description: |
+            Unauthorized:
+            - Please login and use provided tokens
   /restaurant-admins:
     post:
       tags:
         - users
       summary: Restaurant admin registration
+      description: |
+        - Authorization header: **no**
       operationId: addRestaurantAdmin
       requestBody:
         description: User to register
@@ -88,21 +243,23 @@ paths:
             schema:
               $ref: '#/components/schemas/UserCreateDto'
       responses:
-        "201":
+        '201':
           description: user created
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserReadDto'
-        "400":
+        '400':
           description: invalid input, object invalid
-        "409":
+        '409':
           description: User already exists
   /customers:
     post:
       tags:
         - users
       summary: Customer registration
+      description: |
+        - Authorization header: **no**
       operationId: addCustomer
       requestBody:
         description: User to register
@@ -111,30 +268,36 @@ paths:
             schema:
               $ref: '#/components/schemas/UserCreateDto'
       responses:
-        "201":
+        '201':
           description: user created
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserReadDto'
-        "400":
+        '400':
           description: invalid input, object invalid
-        "409":
+        '409':
           description: User already exists
 components:
   schemas:
-    AnonymousTrialDto:
+    AnonymousTryDto:
       properties:
         message:
           type: string
-          description: DiscordApi is running, you are anonymous
+          description: YLunchApi is running, you are anonymous
+    AuthenticatedTryDto:
+      properties:
+        message:
+          type: string
+          description: |
+            YLunchApi is running, you are authenticated as {CurrentUserEmail} with Id: {CurrentUserId} and Roles: {CurrentUserRoles}
     LoginRequestDto:
       type: object
       required:
-        - email
+        - userName
         - password
       properties:
-        email:
+        userName:
           type: string
           description: cannot be empty
           example: my-pseudo
@@ -144,6 +307,19 @@ components:
           example: Password1234.
     TokenReadDto:
       type: object
+      properties:
+        accessToken:
+          type: string
+          example: |
+            eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJZCI6ImFlNTcxOGJkLWY5NzktNDQ1Ni04MmRlLTBjNzgzMzk4NzYzNCIsImp0aSI6IjBjZjc3NGYwLTUxYWQtNDM4Yi1hNTZlLTI1N2VlZGRhMjQ0MCIsIm5iZiI6MTY0MTEzNzMxMCwiZXhwIjoxNjQxMTU4OTEwLCJpYXQiOjE2NDExMzczMTB9.q1VaAodjovu79AyBNbrSxu4yZ4vOlDZQF2IyDvcsbJM
+        refreshToken:
+          type: string
+          example: abcdefghij-a00000e0-aaa0-000a-0000-00e00aa00e00
+    TokenUpdateDto:
+      type: object
+      required:
+        - accessToken
+        - refreshToken
       properties:
         accessToken:
           type: string
@@ -174,7 +350,7 @@ components:
         phoneNumber:
           type: string
           format: phone
-          example: "0612345678"
+          example: '0612345678'
         password:
           type: string
           format: password
@@ -182,6 +358,9 @@ components:
     UserReadDto:
       type: object
       properties:
+        link:
+          type: string
+          example: https://my-api.com/users/a00000e0-aaa0-000a-0000-00e00aa00e00
         id:
           type: string
           example: a00000e0-aaa0-000a-0000-00e00aa00e00
@@ -198,7 +377,7 @@ components:
         phoneNumber:
           type: string
           format: phone
-          example: "0612345678"
+          example: '0612345678'
         roles:
           type: array
           example:
@@ -209,5 +388,5 @@ components:
     Bearer:
       type: http
       description: |
-        JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        JWT Authorization header using the Bearer scheme. Example: 'Authorization: Bearer {token}',
       scheme: bearer
