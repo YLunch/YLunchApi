@@ -3,6 +3,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 using YLunchApi.Authentication.Models;
+using YLunchApi.Domain.RestaurantAggregate.Dto;
 using YLunchApi.Domain.UserAggregate;
 using YLunchApi.Main.Controllers;
 using YLunchApi.TestsShared.Mocks;
@@ -28,7 +29,7 @@ public class RestaurantsControllerTest
 
         // Assert
         var responseResult = Assert.IsType<CreatedResult>(response.Result);
-        var responseBody = Assert.IsType<string>(responseResult.Value);
+        var responseBody = Assert.IsType<RestaurantReadDto>(responseResult.Value);
 
         responseBody.Should().BeEquivalentTo("works");
     }

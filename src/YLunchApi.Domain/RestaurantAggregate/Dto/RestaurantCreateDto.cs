@@ -18,9 +18,6 @@ public class RestaurantCreateDto
         ErrorMessage = "Email is invalid. Should use right format with no uppercase.")]
     public string Email { get; set; } = null!;
 
-    public string? Base64Image { get; set; }
-    public string? Base64Logo { get; set; }
-
     [Required] public bool IsOpen { get; set; }
 
     [Required] public bool IsPublic { get; set; }
@@ -36,10 +33,13 @@ public class RestaurantCreateDto
     // !address
 
     [Required]
-    public ICollection<ClosingDateCreationDto> ClosingDates { get; set; } =
-        new List<ClosingDateCreationDto>();
+    public ICollection<ClosingDateCreateDto> ClosingDates { get; set; } =
+        new List<ClosingDateCreateDto>();
 
     [Required]
-    public ICollection<DayOpeningTimesCreationDto> WeekOpeningTimes { get; set; } =
-        new List<DayOpeningTimesCreationDto>();
+    public ICollection<OpeningTimeCreateDto> WeekOpeningTimes { get; set; } =
+        new List<OpeningTimeCreateDto>();
+
+    public string? Base64Image { get; set; }
+    public string? Base64Logo { get; set; }
 }
