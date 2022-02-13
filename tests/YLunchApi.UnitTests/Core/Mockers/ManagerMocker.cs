@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using YLunchApi.Domain.UserAggregate;
+using YLunchApi.Domain.UserAggregate.Models;
 using YLunchApi.Infrastructure.Database;
 
 namespace YLunchApi.UnitTests.Core.Mockers;

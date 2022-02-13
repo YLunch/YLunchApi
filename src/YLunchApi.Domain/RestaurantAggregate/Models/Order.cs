@@ -1,9 +1,8 @@
-using System.ComponentModel.DataAnnotations;
-using YLunch.DomainShared.RestaurantAggregate.Enums;
-using YLunchApi.Domain.CommonAggregate;
-using YLunchApi.Domain.UserAggregate;
+using YLunchApi.Domain.CommonAggregate.Models;
+using YLunchApi.Domain.RestaurantAggregate.Models.Enums;
+using YLunchApi.Domain.UserAggregate.Models;
 
-namespace YLunchApi.Domain.RestaurantAggregate;
+namespace YLunchApi.Domain.RestaurantAggregate.Models;
 
 public class Order : Entity
 {

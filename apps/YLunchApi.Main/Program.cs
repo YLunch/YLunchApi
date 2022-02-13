@@ -11,7 +11,8 @@ using YLunchApi.Authentication.Models;
 using YLunchApi.Authentication.Repositories;
 using YLunchApi.Authentication.Services;
 using YLunchApi.AuthenticationShared.Repositories;
-using YLunchApi.Domain.UserAggregate;
+using YLunchApi.Domain.UserAggregate.Models;
+using YLunchApi.Domain.UserAggregate.Services;
 using YLunchApi.Infrastructure.Database;
 using YLunchApi.Infrastructure.Database.Repositories;
 

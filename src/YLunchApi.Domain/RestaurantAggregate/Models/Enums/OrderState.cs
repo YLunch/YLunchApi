@@ -1,6 +1,4 @@
-using System.Threading;
-
-namespace YLunch.DomainShared.RestaurantAggregate.Enums
+namespace YLunchApi.Domain.RestaurantAggregate.Models.Enums
 {
     // !!! IMPORTANT: Update Count of OrderStateUtils when add value !!!
     public enum OrderState

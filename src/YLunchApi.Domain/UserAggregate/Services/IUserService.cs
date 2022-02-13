@@ -1,6 +1,7 @@
 using YLunchApi.Domain.UserAggregate.Dto;
+using YLunchApi.Domain.UserAggregate.Models;
 
-namespace YLunchApi.Domain.UserAggregate;
+namespace YLunchApi.Domain.UserAggregate.Services;
 
 public interface IUserService
 {

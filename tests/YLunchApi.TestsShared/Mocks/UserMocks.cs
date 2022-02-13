@@ -1,6 +1,6 @@
 using YLunchApi.Domain.Core.Utils;
-using YLunchApi.Domain.UserAggregate;
 using YLunchApi.Domain.UserAggregate.Dto;
+using YLunchApi.Domain.UserAggregate.Models;
 
 namespace YLunchApi.TestsShared.Mocks;
 

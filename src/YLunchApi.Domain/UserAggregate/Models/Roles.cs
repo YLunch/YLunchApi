@@ -1,4 +1,4 @@
-namespace YLunchApi.Domain.UserAggregate;
+namespace YLunchApi.Domain.UserAggregate.Models;
 
 public static class Roles
 {

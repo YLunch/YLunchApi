@@ -1,6 +1,6 @@
 using YLunchApi.Domain.Core.Utils;
 
-namespace YLunchApi.Domain.CommonAggregate;
+namespace YLunchApi.Domain.CommonAggregate.Dto;
 
 public class EntityReadDto
 {

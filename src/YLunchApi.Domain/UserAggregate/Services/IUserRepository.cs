@@ -1,4 +1,6 @@
-namespace YLunchApi.Domain.UserAggregate;
+using YLunchApi.Domain.UserAggregate.Models;
+
+namespace YLunchApi.Domain.UserAggregate.Services;
 
 public interface IUserRepository
 {

@@ -2,7 +2,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 using YLunchApi.Authentication.Models;
-using YLunchApi.Domain.UserAggregate;
+using YLunchApi.Domain.UserAggregate.Models;
 using YLunchApi.Main.Controllers;
 using YLunchApi.TestsShared.Mocks;
 using YLunchApi.UnitTests.Core.Mockers;

@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
-using YLunchApi.Domain.Core.Utils;
 
-namespace YLunchApi.Domain.CommonAggregate;
+namespace YLunchApi.Domain.CommonAggregate.Models;
 
 public class Entity
 {

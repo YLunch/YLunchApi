@@ -4,8 +4,8 @@ using YLunchApi.Authentication.Models.Dto;
 using YLunchApi.Authentication.Services;
 using YLunchApi.Domain.Core.Utils;
 using YLunchApi.Domain.Exceptions;
-using YLunchApi.Domain.UserAggregate;
 using YLunchApi.Domain.UserAggregate.Dto;
+using YLunchApi.Domain.UserAggregate.Services;
 
 namespace YLunchApi.Main.Controllers;
 

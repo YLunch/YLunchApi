@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using FluentAssertions;
 using Xunit;
-using YLunchApi.Domain.UserAggregate;
+using YLunchApi.Domain.UserAggregate.Models;
 
 namespace YLunchApi.UnitTests.Domain;
 

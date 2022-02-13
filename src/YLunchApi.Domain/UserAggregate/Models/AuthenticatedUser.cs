@@ -1,8 +1,8 @@
 using YLunchApi.Domain.Core.Utils;
 
-namespace YLunchApi.Domain.UserAggregate;
+namespace YLunchApi.Domain.UserAggregate.Models;
 
-public class AuthenticatedUser : User
+public sealed class AuthenticatedUser : User
 {
     public AuthenticatedUser(User user, List<string> roles)
     {

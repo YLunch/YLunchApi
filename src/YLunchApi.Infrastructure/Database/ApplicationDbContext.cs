@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using YLunchApi.Authentication.Models;
-using YLunchApi.Domain.RestaurantAggregate;
-using YLunchApi.Domain.UserAggregate;
+using YLunchApi.Domain.RestaurantAggregate.Models;
+using YLunchApi.Domain.UserAggregate.Models;
 
 namespace YLunchApi.Infrastructure.Database;
 

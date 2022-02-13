@@ -1,4 +1,4 @@
-namespace YLunchApi.Domain.RestaurantAggregate.Enums
+namespace YLunchApi.Domain.RestaurantAggregate.Models.Enums
 {
     // IMPORTANT: Update Count of ProductFamiliesUtils when add value !!!
     public enum ProductType

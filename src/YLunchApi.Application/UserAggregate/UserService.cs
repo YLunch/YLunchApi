@@ -1,6 +1,7 @@
 using YLunchApi.Domain.Exceptions;
-using YLunchApi.Domain.UserAggregate;
 using YLunchApi.Domain.UserAggregate.Dto;
+using YLunchApi.Domain.UserAggregate.Models;
+using YLunchApi.Domain.UserAggregate.Services;
 
 namespace YLunchApi.Application.UserAggregate;
 

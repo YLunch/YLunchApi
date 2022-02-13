@@ -1,4 +1,4 @@
-using YLunchApi.Domain.CommonAggregate;
+using YLunchApi.Domain.CommonAggregate.Dto;
 
 namespace YLunchApi.Domain.RestaurantAggregate.Dto;
 

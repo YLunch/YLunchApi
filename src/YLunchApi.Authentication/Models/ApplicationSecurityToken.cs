@@ -1,5 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
-using YLunchApi.Domain.UserAggregate;
+using YLunchApi.Domain.UserAggregate.Models;
 
 namespace YLunchApi.Authentication.Models;
 

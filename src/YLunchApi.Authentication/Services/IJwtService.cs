@@ -1,5 +1,5 @@
 using YLunchApi.Authentication.Models.Dto;
-using YLunchApi.Domain.UserAggregate;
+using YLunchApi.Domain.UserAggregate.Models;
 
 namespace YLunchApi.Authentication.Services;
 

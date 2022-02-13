@@ -1,4 +1,5 @@
-using YLunchApi.Domain.CommonAggregate;
+using YLunchApi.Domain.CommonAggregate.Dto;
+using YLunchApi.Domain.UserAggregate.Models;
 
 namespace YLunchApi.Domain.UserAggregate.Dto;
 

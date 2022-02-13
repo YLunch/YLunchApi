@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using FluentAssertions;
 using Xunit;
 using YLunchApi.Authentication.Models;
-using YLunchApi.Domain.UserAggregate;
+using YLunchApi.Domain.UserAggregate.Models;
 using YLunchApi.TestsShared.Mocks;
 
 namespace YLunchApi.UnitTests.Domain;
