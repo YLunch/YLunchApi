@@ -7,6 +7,8 @@ using YLunchApi.Domain.UserAggregate.Models;
 
 namespace YLunchApi.Main.Controllers;
 
+[ApiController]
+[Route("[Controller]")]
 public class RestaurantsController : ApplicationControllerBase
 {
     private readonly IRestaurantService _restaurantService;
@@ -24,7 +26,7 @@ public class RestaurantsController : ApplicationControllerBase
     {
         try
         {
-            RestaurantReadDto restaurantReadDto = await _restaurantService.Create(restaurantCreateDto, CurrentUserId!);
+            var restaurantReadDto = await _restaurantService.Create(restaurantCreateDto, CurrentUserId!);
             return Created("", restaurantReadDto);
         }
         catch (EntityAlreadyExistsException)

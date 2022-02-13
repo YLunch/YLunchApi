@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using YLunchApi.Domain.Exceptions;
 using YLunchApi.Domain.RestaurantAggregate.Models;
 using YLunchApi.Domain.RestaurantAggregate.Services;
@@ -21,12 +22,11 @@ public class RestaurantRepository : IRestaurantRepository
 
     public async Task<Restaurant> GetById(string id)
     {
-        var restaurant = await _context.Restaurants.FindAsync(id);
-        if (restaurant == null)
-        {
-            throw new EntityNotFoundException($"Restaurant {id} not found");
-        }
-
+        var restaurant = await _context.Restaurants
+                                       .Include(x => x.ClosingDates)
+                                       .FirstOrDefaultAsync(x => x.Id.Equals(id));
+        if (restaurant == null) throw new EntityNotFoundException($"Restaurant {id} not found");
+        var closingDates = restaurant.ClosingDates;
         return restaurant;
     }
 }

@@ -23,6 +23,12 @@ public class RestaurantService : IRestaurantService
         restaurant.Id = restaurantId;
         restaurant.AdminId = restaurantAdminId;
         restaurant.CreationDateTime = creationDateTime;
+        restaurant.ClosingDates = restaurantCreateDto.ClosingDates.Select(x =>
+        {
+            var closingDate = x.Adapt<ClosingDate>();
+            closingDate.Restaurants.Add(restaurant);
+            return closingDate;
+        }).ToList();
 
         await _restaurantRepository.Create(restaurant);
         var restaurantDb = await _restaurantRepository.GetById(restaurantId);
