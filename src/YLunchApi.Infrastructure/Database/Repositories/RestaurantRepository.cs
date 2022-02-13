@@ -26,7 +26,6 @@ public class RestaurantRepository : IRestaurantRepository
                                        .Include(x => x.ClosingDates)
                                        .FirstOrDefaultAsync(x => x.Id.Equals(id));
         if (restaurant == null) throw new EntityNotFoundException($"Restaurant {id} not found");
-        var closingDates = restaurant.ClosingDates;
         return restaurant;
     }
 }

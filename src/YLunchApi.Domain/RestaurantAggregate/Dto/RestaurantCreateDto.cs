@@ -32,13 +32,9 @@ public class RestaurantCreateDto
     public string AddressExtraInformation { get; set; } = "";
     // !address
 
-    [Required]
-    public ICollection<ClosingDateCreateDto> ClosingDates { get; set; } =
-        new List<ClosingDateCreateDto>();
+    [Required] public ICollection<ClosingDateCreateDto> ClosingDates { get; set; } = null!;
 
-    [Required]
-    public ICollection<OpeningTimeCreateDto> OpeningTimes { get; set; } =
-        new List<OpeningTimeCreateDto>();
+    [Required] public ICollection<OpeningTimeCreateDto> OpeningTimes { get; set; } = null!;
 
     public string? Base64Image { get; set; }
     public string? Base64Logo { get; set; }

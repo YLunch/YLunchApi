@@ -1,5 +1,3 @@
-using YLunchApi.Domain.Core.Utils;
-
 namespace YLunchApi.Domain.CommonAggregate.Dto;
 
 public abstract class EntityReadDto

@@ -1,4 +1,3 @@
-using Mapster;
 using YLunchApi.Domain.RestaurantAggregate.Dto;
 
 namespace YLunchApi.TestsShared.Mocks;
@@ -18,15 +17,4 @@ public static class RestaurantMocks
         ZipCode = "06560",
         StreetNumber = "1"
     };
-
-    public static RestaurantReadDto RestaurantReadDto(string id)
-    {
-        var restaurantReadDto = RestaurantCreateDto.Adapt<RestaurantReadDto>();
-        restaurantReadDto.Id = id;
-        restaurantReadDto.IsCurrentlyOpenToOrder = restaurantReadDto.IsOpen &&
-                                                   // Todo set also based on order limit time
-                                                   !restaurantReadDto.ClosingDates.Any(x =>
-                                                       x.ClosingDateTime.Date.Equals(DateTime.UtcNow.Date));
-        return restaurantReadDto;
-    }
 }

@@ -1,7 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using YLunchApi.Domain.CommonAggregate.Models;
 
 namespace YLunchApi.Domain.RestaurantAggregate.Models;
 
+// Todo remove coverage exclusion
+[ExcludeFromCodeCoverage]
 public class OrderedProduct : Entity
 {
     public string ProductId { get; set; } = null!;

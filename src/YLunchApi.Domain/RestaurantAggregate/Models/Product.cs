@@ -1,8 +1,11 @@
+using System.Diagnostics.CodeAnalysis;
 using YLunchApi.Domain.CommonAggregate.Models;
 using YLunchApi.Domain.RestaurantAggregate.Models.Enums;
 
 namespace YLunchApi.Domain.RestaurantAggregate.Models;
 
+// Todo remove coverage exclusion
+[ExcludeFromCodeCoverage]
 public class Product : Entity
 {
     public string RestaurantId { get; set; } = null!;

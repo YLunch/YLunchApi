@@ -1,9 +1,12 @@
+using System.Diagnostics.CodeAnalysis;
 using YLunchApi.Domain.CommonAggregate.Models;
 using YLunchApi.Domain.RestaurantAggregate.Models.Enums;
 using YLunchApi.Domain.UserAggregate.Models;
 
 namespace YLunchApi.Domain.RestaurantAggregate.Models;
 
+// Todo remove coverage exclusion
+[ExcludeFromCodeCoverage]
 public class Order : Entity
 {
     public string UserId { get; set; } = null!;

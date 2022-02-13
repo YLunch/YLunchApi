@@ -10,7 +10,7 @@ namespace YLunchApi.Domain.RestaurantAggregate.Dto
 
         [Required] public int StartTimeInMinutes { get; set; }
         [Required] public int EndTimeInMinutes { get; set; }
-        [Required] public int? StartOrderTimeInMinutes { get; set; }
-        [Required] public int? EndOrderTimeInMinutes { get; set; }
+        public int? StartOrderTimeInMinutes { get; set; }
+        public int? EndOrderTimeInMinutes { get; set; }
     }
 }

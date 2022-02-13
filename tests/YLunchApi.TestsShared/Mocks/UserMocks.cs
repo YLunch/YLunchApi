@@ -1,4 +1,3 @@
-using YLunchApi.Domain.Core.Utils;
 using YLunchApi.Domain.UserAggregate.Dto;
 using YLunchApi.Domain.UserAggregate.Models;
 
