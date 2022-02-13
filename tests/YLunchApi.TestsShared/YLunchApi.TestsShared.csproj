@@ -10,4 +10,8 @@
         <ProjectReference Include="..\..\src\YLunchApi.Authentication\YLunchApi.Authentication.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Mapster" Version="7.2.0" />
+    </ItemGroup>
+
 </Project>

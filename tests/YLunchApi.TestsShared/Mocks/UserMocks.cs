@@ -34,7 +34,6 @@ public static class UserMocks
             Firstname = CustomerCreateDto.Firstname,
             Lastname = CustomerCreateDto.Lastname,
             Roles = new List<string> { Roles.Customer },
-            Link = $"{EnvironmentUtils.BaseUrl}/Users/{id}"
         };
     }
 
@@ -48,7 +47,6 @@ public static class UserMocks
             Firstname = RestaurantAdminCreateDto.Firstname,
             Lastname = RestaurantAdminCreateDto.Lastname,
             Roles = new List<string> { Roles.RestaurantAdmin },
-            Link = $"{EnvironmentUtils.BaseUrl}/Users/{id}"
         };
     }
 }

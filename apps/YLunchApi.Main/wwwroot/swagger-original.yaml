@@ -384,9 +384,6 @@ components:
     UserReadDto:
       type: object
       properties:
-        link:
-          type: string
-          example: https://my-api.com/users/a00000e0-aaa0-000a-0000-00e00aa00e00
         id:
           type: string
           example: a00000e0-aaa0-000a-0000-00e00aa00e00

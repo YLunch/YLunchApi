@@ -11,14 +11,13 @@ public class UserReadDto : EntityReadDto
     public string Lastname { get; set; } = null!;
     public List<string> Roles { get; set; } = null!;
 
-    private const string ResourcesName = $"{nameof(User)}s";
-
     public UserReadDto()
     {
     }
 
-    public UserReadDto(User user, List<string> roles) : base(user.Id, ResourcesName)
+    public UserReadDto(User user, List<string> roles)
     {
+        Id = user.Id;
         Email = user.Email;
         PhoneNumber = user.PhoneNumber;
         Firstname = user.Firstname;

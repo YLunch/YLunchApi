@@ -18,7 +18,7 @@ namespace YLunchApi.Domain.RestaurantAggregate.Models
         public bool IsCurrentlyOpenToOrder =>
             IsOpen &&
             // Todo set also based on order limit time
-            !ClosingDates.Any(x => x.ClosingDateTime.Date.Equals(DateTime.Now.Date));
+            !ClosingDates.Any(x => x.ClosingDateTime.Date.Equals(DateTime.UtcNow.Date));
 
         public bool IsPublic { get; set; }
         public bool IsPublished { get; set; }
