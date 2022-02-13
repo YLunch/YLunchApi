@@ -23,8 +23,10 @@ public class JwtService : IJwtService
     private readonly JwtSecurityTokenHandler _jwtSecurityTokenHandler;
 
     public JwtService(IRefreshTokenRepository refreshTokenRepository,
-        IOptionsMonitor<JwtConfig> jwtConfig, TokenValidationParameters tokenValidationParameters,
-        IUserRepository userRepository, JwtSecurityTokenHandler jwtSecurityTokenHandler)
+                      IOptionsMonitor<JwtConfig> jwtConfig,
+                      TokenValidationParameters tokenValidationParameters,
+                      IUserRepository userRepository,
+                      JwtSecurityTokenHandler jwtSecurityTokenHandler)
     {
         _refreshTokenRepository = refreshTokenRepository;
         _tokenValidationParameters = tokenValidationParameters;

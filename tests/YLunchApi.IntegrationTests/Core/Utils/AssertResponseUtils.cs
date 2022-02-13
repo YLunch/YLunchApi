@@ -14,6 +14,6 @@ public static class AssertResponseUtils
 
         // Assert
         content.Should()
-            .Contain("Please login and use provided tokens");
+               .Contain("Please login and use provided tokens");
     }
 }

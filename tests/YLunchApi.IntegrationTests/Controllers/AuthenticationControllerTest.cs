@@ -38,9 +38,9 @@ public class AuthenticationControllerTest : ControllerTestBase
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         var content = await ResponseUtils.DeserializeContentAsync(response);
         content.Should()
-            .Contain("The Email field is required.")
-            .And
-            .Contain("The Password field is required.");
+               .Contain("The Email field is required.")
+               .And
+               .Contain("The Password field is required.");
     }
 
     [Fact]
@@ -60,7 +60,7 @@ public class AuthenticationControllerTest : ControllerTestBase
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         var content = await ResponseUtils.DeserializeContentAsync(response);
         content.Should()
-            .Contain("Email is invalid.");
+               .Contain("Email is invalid.");
     }
 
     [Fact]
@@ -102,9 +102,9 @@ public class AuthenticationControllerTest : ControllerTestBase
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         var content = await ResponseUtils.DeserializeContentAsync(response);
         content.Should()
-            .Contain("The AccessToken field is required.")
-            .And
-            .Contain("The RefreshToken field is required.");
+               .Contain("The AccessToken field is required.")
+               .And
+               .Contain("The RefreshToken field is required.");
     }
 
     [Fact]

@@ -13,7 +13,8 @@ public class RestaurantsControllerTest
 {
     private RestaurantsController CreateController()
     {
-        return new RestaurantsController(HttpContextAccessorMocker.GetWithAuthorization(TokenMocks.ValidRestaurantAdminAccessToken));
+        return new RestaurantsController(
+            HttpContextAccessorMocker.GetWithAuthorization(TokenMocks.ValidRestaurantAdminAccessToken));
     }
 
     [Fact]

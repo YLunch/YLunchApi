@@ -35,8 +35,8 @@ builder.Services.AddSwaggerGen();
 
 // For Identity
 builder.Services.AddIdentity<User, IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();
+       .AddEntityFrameworkStores<ApplicationDbContext>()
+       .AddDefaultTokenProviders();
 
 // For Jwt
 var jwtSecret = builder.Configuration["JwtSecret"];
@@ -57,30 +57,31 @@ var tokenValidationParameters = new TokenValidationParameters
 builder.Services.AddSingleton(tokenValidationParameters);
 builder.Services.Configure<JwtConfig>(jwtConfig => jwtConfig.Secret = jwtSecret);
 builder.Services.AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(options =>
-    {
-        options.SaveToken = true;
-        options.TokenValidationParameters = tokenValidationParameters;
-        options.Events = new JwtBearerEvents
-        {
-            OnChallenge = context =>
-            {
-                context.Response.OnStarting(async () =>
-                {
-                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    context.Response.ContentType = "application/json";
-                    await context.Response.WriteAsJsonAsync(new { Message = "Please login and use provided tokens" });
-                });
+       {
+           options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+           options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+           options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+       })
+       .AddJwtBearer(options =>
+       {
+           options.SaveToken = true;
+           options.TokenValidationParameters = tokenValidationParameters;
+           options.Events = new JwtBearerEvents
+           {
+               OnChallenge = context =>
+               {
+                   context.Response.OnStarting(async () =>
+                   {
+                       context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                       context.Response.ContentType = "application/json";
+                       await context.Response.WriteAsJsonAsync(new
+                           { Message = "Please login and use provided tokens" });
+                   });
 
-                return Task.CompletedTask;
-            }
-        };
-    });
+                   return Task.CompletedTask;
+               }
+           };
+       });
 
 // For Entity Framework
 var database = builder.Configuration["DbName"];
@@ -145,7 +146,7 @@ else
         {
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
             context.Response.ContentType = "application/json";
-            await context.Response.WriteAsJsonAsync(new { Message = "Something went wrong, try again later"});
+            await context.Response.WriteAsJsonAsync(new { Message = "Something went wrong, try again later" });
         });
     });
 }

@@ -38,8 +38,8 @@ public class TrialsControllerTest : ControllerTestBase
 
         // Assert
         authenticatedTrialResponseContent.Should()
-            .BeEquivalentTo(
-                $"YLunchApi is running, you are authenticated as {authenticatedUserInfo.UserEmail} with Id: {authenticatedUserInfo.UserId} and Roles: {Roles.ListToString(authenticatedUserInfo.UserRoles)}");
+                                         .BeEquivalentTo(
+                                             $"YLunchApi is running, you are authenticated as {authenticatedUserInfo.UserEmail} with Id: {authenticatedUserInfo.UserId} and Roles: {Roles.ListToString(authenticatedUserInfo.UserRoles)}");
 
         var refreshTokensBody = new
         {
@@ -57,8 +57,8 @@ public class TrialsControllerTest : ControllerTestBase
         var authenticatedTrialWithExpiredTokensResponseContent =
             await ResponseUtils.DeserializeContentAsync(authenticatedTrialRefreshedTokensResponse);
         authenticatedTrialWithExpiredTokensResponseContent.Should()
-            .BeEquivalentTo(
-                $"YLunchApi is running, you are authenticated as {authenticatedUserInfo.UserEmail} with Id: {authenticatedUserInfo.UserId} and Roles: {Roles.ListToString(authenticatedUserInfo.UserRoles)}");
+                                                          .BeEquivalentTo(
+                                                              $"YLunchApi is running, you are authenticated as {authenticatedUserInfo.UserEmail} with Id: {authenticatedUserInfo.UserId} and Roles: {Roles.ListToString(authenticatedUserInfo.UserRoles)}");
     }
 
     [Fact]
@@ -75,8 +75,8 @@ public class TrialsControllerTest : ControllerTestBase
 
         // Assert
         authenticatedTrialResponseContent.Should()
-            .BeEquivalentTo(
-                $"YLunchApi is running, you are authenticated as {authenticatedUserInfo.UserEmail} with Id: {authenticatedUserInfo.UserId} and Roles: {Roles.ListToString(authenticatedUserInfo.UserRoles)}");
+                                         .BeEquivalentTo(
+                                             $"YLunchApi is running, you are authenticated as {authenticatedUserInfo.UserEmail} with Id: {authenticatedUserInfo.UserId} and Roles: {Roles.ListToString(authenticatedUserInfo.UserRoles)}");
 
         var refreshTokensBody = new
         {
@@ -94,8 +94,8 @@ public class TrialsControllerTest : ControllerTestBase
         var authenticatedTrialWithExpiredTokensResponseContent =
             await ResponseUtils.DeserializeContentAsync(authenticatedTrialRefreshedTokensResponse);
         authenticatedTrialWithExpiredTokensResponseContent.Should()
-            .BeEquivalentTo(
-                $"YLunchApi is running, you are authenticated as {authenticatedUserInfo.UserEmail} with Id: {authenticatedUserInfo.UserId} and Roles: {Roles.ListToString(authenticatedUserInfo.UserRoles)}");
+                                                          .BeEquivalentTo(
+                                                              $"YLunchApi is running, you are authenticated as {authenticatedUserInfo.UserEmail} with Id: {authenticatedUserInfo.UserId} and Roles: {Roles.ListToString(authenticatedUserInfo.UserRoles)}");
     }
 
     [Fact]

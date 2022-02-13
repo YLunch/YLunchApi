@@ -125,8 +125,8 @@ public class UsersControllerTest : ControllerTestBase
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         var content = await ResponseUtils.DeserializeContentAsync(response);
         content.Should()
-            .Contain(
-                "Password is not allowed. Must contain at least 8 characters, 1 lowercase letter, 1 uppercase letter, 1 special character and 1 number.");
+               .Contain(
+                   "Password is not allowed. Must contain at least 8 characters, 1 lowercase letter, 1 uppercase letter, 1 special character and 1 number.");
     }
 
     [Theory]
@@ -160,7 +160,8 @@ public class UsersControllerTest : ControllerTestBase
     [InlineData("Je-A", "Du-P")]
     [InlineData("Je-A", "Du P")]
     public async Task Post_RestaurantAdmin_Should_Return_A_400BadRequest_When_Firstname_Or_Lastname_Is_Invalid(
-        string firstname, string lastname
+        string firstname,
+        string lastname
     )
     {
         // Arrange
@@ -177,9 +178,9 @@ public class UsersControllerTest : ControllerTestBase
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         var content = await ResponseUtils.DeserializeContentAsync(response);
         content.Should()
-            .Contain("Firstname is not allowed")
-            .And
-            .Contain("Lastname is not allowed");
+               .Contain("Firstname is not allowed")
+               .And
+               .Contain("Lastname is not allowed");
     }
 
     [Fact]
@@ -290,8 +291,8 @@ public class UsersControllerTest : ControllerTestBase
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         var content = await ResponseUtils.DeserializeContentAsync(response);
         content.Should()
-            .Contain(
-                "Password is not allowed. Must contain at least 8 characters, 1 lowercase letter, 1 uppercase letter, 1 special character and 1 number.");
+               .Contain(
+                   "Password is not allowed. Must contain at least 8 characters, 1 lowercase letter, 1 uppercase letter, 1 special character and 1 number.");
     }
 
     [Theory]
@@ -325,7 +326,8 @@ public class UsersControllerTest : ControllerTestBase
     [InlineData("Je-A", "Du-P")]
     [InlineData("Je-A", "Du P")]
     public async Task Post_Customer_Should_Return_A_400BadRequest_When_Firstname_Or_Lastname_Is_Invalid(
-        string firstname, string lastname
+        string firstname,
+        string lastname
     )
     {
         // Arrange
@@ -342,8 +344,8 @@ public class UsersControllerTest : ControllerTestBase
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         var content = await ResponseUtils.DeserializeContentAsync(response);
         content.Should()
-            .Contain("Firstname is not allowed")
-            .And
-            .Contain("Lastname is not allowed");
+               .Contain("Firstname is not allowed")
+               .And
+               .Contain("Lastname is not allowed");
     }
 }

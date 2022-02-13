@@ -66,12 +66,11 @@ public class JwtServiceTest
         _refreshTokenRepositoryMock = new Mock<RefreshTokenRepository>(_context).As<IRefreshTokenRepository>();
 
         _refreshTokenRepositoryMock.Setup(x => x.GetByToken(It.IsAny<string>()))
-            .Returns<string>(async refreshTokenString =>
-                {
-                    return await _context.RefreshTokens
-                        .FirstOrDefaultAsync(x => x.Token.Equals(refreshTokenString));
-                }
-            );
+                                   .Returns<string>(async refreshTokenString =>
+                                       await _context.RefreshTokens
+                                                     .FirstOrDefaultAsync(x =>
+                                                         x.Token.Equals(refreshTokenString))
+                                   );
     }
 
     private IJwtService CreateJwtService(Mock<JwtSecurityTokenHandler>? jwtSecurityTokenHandlerMock = null)
@@ -173,7 +172,7 @@ public class JwtServiceTest
         refreshToken.ExpirationDateTime = refreshToken.ExpirationDateTime.AddMonths(-1);
         await _context.RefreshTokens.AddAsync(refreshToken);
         _refreshTokenRepositoryMock.Setup(x => x.GetByToken(It.IsAny<string>()))
-            .ReturnsAsync(() => refreshToken);
+                                   .ReturnsAsync(() => refreshToken);
         var refreshTokensRequest = new TokenUpdateDto
         {
             AccessToken = TokenMocks.ExpiredAccessToken,
@@ -196,7 +195,7 @@ public class JwtServiceTest
         refreshToken.IsUsed = true;
         await _context.AddAsync(refreshToken);
         _refreshTokenRepositoryMock.Setup(x => x.GetByToken(It.IsAny<string>()))
-            .ReturnsAsync(() => refreshToken);
+                                   .ReturnsAsync(() => refreshToken);
         var refreshTokensRequest = new TokenUpdateDto
         {
             AccessToken = TokenMocks.ExpiredAccessToken,
@@ -218,7 +217,7 @@ public class JwtServiceTest
         refreshToken.IsRevoked = true;
         await _context.AddAsync(refreshToken);
         _refreshTokenRepositoryMock.Setup(x => x.GetByToken(It.IsAny<string>()))
-            .ReturnsAsync(() => refreshToken);
+                                   .ReturnsAsync(() => refreshToken);
         var refreshTokensRequest = new TokenUpdateDto
         {
             AccessToken = TokenMocks.ExpiredAccessToken,
@@ -240,7 +239,7 @@ public class JwtServiceTest
         refreshToken.JwtId = "badId";
         await _context.AddAsync(refreshToken);
         _refreshTokenRepositoryMock.Setup(x => x.GetByToken(It.IsAny<string>()))
-            .ReturnsAsync(() => refreshToken);
+                                   .ReturnsAsync(() => refreshToken);
         var refreshTokensRequest = new TokenUpdateDto
         {
             AccessToken = TokenMocks.ExpiredAccessToken,

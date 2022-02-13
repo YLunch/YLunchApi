@@ -26,8 +26,8 @@ public class Order : Entity
         new List<OrderStatus>();
 
     public OrderStatus CurrentOrderStatus => OrderStatuses
-        .OrderBy(x => x.DateTime)
-        .Last();
+                                             .OrderBy(x => x.DateTime)
+                                             .Last();
 
     public bool IsAcknowledged =>
         OrderStatuses.Any(os => os.State.Equals(OrderState.Acknowledged));
