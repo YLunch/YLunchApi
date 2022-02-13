@@ -1,8 +1,9 @@
+using System.ComponentModel.DataAnnotations;
 using YLunchApi.Domain.CommonAggregate;
 
-namespace YLunchApi.Domain.RestaurantAggregate.Dto;
+namespace YLunchApi.Domain.RestaurantAggregate;
 
-public class OpeningTimeReadDto : EntityReadDto
+public class OpeningTime : Entity
 {
     public DayOfWeek DayOfWeek { get; set; }
     public int StartTimeInMinutes { get; set; }

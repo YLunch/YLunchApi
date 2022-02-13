@@ -28,7 +28,7 @@ public class RestaurantReadDto : EntityReadDto
     // !address
 
     public ICollection<ClosingDateReadDto> ClosingDates { get; set; } = new List<ClosingDateReadDto>();
-    public ICollection<OpeningTimeReadDto> WeekOpeningTimes { get; set; } = new List<OpeningTimeReadDto>();
+    public ICollection<OpeningTimeReadDto> OpeningTimes { get; set; } = new List<OpeningTimeReadDto>();
 
     public string? Base64Image { get; set; }
     public string? Base64Logo { get; set; }

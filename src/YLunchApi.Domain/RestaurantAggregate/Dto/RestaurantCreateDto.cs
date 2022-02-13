@@ -37,7 +37,7 @@ public class RestaurantCreateDto
         new List<ClosingDateCreateDto>();
 
     [Required]
-    public ICollection<OpeningTimeCreateDto> WeekOpeningTimes { get; set; } =
+    public ICollection<OpeningTimeCreateDto> OpeningTimes { get; set; } =
         new List<OpeningTimeCreateDto>();
 
     public string? Base64Image { get; set; }
