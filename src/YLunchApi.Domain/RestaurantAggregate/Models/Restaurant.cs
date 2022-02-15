@@ -17,8 +17,14 @@ public class Restaurant : Entity
 
     public bool IsCurrentlyOpenToOrder =>
         IsOpen &&
-        // Todo set also based on order limit time
-        !ClosingDates.Any(x => x.ClosingDateTime.Date.Equals(DateTime.UtcNow.Date));
+        !ClosingDates.Any(x => x.ClosingDateTime.Date.Equals(DateTime.UtcNow.Date)) &&
+        OpeningTimes.Any(x =>
+        {
+            var now = DateTime.UtcNow;
+            return x.DayOfWeek == now.DayOfWeek &&
+                   x.StartOrderTimeInMinutes < now.Hour * 60 + now.Minute &&
+                   x.EndOrderTimeInMinutes > now.Hour * 60 + now.Minute;
+        });
 
     public bool IsPublic { get; set; }
     public DateTime CreationDateTime { get; set; }
@@ -40,22 +46,27 @@ public class Restaurant : Entity
     public virtual ICollection<ClosingDate> ClosingDates { get; set; } = new List<ClosingDate>();
     public virtual ICollection<OpeningTime> OpeningTimes { get; set; } = new List<OpeningTime>();
     public virtual ICollection<Product> Products { get; set; } = new List<Product>();
-    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 
-    public static bool CanPublish(Restaurant restaurant) => //NOSONAR
-        restaurant.IsPublic && //NOSONAR
-        !string.IsNullOrEmpty(restaurant.Name) && //NOSONAR
-        !string.IsNullOrEmpty(restaurant.PhoneNumber) && //NOSONAR
-        !string.IsNullOrEmpty(restaurant.Email) && //NOSONAR
-        !string.IsNullOrEmpty(restaurant.ZipCode) && //NOSONAR
-        !string.IsNullOrEmpty(restaurant.Country) && //NOSONAR
-        !string.IsNullOrEmpty(restaurant.City) && //NOSONAR
-        !string.IsNullOrEmpty(restaurant.StreetNumber) && //NOSONAR
-        !string.IsNullOrEmpty(restaurant.StreetName) && //NOSONAR
-        !string.IsNullOrEmpty(restaurant.AdminId) && //NOSONAR
-        restaurant.OpeningTimes.Count > 0; //NOSONAR
+    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
     // Todo uncomment when create product is implemented
     // && Products.Any(x => x.IsActive); //NOSONAR
 
     public bool IsPublished { get; set; }
+
+    public static bool CanPublish(Restaurant restaurant)
+    {
+        //NOSONAR
+        return restaurant.IsPublic && //NOSONAR
+               !string.IsNullOrEmpty(restaurant.Name) && //NOSONAR
+               !string.IsNullOrEmpty(restaurant.PhoneNumber) && //NOSONAR
+               !string.IsNullOrEmpty(restaurant.Email) && //NOSONAR
+               !string.IsNullOrEmpty(restaurant.ZipCode) && //NOSONAR
+               !string.IsNullOrEmpty(restaurant.Country) && //NOSONAR
+               !string.IsNullOrEmpty(restaurant.City) && //NOSONAR
+               !string.IsNullOrEmpty(restaurant.StreetNumber) && //NOSONAR
+               !string.IsNullOrEmpty(restaurant.StreetName) && //NOSONAR
+               !string.IsNullOrEmpty(restaurant.AdminId) && //NOSONAR
+               restaurant.OpeningTimes.Count > 0;
+        //NOSONAR
+    }
 }

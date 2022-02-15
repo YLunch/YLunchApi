@@ -79,5 +79,166 @@ public class RestaurantsControllerTest
         responseBody.IsCurrentlyOpenToOrder.Should().Be(true);
     }
 
-    // Todo test IsPublished, IsCurrentlyOpenToOrder
+    [Fact]
+    public async Task CreateRestaurant_Should_Return_A_409Conflict()
+    {
+        // Arrange
+        var controller = CreateController();
+        var restaurantCreateDto = RestaurantMocks.RestaurantCreateDto;
+
+        // Act
+        _ = await controller.CreateRestaurant(restaurantCreateDto);
+        var response = await controller.CreateRestaurant(restaurantCreateDto);
+
+        // Assert
+        var responseResult = Assert.IsType<ConflictObjectResult>(response.Result);
+        var responseBody = Assert.IsType<string>(responseResult.Value);
+        responseBody.Should().Be("Restaurant already exists");
+    }
+
+    [Fact]
+    public async Task GetRestaurantById_Should_Return_A_200Ok()
+    {
+        // Arrange
+        var controller = CreateController();
+        var restaurantCreateDto = RestaurantMocks.RestaurantCreateDto;
+        restaurantCreateDto.OpeningTimes = new List<OpeningTimeCreateDto>
+        {
+            new()
+            {
+                DayOfWeek = DateTime.UtcNow.DayOfWeek,
+                StartTimeInMinutes = 0,
+                EndTimeInMinutes = 1440,
+                StartOrderTimeInMinutes = 0,
+                EndOrderTimeInMinutes = 1440
+            }
+        };
+        var restaurantCreationResponse = await controller.CreateRestaurant(restaurantCreateDto);
+        var restaurantCreationResponseResult = Assert.IsType<CreatedResult>(restaurantCreationResponse.Result);
+        var restaurantCreationResponseBody = Assert.IsType<RestaurantReadDto>(restaurantCreationResponseResult.Value);
+        var restaurantId = restaurantCreationResponseBody.Id;
+
+        // Act
+        var response = await controller.GetRestaurantById(restaurantId);
+
+        // Assert
+        var responseResult = Assert.IsType<OkObjectResult>(response.Result);
+        var responseBody = Assert.IsType<RestaurantReadDto>(responseResult.Value);
+
+        responseBody.Id.Should().MatchRegex(GuidUtils.Regex);
+        responseBody.AdminId.Should().Be(_restaurantAdminInfo.UserId);
+        responseBody.Email.Should().Be(restaurantCreateDto.Email);
+        responseBody.PhoneNumber.Should().Be(restaurantCreateDto.PhoneNumber);
+        responseBody.CreationDateTime.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
+        responseBody.Name.Should().Be(restaurantCreateDto.Name);
+        responseBody.City.Should().Be(restaurantCreateDto.City);
+        responseBody.Country.Should().Be(restaurantCreateDto.Country);
+        responseBody.StreetName.Should().Be(restaurantCreateDto.StreetName);
+        responseBody.ZipCode.Should().Be(restaurantCreateDto.ZipCode);
+        responseBody.StreetNumber.Should().Be(restaurantCreateDto.StreetNumber);
+        responseBody.IsOpen.Should().Be(restaurantCreateDto.IsOpen);
+        responseBody.IsPublic.Should().Be(restaurantCreateDto.IsPublic);
+        responseBody.ClosingDates.Should().BeEquivalentTo(restaurantCreateDto.ClosingDates);
+        responseBody.OpeningTimes.Should().BeEquivalentTo(restaurantCreateDto.OpeningTimes);
+        responseBody.IsCurrentlyOpenToOrder.Should().Be(true);
+    }
+
+    [Fact]
+    public async Task
+        GetRestaurantById_Should_Return_A_200Ok_Having_IsCurrentlyOpenToOrder_False_Because_Of_ClosingDates()
+    {
+        // Arrange
+        var controller = CreateController();
+        var restaurantCreateDto = RestaurantMocks.RestaurantCreateDto;
+        restaurantCreateDto.ClosingDates = new List<ClosingDateCreateDto>
+        {
+            new() { ClosingDateTime = DateTime.UtcNow }
+        };
+        var restaurantCreationResponse = await controller.CreateRestaurant(restaurantCreateDto);
+        var restaurantCreationResponseResult = Assert.IsType<CreatedResult>(restaurantCreationResponse.Result);
+        var restaurantCreationResponseBody = Assert.IsType<RestaurantReadDto>(restaurantCreationResponseResult.Value);
+        var restaurantId = restaurantCreationResponseBody.Id;
+
+        // Act
+        var response = await controller.GetRestaurantById(restaurantId);
+
+        // Assert
+        var responseResult = Assert.IsType<OkObjectResult>(response.Result);
+        var responseBody = Assert.IsType<RestaurantReadDto>(responseResult.Value);
+
+        responseBody.IsCurrentlyOpenToOrder.Should().Be(false);
+    }
+
+    [Fact]
+    public async Task
+        GetRestaurantById_Should_Return_A_200Ok_Having_IsCurrentlyOpenToOrder_False_Because_Of_OpeningTimes_To_Order()
+    {
+        // Arrange
+        var controller = CreateController();
+        var restaurantCreateDto = RestaurantMocks.RestaurantCreateDto;
+        restaurantCreateDto.OpeningTimes = new List<OpeningTimeCreateDto>
+        {
+            new()
+            {
+                DayOfWeek = DateTime.UtcNow.DayOfWeek,
+                StartTimeInMinutes = 0,
+                EndTimeInMinutes = 1440,
+                StartOrderTimeInMinutes = 0,
+                EndOrderTimeInMinutes = 0
+            }
+        };
+        var restaurantCreationResponse = await controller.CreateRestaurant(restaurantCreateDto);
+        var restaurantCreationResponseResult = Assert.IsType<CreatedResult>(restaurantCreationResponse.Result);
+        var restaurantCreationResponseBody = Assert.IsType<RestaurantReadDto>(restaurantCreationResponseResult.Value);
+        var restaurantId = restaurantCreationResponseBody.Id;
+
+        // Act
+        var response = await controller.GetRestaurantById(restaurantId);
+
+        // Assert
+        var responseResult = Assert.IsType<OkObjectResult>(response.Result);
+        var responseBody = Assert.IsType<RestaurantReadDto>(responseResult.Value);
+
+        responseBody.IsCurrentlyOpenToOrder.Should().Be(false);
+    }
+
+    [Fact]
+    public async Task GetRestaurantById_Should_Return_A_200Ok_Having_IsCurrentlyOpenToOrder_False_Because_Of_IsOpen_False()
+    {
+        // Arrange
+        var controller = CreateController();
+        var restaurantCreateDto = RestaurantMocks.RestaurantCreateDto;
+        restaurantCreateDto.IsOpen = false;
+        var restaurantCreationResponse = await controller.CreateRestaurant(restaurantCreateDto);
+        var restaurantCreationResponseResult = Assert.IsType<CreatedResult>(restaurantCreationResponse.Result);
+        var restaurantCreationResponseBody = Assert.IsType<RestaurantReadDto>(restaurantCreationResponseResult.Value);
+        var restaurantId = restaurantCreationResponseBody.Id;
+
+        // Act
+        var response = await controller.GetRestaurantById(restaurantId);
+
+        // Assert
+        var responseResult = Assert.IsType<OkObjectResult>(response.Result);
+        var responseBody = Assert.IsType<RestaurantReadDto>(responseResult.Value);
+
+        responseBody.IsCurrentlyOpenToOrder.Should().Be(false);
+    }
+
+    [Fact]
+    public async Task GetRestaurantById_Should_Return_A_404NotFound()
+    {
+        // Arrange
+        var controller = CreateController();
+        var notExistingRestaurantId = Guid.NewGuid().ToString();
+
+        // Act
+        var response = await controller.GetRestaurantById(notExistingRestaurantId);
+
+        // Assert
+        var responseResult = Assert.IsType<NotFoundObjectResult>(response.Result);
+        var responseBody = Assert.IsType<string>(responseResult.Value);
+        responseBody.Should().Be($"Restaurant {notExistingRestaurantId} not found");
+    }
+
+    // Todo test IsPublished
 }

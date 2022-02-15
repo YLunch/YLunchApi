@@ -34,4 +34,18 @@ public class RestaurantsController : ApplicationControllerBase
             return Conflict("Restaurant already exists");
         }
     }
+
+    [HttpGet("restaurantId")]
+    public async Task<ActionResult<RestaurantReadDto>> GetRestaurantById(string restaurantId)
+    {
+        try
+        {
+            var restaurantReadDto = await _restaurantService.GetById(restaurantId);
+            return Ok(restaurantReadDto);
+        }
+        catch (EntityNotFoundException)
+        {
+            return NotFound($"Restaurant {restaurantId} not found");
+        }
+    }
 }

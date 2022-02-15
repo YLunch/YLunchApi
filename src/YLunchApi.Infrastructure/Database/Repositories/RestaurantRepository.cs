@@ -16,6 +16,17 @@ public class RestaurantRepository : IRestaurantRepository
 
     public async Task Create(Restaurant restaurant)
     {
+        var existingRestaurant = await _context.Restaurants.FirstOrDefaultAsync(x =>
+            x.Name.Equals(restaurant.Name) &&
+            x.Country.Equals(restaurant.Country) &&
+            x.City.Equals(restaurant.City) &&
+            x.ZipCode.Equals(restaurant.ZipCode) &&
+            x.StreetName.Equals(restaurant.StreetName) &&
+            x.StreetNumber.Equals(restaurant.StreetNumber));
+        if (existingRestaurant != null)
+        {
+            throw new EntityAlreadyExistsException();
+        }
         await _context.Restaurants.AddAsync(restaurant);
         await _context.SaveChangesAsync();
     }

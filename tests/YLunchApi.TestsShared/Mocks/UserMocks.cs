@@ -5,7 +5,7 @@ namespace YLunchApi.TestsShared.Mocks;
 
 public static class UserMocks
 {
-    public static readonly RestaurantAdminCreateDto RestaurantAdminCreateDto = new()
+    public static RestaurantAdminCreateDto RestaurantAdminCreateDto => new()
     {
         Email = "admin@restaurant.com",
         Firstname = "Jean-Marc",
@@ -14,7 +14,7 @@ public static class UserMocks
         Password = "Password1234."
     };
 
-    public static readonly CustomerCreateDto CustomerCreateDto = new()
+    public static CustomerCreateDto CustomerCreateDto => new()
     {
         Email = "anne-marie.martin@ynov.com",
         Firstname = "Anne-Marie",
