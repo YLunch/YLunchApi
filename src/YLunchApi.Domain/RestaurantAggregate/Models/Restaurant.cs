@@ -48,25 +48,23 @@ public class Restaurant : Entity
     public virtual ICollection<Product> Products { get; set; } = new List<Product>();
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
-    // Todo uncomment when create product is implemented
-    // && Products.Any(x => x.IsActive); //NOSONAR
 
     public bool IsPublished { get; set; }
 
     public static bool CanPublish(Restaurant restaurant)
     {
-        //NOSONAR
-        return restaurant.IsPublic && //NOSONAR
-               !string.IsNullOrEmpty(restaurant.Name) && //NOSONAR
-               !string.IsNullOrEmpty(restaurant.PhoneNumber) && //NOSONAR
-               !string.IsNullOrEmpty(restaurant.Email) && //NOSONAR
-               !string.IsNullOrEmpty(restaurant.ZipCode) && //NOSONAR
-               !string.IsNullOrEmpty(restaurant.Country) && //NOSONAR
-               !string.IsNullOrEmpty(restaurant.City) && //NOSONAR
-               !string.IsNullOrEmpty(restaurant.StreetNumber) && //NOSONAR
-               !string.IsNullOrEmpty(restaurant.StreetName) && //NOSONAR
-               !string.IsNullOrEmpty(restaurant.AdminId) && //NOSONAR
+        return restaurant.IsPublic &&
+               !string.IsNullOrEmpty(restaurant.Name) &&
+               !string.IsNullOrEmpty(restaurant.PhoneNumber) &&
+               !string.IsNullOrEmpty(restaurant.Email) &&
+               !string.IsNullOrEmpty(restaurant.ZipCode) &&
+               !string.IsNullOrEmpty(restaurant.Country) &&
+               !string.IsNullOrEmpty(restaurant.City) &&
+               !string.IsNullOrEmpty(restaurant.StreetNumber) &&
+               !string.IsNullOrEmpty(restaurant.StreetName) &&
+               !string.IsNullOrEmpty(restaurant.AdminId) &&
                restaurant.OpeningTimes.Count > 0;
-        //NOSONAR
+        // Todo uncomment when create product is implemented
+        // && Products.Any(x => x.IsActive); //NOSONAR
     }
 }
