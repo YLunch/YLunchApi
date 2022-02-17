@@ -78,6 +78,7 @@ public class RestaurantsControllerTest
         responseBody.ClosingDates.Should().BeEquivalentTo(restaurantCreateDto.ClosingDates);
         responseBody.OpeningTimes.Should().BeEquivalentTo(restaurantCreateDto.OpeningTimes);
         responseBody.IsCurrentlyOpenToOrder.Should().Be(true);
+        responseBody.IsPublished.Should().Be(true);
     }
 
     [Fact]
