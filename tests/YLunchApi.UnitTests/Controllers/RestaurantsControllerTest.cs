@@ -159,6 +159,190 @@ public class RestaurantsControllerTest
 
     [Fact]
     public async Task
+        GetRestaurantById_Should_Return_A_200Ok_Having_IsPublished_False_Because_Of_Missing_Name()
+    {
+        // Arrange
+        var controller = CreateController();
+        var restaurantCreateDto = RestaurantMocks.RestaurantCreateDto;
+        restaurantCreateDto.Name = "";
+        var restaurantCreationResponse = await controller.CreateRestaurant(restaurantCreateDto);
+        var restaurantCreationResponseResult = Assert.IsType<CreatedResult>(restaurantCreationResponse.Result);
+        var restaurantCreationResponseBody = Assert.IsType<RestaurantReadDto>(restaurantCreationResponseResult.Value);
+        var restaurantId = restaurantCreationResponseBody.Id;
+
+        // Act
+        var response = await controller.GetRestaurantById(restaurantId);
+
+        // Assert
+        var responseResult = Assert.IsType<OkObjectResult>(response.Result);
+        var responseBody = Assert.IsType<RestaurantReadDto>(responseResult.Value);
+
+        responseBody.IsPublished.Should().Be(false);
+    }
+
+    [Fact]
+    public async Task
+        GetRestaurantById_Should_Return_A_200Ok_Having_IsPublished_False_Because_Of_Missing_Email()
+    {
+        // Arrange
+        var controller = CreateController();
+        var restaurantCreateDto = RestaurantMocks.RestaurantCreateDto;
+        restaurantCreateDto.Email = "";
+        var restaurantCreationResponse = await controller.CreateRestaurant(restaurantCreateDto);
+        var restaurantCreationResponseResult = Assert.IsType<CreatedResult>(restaurantCreationResponse.Result);
+        var restaurantCreationResponseBody = Assert.IsType<RestaurantReadDto>(restaurantCreationResponseResult.Value);
+        var restaurantId = restaurantCreationResponseBody.Id;
+
+        // Act
+        var response = await controller.GetRestaurantById(restaurantId);
+
+        // Assert
+        var responseResult = Assert.IsType<OkObjectResult>(response.Result);
+        var responseBody = Assert.IsType<RestaurantReadDto>(responseResult.Value);
+
+        responseBody.IsPublished.Should().Be(false);
+    }
+
+    [Fact]
+    public async Task
+        GetRestaurantById_Should_Return_A_200Ok_Having_IsPublished_False_Because_Of_Missing_PhoneNumber()
+    {
+        // Arrange
+        var controller = CreateController();
+        var restaurantCreateDto = RestaurantMocks.RestaurantCreateDto;
+        restaurantCreateDto.PhoneNumber = "";
+        var restaurantCreationResponse = await controller.CreateRestaurant(restaurantCreateDto);
+        var restaurantCreationResponseResult = Assert.IsType<CreatedResult>(restaurantCreationResponse.Result);
+        var restaurantCreationResponseBody = Assert.IsType<RestaurantReadDto>(restaurantCreationResponseResult.Value);
+        var restaurantId = restaurantCreationResponseBody.Id;
+
+        // Act
+        var response = await controller.GetRestaurantById(restaurantId);
+
+        // Assert
+        var responseResult = Assert.IsType<OkObjectResult>(response.Result);
+        var responseBody = Assert.IsType<RestaurantReadDto>(responseResult.Value);
+
+        responseBody.IsPublished.Should().Be(false);
+    }
+
+    [Fact]
+    public async Task
+        GetRestaurantById_Should_Return_A_200Ok_Having_IsPublished_False_Because_Of_Missing_Country()
+    {
+        // Arrange
+        var controller = CreateController();
+        var restaurantCreateDto = RestaurantMocks.RestaurantCreateDto;
+        restaurantCreateDto.Country = "";
+        var restaurantCreationResponse = await controller.CreateRestaurant(restaurantCreateDto);
+        var restaurantCreationResponseResult = Assert.IsType<CreatedResult>(restaurantCreationResponse.Result);
+        var restaurantCreationResponseBody = Assert.IsType<RestaurantReadDto>(restaurantCreationResponseResult.Value);
+        var restaurantId = restaurantCreationResponseBody.Id;
+
+        // Act
+        var response = await controller.GetRestaurantById(restaurantId);
+
+        // Assert
+        var responseResult = Assert.IsType<OkObjectResult>(response.Result);
+        var responseBody = Assert.IsType<RestaurantReadDto>(responseResult.Value);
+
+        responseBody.IsPublished.Should().Be(false);
+    }
+
+    [Fact]
+    public async Task
+        GetRestaurantById_Should_Return_A_200Ok_Having_IsPublished_False_Because_Of_Missing_City()
+    {
+        // Arrange
+        var controller = CreateController();
+        var restaurantCreateDto = RestaurantMocks.RestaurantCreateDto;
+        restaurantCreateDto.City = "";
+        var restaurantCreationResponse = await controller.CreateRestaurant(restaurantCreateDto);
+        var restaurantCreationResponseResult = Assert.IsType<CreatedResult>(restaurantCreationResponse.Result);
+        var restaurantCreationResponseBody = Assert.IsType<RestaurantReadDto>(restaurantCreationResponseResult.Value);
+        var restaurantId = restaurantCreationResponseBody.Id;
+
+        // Act
+        var response = await controller.GetRestaurantById(restaurantId);
+
+        // Assert
+        var responseResult = Assert.IsType<OkObjectResult>(response.Result);
+        var responseBody = Assert.IsType<RestaurantReadDto>(responseResult.Value);
+
+        responseBody.IsPublished.Should().Be(false);
+    }
+
+    [Fact]
+    public async Task
+        GetRestaurantById_Should_Return_A_200Ok_Having_IsPublished_False_Because_Of_Missing_ZipCode()
+    {
+        // Arrange
+        var controller = CreateController();
+        var restaurantCreateDto = RestaurantMocks.RestaurantCreateDto;
+        restaurantCreateDto.ZipCode = "";
+        var restaurantCreationResponse = await controller.CreateRestaurant(restaurantCreateDto);
+        var restaurantCreationResponseResult = Assert.IsType<CreatedResult>(restaurantCreationResponse.Result);
+        var restaurantCreationResponseBody = Assert.IsType<RestaurantReadDto>(restaurantCreationResponseResult.Value);
+        var restaurantId = restaurantCreationResponseBody.Id;
+
+        // Act
+        var response = await controller.GetRestaurantById(restaurantId);
+
+        // Assert
+        var responseResult = Assert.IsType<OkObjectResult>(response.Result);
+        var responseBody = Assert.IsType<RestaurantReadDto>(responseResult.Value);
+
+        responseBody.IsPublished.Should().Be(false);
+    }
+
+    [Fact]
+    public async Task
+        GetRestaurantById_Should_Return_A_200Ok_Having_IsPublished_False_Because_Of_Missing_StreetName()
+    {
+        // Arrange
+        var controller = CreateController();
+        var restaurantCreateDto = RestaurantMocks.RestaurantCreateDto;
+        restaurantCreateDto.StreetName = "";
+        var restaurantCreationResponse = await controller.CreateRestaurant(restaurantCreateDto);
+        var restaurantCreationResponseResult = Assert.IsType<CreatedResult>(restaurantCreationResponse.Result);
+        var restaurantCreationResponseBody = Assert.IsType<RestaurantReadDto>(restaurantCreationResponseResult.Value);
+        var restaurantId = restaurantCreationResponseBody.Id;
+
+        // Act
+        var response = await controller.GetRestaurantById(restaurantId);
+
+        // Assert
+        var responseResult = Assert.IsType<OkObjectResult>(response.Result);
+        var responseBody = Assert.IsType<RestaurantReadDto>(responseResult.Value);
+
+        responseBody.IsPublished.Should().Be(false);
+    }
+
+    [Fact]
+    public async Task
+        GetRestaurantById_Should_Return_A_200Ok_Having_IsPublished_False_Because_Of_Missing_StreetNumber()
+    {
+        // Arrange
+        var controller = CreateController();
+        var restaurantCreateDto = RestaurantMocks.RestaurantCreateDto;
+        restaurantCreateDto.StreetNumber = "";
+        var restaurantCreationResponse = await controller.CreateRestaurant(restaurantCreateDto);
+        var restaurantCreationResponseResult = Assert.IsType<CreatedResult>(restaurantCreationResponse.Result);
+        var restaurantCreationResponseBody = Assert.IsType<RestaurantReadDto>(restaurantCreationResponseResult.Value);
+        var restaurantId = restaurantCreationResponseBody.Id;
+
+        // Act
+        var response = await controller.GetRestaurantById(restaurantId);
+
+        // Assert
+        var responseResult = Assert.IsType<OkObjectResult>(response.Result);
+        var responseBody = Assert.IsType<RestaurantReadDto>(responseResult.Value);
+
+        responseBody.IsPublished.Should().Be(false);
+    }
+
+    [Fact]
+    public async Task
         GetRestaurantById_Should_Return_A_200Ok_Having_IsPublished_False_Because_Of_IsPublic_False()
     {
         // Arrange
