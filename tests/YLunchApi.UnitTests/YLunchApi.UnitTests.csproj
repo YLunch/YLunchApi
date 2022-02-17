@@ -39,6 +39,7 @@
         <ProjectReference Include="..\..\src\YLunchApi.Application\YLunchApi.Application.csproj" />
         <ProjectReference Include="..\..\src\YLunchApi.Domain\YLunchApi.Domain.csproj" />
         <ProjectReference Include="..\..\src\YLunchApi.Infrastructure\YLunchApi.Infrastructure.csproj" />
+        <ProjectReference Include="..\..\src\YLunchApi.Utils\YLunchApi.Utils.csproj" />
         <ProjectReference Include="..\YLunchApi.TestsShared\YLunchApi.TestsShared.csproj" />
     </ItemGroup>
 

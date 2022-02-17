@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Identity;
 using YLunchApi.Domain.Core.Utils;
 using YLunchApi.Domain.UserAggregate.Dto;
+using YLunchApi.Utils.Extensions;
 
 namespace YLunchApi.Domain.UserAggregate.Models;
 

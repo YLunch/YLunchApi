@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Xunit;
 using YLunchApi.Domain.Core.Utils;
+using YLunchApi.Utils.Extensions;
 
 namespace YLunchApi.UnitTests.Domain;
 

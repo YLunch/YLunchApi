@@ -13,6 +13,8 @@ using YLunchApi.TestsShared;
 using YLunchApi.TestsShared.Mocks;
 using YLunchApi.UnitTests.Core;
 using YLunchApi.UnitTests.Core.Mockers;
+using YLunchApi.Utils;
+using YLunchApi.Utils.Extensions;
 
 namespace YLunchApi.UnitTests.Controllers;
 
@@ -103,8 +105,8 @@ public class RestaurantsControllerTest
         var controller = CreateController();
         var restaurantCreateDto = RestaurantMocks.RestaurantCreateDto;
         var utcNow = DateTime.UtcNow;
-        var utcNowMinus2Hours = utcNow.AddHours(-2).Hour;
-        var utcNowPlus1Hour = utcNow.AddHours(1).Hour;
+        var utcNowMinus2H = utcNow.AddHours(-2);
+        var utcNowPlus1H = utcNow.AddHours(1);
         restaurantCreateDto.OpeningTimes = new List<OpeningTimeCreateDto>
         {
             new()
@@ -112,8 +114,8 @@ public class RestaurantsControllerTest
                 DayOfWeek = utcNow.DayOfWeek,
                 StartTimeInMinutes = 0,
                 EndTimeInMinutes = 1440,
-                StartOrderTimeInMinutes = utcNowMinus2Hours * 60,
-                EndOrderTimeInMinutes = utcNowPlus1Hour * 60
+                StartOrderTimeInMinutes = utcNowMinus2H.MinutesFromMidnight(),
+                EndOrderTimeInMinutes = utcNowPlus1H.MinutesFromMidnight()
             }
         };
         restaurantCreateDto.AddressExtraInformation = "extra information";
@@ -212,8 +214,8 @@ public class RestaurantsControllerTest
         var controller = CreateController();
         var restaurantCreateDto = RestaurantMocks.RestaurantCreateDto;
         var utcNow = DateTime.UtcNow;
-        var utcNowMinus2Hours = utcNow.AddHours(-3).Hour;
-        var utcNowMinus1Hours = utcNow.AddHours(-1).Hour;
+        var utcNowMinus3H = utcNow.AddHours(-3);
+        var utcNowMinus1H = utcNow.AddHours(-1);
         restaurantCreateDto.OpeningTimes = new List<OpeningTimeCreateDto>
         {
             new()
@@ -221,8 +223,8 @@ public class RestaurantsControllerTest
                 DayOfWeek = utcNow.DayOfWeek,
                 StartTimeInMinutes = 0,
                 EndTimeInMinutes = 1440,
-                StartOrderTimeInMinutes = utcNowMinus2Hours * 60,
-                EndOrderTimeInMinutes = utcNowMinus1Hours * 60
+                StartOrderTimeInMinutes = utcNowMinus3H.MinutesFromMidnight(),
+                EndOrderTimeInMinutes = utcNowMinus1H.MinutesFromMidnight()
             }
         };
         var restaurantCreationResponse = await controller.CreateRestaurant(restaurantCreateDto);
@@ -249,8 +251,8 @@ public class RestaurantsControllerTest
         var restaurantCreateDto = RestaurantMocks.RestaurantCreateDto;
         restaurantCreateDto.IsOpen = false;
         var utcNow = DateTime.UtcNow;
-        var utcNowMinus2Hours = utcNow.AddHours(-2).Hour;
-        var utcNowPlus1Hour = utcNow.AddHours(1).Hour;
+        var utcNowMinus2H = utcNow.AddHours(-2);
+        var utcNowPlus1H = utcNow.AddHours(1);
         restaurantCreateDto.OpeningTimes = new List<OpeningTimeCreateDto>
         {
             new()
@@ -258,8 +260,8 @@ public class RestaurantsControllerTest
                 DayOfWeek = utcNow.DayOfWeek,
                 StartTimeInMinutes = 0,
                 EndTimeInMinutes = 1440,
-                StartOrderTimeInMinutes = utcNowMinus2Hours * 60,
-                EndOrderTimeInMinutes = utcNowPlus1Hour * 60
+                StartOrderTimeInMinutes = utcNowMinus2H.MinutesFromMidnight(),
+                EndOrderTimeInMinutes = utcNowPlus1H.MinutesFromMidnight()
             }
         };
         var restaurantCreationResponse = await controller.CreateRestaurant(restaurantCreateDto);
@@ -293,5 +295,5 @@ public class RestaurantsControllerTest
         responseBody.Should().Be($"Restaurant {notExistingRestaurantId} not found");
     }
 
-    // Todo test IsPublished
+    // Todo test IsPublished when product is active
 }
