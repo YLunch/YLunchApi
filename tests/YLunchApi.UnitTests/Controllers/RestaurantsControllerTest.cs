@@ -13,8 +13,8 @@ using YLunchApi.TestsShared;
 using YLunchApi.TestsShared.Mocks;
 using YLunchApi.UnitTests.Core;
 using YLunchApi.UnitTests.Core.Mockers;
-using YLunchApi.Utils;
-using YLunchApi.Utils.Extensions;
+using YLunchApi.Helpers;
+using YLunchApi.Helpers.Extensions;
 
 namespace YLunchApi.UnitTests.Controllers;
 

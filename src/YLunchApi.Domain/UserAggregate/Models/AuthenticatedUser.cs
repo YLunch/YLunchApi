@@ -1,5 +1,5 @@
 using YLunchApi.Domain.Core.Utils;
-using YLunchApi.Utils.Extensions;
+using YLunchApi.Helpers.Extensions;
 
 namespace YLunchApi.Domain.UserAggregate.Models;
 

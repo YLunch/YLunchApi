@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace YLunchApi.Utils.Extensions;
+namespace YLunchApi.Helpers.Extensions;
 
 public static class StringExtension
 {

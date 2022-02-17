@@ -1,4 +1,4 @@
-namespace YLunchApi.Utils.Extensions;
+namespace YLunchApi.Helpers.Extensions;
 
 public static class DateTimeExtension
 {

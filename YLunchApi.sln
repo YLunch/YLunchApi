@@ -24,7 +24,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YLunchApi.AuthenticationSha
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YLunchApi.TestsShared", "tests\YLunchApi.TestsShared\YLunchApi.TestsShared.csproj", "{E0DC9137-D8F9-4454-A91F-5207EEEFB471}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YLunchApi.Utils", "src\YLunchApi.Utils\YLunchApi.Utils.csproj", "{1372DCAF-5BEC-489E-8CE9-501224F39462}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YLunchApi.Helpers", "src\YLunchApi.Helpers\YLunchApi.Helpers.csproj", "{1372DCAF-5BEC-489E-8CE9-501224F39462}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
