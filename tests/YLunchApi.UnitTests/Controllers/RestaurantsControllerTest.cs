@@ -207,7 +207,43 @@ public class RestaurantsControllerTest
 
     [Fact]
     public async Task
-        GetRestaurantById_Should_Return_A_200Ok_Having_IsCurrentlyOpenToOrder_False_Because_Of_OpeningTimes_To_Order()
+        GetRestaurantById_Should_Return_A_200Ok_Having_IsCurrentlyOpenToOrder_False_Because_Of_Day_Out_OpeningTimes_To_Order()
+    {
+        // Arrange
+        var controller = CreateController();
+        var restaurantCreateDto = RestaurantMocks.RestaurantCreateDto;
+        var tomorrowDateTime = DateTime.UtcNow.AddDays(1);
+        var tomorrowDateTimeMinus1H = tomorrowDateTime.AddHours(-1);
+        var tomorrowDateTimePlus1H = tomorrowDateTime.AddHours(1);
+        restaurantCreateDto.OpeningTimes = new List<OpeningTimeCreateDto>
+        {
+            new()
+            {
+                DayOfWeek = tomorrowDateTime.DayOfWeek,
+                StartTimeInMinutes = 0,
+                EndTimeInMinutes = 1440,
+                StartOrderTimeInMinutes = tomorrowDateTimeMinus1H.MinutesFromMidnight(),
+                EndOrderTimeInMinutes = tomorrowDateTimePlus1H.MinutesFromMidnight()
+            }
+        };
+        var restaurantCreationResponse = await controller.CreateRestaurant(restaurantCreateDto);
+        var restaurantCreationResponseResult = Assert.IsType<CreatedResult>(restaurantCreationResponse.Result);
+        var restaurantCreationResponseBody = Assert.IsType<RestaurantReadDto>(restaurantCreationResponseResult.Value);
+        var restaurantId = restaurantCreationResponseBody.Id;
+
+        // Act
+        var response = await controller.GetRestaurantById(restaurantId);
+
+        // Assert
+        var responseResult = Assert.IsType<OkObjectResult>(response.Result);
+        var responseBody = Assert.IsType<RestaurantReadDto>(responseResult.Value);
+
+        responseBody.IsCurrentlyOpenToOrder.Should().Be(false);
+    }
+
+    [Fact]
+    public async Task
+        GetRestaurantById_Should_Return_A_200Ok_Having_IsCurrentlyOpenToOrder_False_Because_Of_Time_Out_OpeningTimes_To_Order()
     {
         // Arrange
         var controller = CreateController();
