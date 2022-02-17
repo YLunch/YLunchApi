@@ -7,14 +7,13 @@ using Xunit;
 using YLunchApi.Application.RestaurantAggregate;
 using YLunchApi.Authentication.Models;
 using YLunchApi.Domain.RestaurantAggregate.Dto;
+using YLunchApi.Helpers.Extensions;
 using YLunchApi.Infrastructure.Database.Repositories;
 using YLunchApi.Main.Controllers;
 using YLunchApi.TestsShared;
 using YLunchApi.TestsShared.Mocks;
 using YLunchApi.UnitTests.Core;
 using YLunchApi.UnitTests.Core.Mockers;
-using YLunchApi.Helpers;
-using YLunchApi.Helpers.Extensions;
 
 namespace YLunchApi.UnitTests.Controllers;
 

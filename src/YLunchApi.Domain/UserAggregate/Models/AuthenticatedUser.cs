@@ -1,4 +1,3 @@
-using YLunchApi.Domain.Core.Utils;
 using YLunchApi.Helpers.Extensions;
 
 namespace YLunchApi.Domain.UserAggregate.Models;

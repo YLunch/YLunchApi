@@ -27,6 +27,7 @@ public class RestaurantRepository : IRestaurantRepository
         {
             throw new EntityAlreadyExistsException();
         }
+
         await _context.Restaurants.AddAsync(restaurant);
         await _context.SaveChangesAsync();
     }
