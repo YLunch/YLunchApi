@@ -35,6 +35,7 @@ public class RestaurantRepository : IRestaurantRepository
     {
         var restaurant = await _context.Restaurants
                                        .Include(x => x.ClosingDates)
+                                       .Include(x => x.OpeningTimes)
                                        .FirstOrDefaultAsync(x => x.Id.Equals(id));
         if (restaurant == null) throw new EntityNotFoundException($"Restaurant {id} not found");
         return restaurant;

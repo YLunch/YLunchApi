@@ -35,7 +35,7 @@ public class RestaurantsController : ApplicationControllerBase
         }
     }
 
-    [HttpGet("restaurantId")]
+    [HttpGet("{restaurantId}")]
     public async Task<ActionResult<RestaurantReadDto>> GetRestaurantById(string restaurantId)
     {
         try

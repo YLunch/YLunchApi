@@ -25,6 +25,8 @@ tags:
     description: authentication endpoints
   - name: users
     description: users endpoints
+  - name: restaurants
+    description: restaurants endpoints
 paths:
   /trials/anonymous:
     get:
@@ -278,6 +280,71 @@ paths:
           description: invalid input, object invalid
         '409':
           description: User already exists
+  /restaurants:
+    post:
+      tags:
+        - restaurants
+      summary: Restaurant creation
+      description: |
+        - Authorization header: **yes**
+        - Granted roles:
+          - RestaurantAdmin
+      operationId: addRestaurant
+      requestBody:
+        description: Restaurant to create
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestaurantCreateDto'
+      responses:
+        '201':
+          description: restaurant created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestaurantReadDto'
+        '400':
+          description: invalid input, object invalid
+        '409':
+          description: Restaurant already exists
+  /restaurants/{restaurantId}:
+    description: |
+      - Authorization header: **yes**
+      - Granted roles:
+        - All
+    get:
+      tags:
+        - restaurants
+      summary: Gets a restaurant by id
+      operationId: getRestaurantById
+      parameters:
+        - in: path
+          name: restaurantId
+          required: true
+          description: The id of the restaurant you want to get
+          schema:
+            type: string
+      responses:
+        '200':
+          description: |
+            Success:
+            - The restaurant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestaurantReadDto'
+        '400':
+          description: |
+            Bad request:
+            - Something went wrong, please try again later
+        '401':
+          description: |
+            Unauthorized:
+            - Please login and use provided tokens
+        '404':
+          description: |
+            Not found:
+            - Restaurant not found
 components:
   schemas:
     AnonymousTryDto:
@@ -293,9 +360,6 @@ components:
             YLunchApi is running, you are authenticated as {CurrentUserEmail} with Id: {CurrentUserId} and Roles: {CurrentUserRoles}
     LoginRequestDto:
       type: object
-      required:
-        - email
-        - password
       properties:
         email:
           type: string
@@ -304,6 +368,9 @@ components:
         password:
           type: string
           example: Password1234.
+      required:
+        - email
+        - password
     TokenReadDto:
       type: object
       properties:
@@ -316,9 +383,6 @@ components:
           example: abcdefghij-a00000e0-aaa0-000a-0000-00e00aa00e00
     TokenUpdateDto:
       type: object
-      required:
-        - accessToken
-        - refreshToken
       properties:
         accessToken:
           type: string
@@ -327,13 +391,10 @@ components:
         refreshToken:
           type: string
           example: abcdefghij-a00000e0-aaa0-000a-0000-00e00aa00e00
-    RestaurantAdminCreateDto:
       required:
-        - email
-        - firstname
-        - lastname
-        - password
-        - phoneNumber
+        - accessToken
+        - refreshToken
+    RestaurantAdminCreateDto:
       type: object
       properties:
         email:
@@ -354,13 +415,13 @@ components:
           type: string
           format: password
           example: Password1234.
-    CustomerCreateDto:
       required:
         - email
         - firstname
         - lastname
         - password
         - phoneNumber
+    CustomerCreateDto:
       type: object
       properties:
         email:
@@ -381,6 +442,12 @@ components:
           type: string
           format: password
           example: Password1234.
+      required:
+        - email
+        - firstname
+        - lastname
+        - password
+        - phoneNumber
     UserReadDto:
       type: object
       properties:
@@ -407,6 +474,209 @@ components:
             - RestaurantAdmin
           items:
             type: string
+    ClosingDateCreateDto:
+      type: object
+      properties:
+        closingDateTime:
+          type: string
+          example: "2021-12-31T00:00:00.000000"
+      required:
+        - closingDateTime
+    ClosingDateReadDto:
+      type: object
+      properties:
+        id:
+          type: string
+          example: a00000e0-aaa0-000a-0000-00e00aa00e00
+        closingDateTime:
+          type: string
+          example: "2021-12-31T00:00:00.000000"
+    OpeningTimeCreateDto:
+      type: object
+      properties:
+        dayOfWeek:
+          type: number
+          description: 'Starting from Sunday: 0 to Saturday: 6'
+          example: 4
+        startTimeInMinutes:
+          type: number
+          description: 'Number of minutes past 00:00 for example 10:00 is 600, which means the restaurant is open since 10:00'
+          example: 600
+        endTimeInMinutes:
+          type: number
+          description: 'Number of minutes past 00:00 for example 12:00 is 720, which means the restaurant is open until 12:00'
+          example: 720
+        startOrderTimeInMinutes:
+          type: number
+          description: 'Number of minutes past 00:00 for example 10:00 is 600, which means the restaurant accepts orders since 10:00'
+          example: 600
+        endOrderTimeInMinutes:
+          type: number
+          description: 'Number of minutes past 00:00 for example 12:00 is 720, which means the restaurant accepts orders until 12:00'
+          example: 720
+      required:
+        - dayOfWeek
+        - startTimeInMinutes
+        - endTimeInMinutes
+    OpeningTimeReadDto:
+      type: object
+      properties:
+        id:
+          type: string
+          example: a00000e0-aaa0-000a-0000-00e00aa00e00
+        dayOfWeek:
+          type: number
+          description: 'Starting from Sunday: 0 to Saturday: 6'
+          example: 4
+        startTimeInMinutes:
+          type: number
+          description: 'Number of minutes past 00:00 for example 10:00 is 600, which means the restaurant is open since 10:00'
+          example: 600
+        endTimeInMinutes:
+          type: number
+          description: 'Number of minutes past 00:00 for example 12:00 is 720, which means the restaurant is open until 12:00'
+          example: 720
+        startOrderTimeInMinutes:
+          type: number
+          description: 'Number of minutes past 00:00 for example 10:00 is 600, which means the restaurant accepts orders since 10:00'
+          example: 600
+        endOrderTimeInMinutes:
+          type: number
+          description: 'Number of minutes past 00:00 for example 12:00 is 720, which means the restaurant accepts orders until 12:00'
+          example: 720
+    RestaurantCreateDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: my restaurant
+        phoneNumber:
+          type: string
+          format: phone
+          example: '0612345678'
+        email:
+          type: string
+          format: email
+          example: my.restaurant@restaurant.com
+        isOpen:
+          type: boolean
+          description: 'True if the restaurant is opening based on regular opening times, false if the restaurant is not not open even while opening times are covered'
+          example: true
+        isPublic:
+          type: boolean
+          description: 'True if the restaurant wants to be visible for customers, actual visibility value is `isPublished` (refer to that field in `RestaurantReadDto`for details)'
+          example: true
+        zipCode:
+          type: string
+          example: '06560'
+        country:
+          type: string
+          example: France
+        city:
+          type: string
+          example: Valbonne
+        streetNumber:
+          type: string
+          example: '1'
+        streetName:
+          type: string
+          example: Place Sophie Lafitte
+        addressExtraInformation:
+          type: string
+          example: Bât. G
+        closingDates:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClosingDateCreateDto'
+        openingTimes:
+          type: array
+          items:
+            $ref: '#/components/schemas/OpeningTimeCreateDto'
+        base64Image:
+          type: string
+          description: Base 64 encoded image
+          example: 'data:image/png;base64,iVBORw0KGgoAAA...'
+        base64Logo:
+          type: string
+          description: Base 64 encoded logo
+          example: 'data:image/png;base64,iVBORw0KGgoAAA...'
+      required:
+        - name
+        - email
+        - phoneNumber
+        - zipCode
+        - country
+        - city
+        - streetName
+        - streetNumber
+        - isOpen
+        - isPublic
+    RestaurantReadDto:
+      type: object
+      properties:
+        id:
+          type: string
+          example: a00000e0-aaa0-000a-0000-00e00aa00e00
+        name:
+          type: string
+          example: my restaurant
+        phoneNumber:
+          type: string
+          format: phone
+          example: '0612345678'
+        email:
+          type: string
+          format: email
+          example: my.restaurant@restaurant.com
+        isOpen:
+          type: boolean
+          description: 'True if the restaurant is opening based on regular opening times, false if the restaurant is not not open even while opening times are covered'
+          example: true
+        isPublic:
+          type: boolean
+          description: 'True if the restaurant wants to be visible for customers, actual display value is `isPublished` (refer to that field for details)'
+          example: true
+        zipCode:
+          type: string
+          example: '06560'
+        country:
+          type: string
+          example: France
+        city:
+          type: string
+          example: Valbonne
+        streetNumber:
+          type: string
+          example: '1'
+        streetName:
+          type: string
+          example: Place Sophie Lafitte
+        addressExtraInformation:
+          type: string
+          example: Bât. G
+        closingDates:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClosingDateReadDto'
+        openingTimes:
+          type: array
+          items:
+            $ref: '#/components/schemas/OpeningTimeReadDto'
+        base64Image:
+          type: string
+          description: Base 64 encoded image
+          example: 'data:image/png;base64,iVBORw0KGgoAAA...'
+        base64Logo:
+          type: string
+          description: Base 64 encoded logo
+          example: 'data:image/png;base64,iVBORw0KGgoAAA...'
+        isPublished:
+          type: boolean
+          description: 'This is true if the restaurant has a value for all the required fields of `RestaurantCreateDto` plus at least one opening time and one product which has isActive value set to true. If true, the restaurant is visible for customers'
+          example: true
+        isCurrentlyOpenToOrder:
+          type: boolean
+          description: 'True if now is contained in any startOrderTimeInMinutes and endOrderTimeInMinutes'
   securitySchemes:
     Bearer:
       type: http
