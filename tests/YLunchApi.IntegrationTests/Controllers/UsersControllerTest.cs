@@ -126,7 +126,7 @@ public class UsersControllerTest : ControllerTestBase
         var content = await ResponseUtils.DeserializeContentAsync(response);
         content.Should()
                .Contain(
-                   "Password is not allowed. Must contain at least 8 characters, 1 lowercase letter, 1 uppercase letter, 1 special character and 1 number.");
+                   "Password is invalid. Must contain at least 8 characters, 1 lowercase letter, 1 uppercase letter, 1 special character and 1 number.");
     }
 
     [Theory]
@@ -150,7 +150,7 @@ public class UsersControllerTest : ControllerTestBase
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         var content = await ResponseUtils.DeserializeContentAsync(response);
-        content.Should().Contain("PhoneNumber is not allowed. Example: 0612345678.");
+        content.Should().Contain("PhoneNumber is invalid. Example: '0612345678'.");
     }
 
     [Theory]
@@ -178,9 +178,9 @@ public class UsersControllerTest : ControllerTestBase
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         var content = await ResponseUtils.DeserializeContentAsync(response);
         content.Should()
-               .Contain("Firstname is not allowed")
+               .Contain("Firstname is invalid")
                .And
-               .Contain("Lastname is not allowed");
+               .Contain("Lastname is invalid");
     }
 
     [Fact]
@@ -266,7 +266,7 @@ public class UsersControllerTest : ControllerTestBase
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         var content = await ResponseUtils.DeserializeContentAsync(response);
-        content.Should().Contain("Email is not allowed. You must provide your Ynov email");
+        content.Should().Contain("Email is invalid. You must provide your Ynov email");
     }
 
     [Theory]
@@ -292,7 +292,7 @@ public class UsersControllerTest : ControllerTestBase
         var content = await ResponseUtils.DeserializeContentAsync(response);
         content.Should()
                .Contain(
-                   "Password is not allowed. Must contain at least 8 characters, 1 lowercase letter, 1 uppercase letter, 1 special character and 1 number.");
+                   "Password is invalid. Must contain at least 8 characters, 1 lowercase letter, 1 uppercase letter, 1 special character and 1 number.");
     }
 
     [Theory]
@@ -316,7 +316,7 @@ public class UsersControllerTest : ControllerTestBase
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         var content = await ResponseUtils.DeserializeContentAsync(response);
-        content.Should().Contain("PhoneNumber is not allowed. Example: 0612345678.");
+        content.Should().Contain("PhoneNumber is invalid. Example: '0612345678'.");
     }
 
     [Theory]
@@ -344,8 +344,8 @@ public class UsersControllerTest : ControllerTestBase
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         var content = await ResponseUtils.DeserializeContentAsync(response);
         content.Should()
-               .Contain("Firstname is not allowed")
+               .Contain("Firstname is invalid")
                .And
-               .Contain("Lastname is not allowed");
+               .Contain("Lastname is invalid");
     }
 }

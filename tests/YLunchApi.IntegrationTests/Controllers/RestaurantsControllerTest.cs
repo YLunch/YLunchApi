@@ -45,9 +45,9 @@ public class RestaurantsControllerTest : ControllerTestBase
                 {
                     DayOfWeek = DateTime.UtcNow.DayOfWeek,
                     StartTimeInMinutes = 0,
-                    EndTimeInMinutes = 1440,
+                    EndTimeInMinutes = 1439,
                     StartOrderTimeInMinutes = 0,
-                    EndOrderTimeInMinutes = 1440
+                    EndOrderTimeInMinutes = 1439
                 }
             }
         };
@@ -86,21 +86,7 @@ public class RestaurantsControllerTest : ControllerTestBase
         Client.SetAuthorizationHeader(authenticatedUserInfo.AccessToken);
         var body = new
         {
-            Name = "",
-            ClosingDates = new List<dynamic>()
-            {
-                new { ClosingDateTime = "" }
-            },
-
-            OpeningTimes = new List<dynamic>()
-            {
-                new
-                {
-                    DayOfWeek = 7,
-                    StartOrderTimeInMinutes = 1440,
-                    EndOrderTimeInMinutes = 1440
-                }
-            }
+            Name = ""
         };
 
         // Act
@@ -128,15 +114,24 @@ public class RestaurantsControllerTest : ControllerTestBase
         Client.SetAuthorizationHeader(authenticatedUserInfo.AccessToken);
         var body = new
         {
-            ClosingDates = new List<dynamic>()
-            {
-            },
-
-            OpeningTimes = new List<dynamic>()
+            RestaurantMocks.RestaurantCreateDto.Name,
+            Email = "bad email",
+            PhoneNumber = "bad phone",
+            RestaurantMocks.RestaurantCreateDto.Country,
+            RestaurantMocks.RestaurantCreateDto.City,
+            ZipCode = "bad zipcode",
+            RestaurantMocks.RestaurantCreateDto.StreetName,
+            RestaurantMocks.RestaurantCreateDto.StreetNumber,
+            RestaurantMocks.RestaurantCreateDto.IsOpen,
+            RestaurantMocks.RestaurantCreateDto.IsPublic,
+            ClosingDates = new List<dynamic>(),
+            OpeningTimes = new List<dynamic>
             {
                 new
                 {
                     DayOfWeek = 7,
+                    StartTimeInMinutes = 1440,
+                    EndTimeInMinutes = 1440,
                     StartOrderTimeInMinutes = 1440,
                     EndOrderTimeInMinutes = 1440
                 }
@@ -150,7 +145,22 @@ public class RestaurantsControllerTest : ControllerTestBase
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         var responseBody = await ResponseUtils.DeserializeContentAsync(response);
 
-        responseBody.Should().Contain("DayOfWeek\": [\"Day must be in range 0-6, 0 is sunday, 6 is saturday\"]");
+        responseBody.Should().Contain("PhoneNumber is invalid. Example: '0612345678'.");
+        responseBody.Should().Contain("ZipCode is invalid. Example: '06560'.");
+        responseBody.Should()
+                    .Contain("Email is invalid. It should be lowercase email format. Example: example@example.com.");
+        responseBody.Should().Contain("DayOfWeek\":[\"Day must be in range 0-6, 0 is sunday, 6 is saturday\"]");
+        responseBody.Should()
+                    .Contain(
+                        "StartTimeInMinutes\":[\"Minutes from midnight should be in range of 0 and 1439 (23h59)\"]");
+        responseBody.Should()
+                    .Contain("EndTimeInMinutes\":[\"Minutes from midnight should be in range of 0 and 1439 (23h59)\"]");
+        responseBody.Should()
+                    .Contain(
+                        "StartOrderTimeInMinutes\":[\"Minutes from midnight should be in range of 0 and 1439 (23h59)\"]");
+        responseBody.Should()
+                    .Contain(
+                        "EndOrderTimeInMinutes\":[\"Minutes from midnight should be in range of 0 and 1439 (23h59)\"]");
     }
 
     [Fact]

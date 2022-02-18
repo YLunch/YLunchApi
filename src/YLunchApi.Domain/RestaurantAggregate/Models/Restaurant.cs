@@ -23,8 +23,11 @@ public class Restaurant : Entity
         {
             var utcNow = DateTime.UtcNow;
             return x.DayOfWeek == utcNow.DayOfWeek &&
-                   x.StartOrderTimeInMinutes < utcNow.MinutesFromMidnight() &&
-                   x.EndOrderTimeInMinutes > utcNow.MinutesFromMidnight();
+                   (x.StartOrderTimeInMinutes < x.EndOrderTimeInMinutes ?
+                       x.StartOrderTimeInMinutes <= utcNow.MinutesFromMidnight() &&
+                       x.EndOrderTimeInMinutes > utcNow.MinutesFromMidnight() :
+                       x.StartOrderTimeInMinutes <= utcNow.MinutesFromMidnight() ||
+                       x.EndOrderTimeInMinutes > utcNow.MinutesFromMidnight());
         });
 
     public bool IsPublic { get; set; }
