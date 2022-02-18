@@ -228,7 +228,7 @@ namespace YLunchApi.Main.Migrations
                     b.ToTable("RefreshTokens");
                 });
 
-            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Allergen", b =>
+            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Models.Allergen", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
@@ -242,7 +242,7 @@ namespace YLunchApi.Main.Migrations
                     b.ToTable("Allergens");
                 });
 
-            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.ClosingDate", b =>
+            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Models.ClosingDate", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
@@ -255,7 +255,7 @@ namespace YLunchApi.Main.Migrations
                     b.ToTable("ClosingDates");
                 });
 
-            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.OpeningTime", b =>
+            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Models.OpeningTime", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
@@ -263,20 +263,20 @@ namespace YLunchApi.Main.Migrations
                     b.Property<int>("DayOfWeek")
                         .HasColumnType("int");
 
-                    b.Property<int?>("EndOrderTimeInMinutes")
+                    b.Property<int>("OffsetOpenMinutes")
                         .HasColumnType("int");
 
-                    b.Property<int>("EndTimeInMinutes")
+                    b.Property<int>("OpenMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrderingOffsetOpenMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrderingOpenMinutes")
                         .HasColumnType("int");
 
                     b.Property<string>("RestaurantId")
                         .HasColumnType("varchar(255)");
-
-                    b.Property<int?>("StartOrderTimeInMinutes")
-                        .HasColumnType("int");
-
-                    b.Property<int>("StartTimeInMinutes")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -285,7 +285,7 @@ namespace YLunchApi.Main.Migrations
                     b.ToTable("OpeningTimes");
                 });
 
-            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Order", b =>
+            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Models.Order", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
@@ -328,7 +328,7 @@ namespace YLunchApi.Main.Migrations
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.OrderedProduct", b =>
+            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Models.OrderedProduct", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
@@ -381,7 +381,7 @@ namespace YLunchApi.Main.Migrations
                     b.ToTable("OrderedProducts");
                 });
 
-            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.OrderStatus", b =>
+            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Models.OrderStatus", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
@@ -403,7 +403,7 @@ namespace YLunchApi.Main.Migrations
                     b.ToTable("OrderStatuses");
                 });
 
-            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Product", b =>
+            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Models.Product", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
@@ -448,7 +448,7 @@ namespace YLunchApi.Main.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.ProductTag", b =>
+            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Models.ProductTag", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
@@ -462,7 +462,7 @@ namespace YLunchApi.Main.Migrations
                     b.ToTable("ProductTags");
                 });
 
-            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Restaurant", b =>
+            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Models.Restaurant", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
@@ -540,7 +540,7 @@ namespace YLunchApi.Main.Migrations
                     b.ToTable("Restaurants");
                 });
 
-            modelBuilder.Entity("YLunchApi.Domain.UserAggregate.User", b =>
+            modelBuilder.Entity("YLunchApi.Domain.UserAggregate.Models.User", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
@@ -614,13 +614,13 @@ namespace YLunchApi.Main.Migrations
 
             modelBuilder.Entity("AllergenProduct", b =>
                 {
-                    b.HasOne("YLunchApi.Domain.RestaurantAggregate.Allergen", null)
+                    b.HasOne("YLunchApi.Domain.RestaurantAggregate.Models.Allergen", null)
                         .WithMany()
                         .HasForeignKey("AllergensId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("YLunchApi.Domain.RestaurantAggregate.Product", null)
+                    b.HasOne("YLunchApi.Domain.RestaurantAggregate.Models.Product", null)
                         .WithMany()
                         .HasForeignKey("ProductsId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -629,13 +629,13 @@ namespace YLunchApi.Main.Migrations
 
             modelBuilder.Entity("ClosingDateRestaurant", b =>
                 {
-                    b.HasOne("YLunchApi.Domain.RestaurantAggregate.ClosingDate", null)
+                    b.HasOne("YLunchApi.Domain.RestaurantAggregate.Models.ClosingDate", null)
                         .WithMany()
                         .HasForeignKey("ClosingDatesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("YLunchApi.Domain.RestaurantAggregate.Restaurant", null)
+                    b.HasOne("YLunchApi.Domain.RestaurantAggregate.Models.Restaurant", null)
                         .WithMany()
                         .HasForeignKey("RestaurantsId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -653,7 +653,7 @@ namespace YLunchApi.Main.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("YLunchApi.Domain.UserAggregate.User", null)
+                    b.HasOne("YLunchApi.Domain.UserAggregate.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -662,7 +662,7 @@ namespace YLunchApi.Main.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("YLunchApi.Domain.UserAggregate.User", null)
+                    b.HasOne("YLunchApi.Domain.UserAggregate.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -677,7 +677,7 @@ namespace YLunchApi.Main.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("YLunchApi.Domain.UserAggregate.User", null)
+                    b.HasOne("YLunchApi.Domain.UserAggregate.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -686,7 +686,7 @@ namespace YLunchApi.Main.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("YLunchApi.Domain.UserAggregate.User", null)
+                    b.HasOne("YLunchApi.Domain.UserAggregate.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -695,13 +695,13 @@ namespace YLunchApi.Main.Migrations
 
             modelBuilder.Entity("ProductProductTag", b =>
                 {
-                    b.HasOne("YLunchApi.Domain.RestaurantAggregate.ProductTag", null)
+                    b.HasOne("YLunchApi.Domain.RestaurantAggregate.Models.ProductTag", null)
                         .WithMany()
                         .HasForeignKey("ProductTagsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("YLunchApi.Domain.RestaurantAggregate.Product", null)
+                    b.HasOne("YLunchApi.Domain.RestaurantAggregate.Models.Product", null)
                         .WithMany()
                         .HasForeignKey("ProductsId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -710,7 +710,7 @@ namespace YLunchApi.Main.Migrations
 
             modelBuilder.Entity("YLunchApi.Authentication.Models.RefreshToken", b =>
                 {
-                    b.HasOne("YLunchApi.Domain.UserAggregate.User", "User")
+                    b.HasOne("YLunchApi.Domain.UserAggregate.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -719,22 +719,22 @@ namespace YLunchApi.Main.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.OpeningTime", b =>
+            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Models.OpeningTime", b =>
                 {
-                    b.HasOne("YLunchApi.Domain.RestaurantAggregate.Restaurant", null)
+                    b.HasOne("YLunchApi.Domain.RestaurantAggregate.Models.Restaurant", null)
                         .WithMany("OpeningTimes")
                         .HasForeignKey("RestaurantId");
                 });
 
-            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Order", b =>
+            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Models.Order", b =>
                 {
-                    b.HasOne("YLunchApi.Domain.RestaurantAggregate.Restaurant", "Restaurant")
+                    b.HasOne("YLunchApi.Domain.RestaurantAggregate.Models.Restaurant", "Restaurant")
                         .WithMany("Orders")
                         .HasForeignKey("RestaurantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("YLunchApi.Domain.UserAggregate.User", "Customer")
+                    b.HasOne("YLunchApi.Domain.UserAggregate.Models.User", "Customer")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -745,21 +745,21 @@ namespace YLunchApi.Main.Migrations
                     b.Navigation("Restaurant");
                 });
 
-            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.OrderedProduct", b =>
+            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Models.OrderedProduct", b =>
                 {
-                    b.HasOne("YLunchApi.Domain.RestaurantAggregate.Order", "Order")
+                    b.HasOne("YLunchApi.Domain.RestaurantAggregate.Models.Order", "Order")
                         .WithMany("OrderedProducts")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("YLunchApi.Domain.RestaurantAggregate.Product", "Product")
+                    b.HasOne("YLunchApi.Domain.RestaurantAggregate.Models.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("YLunchApi.Domain.RestaurantAggregate.Restaurant", "Restaurant")
+                    b.HasOne("YLunchApi.Domain.RestaurantAggregate.Models.Restaurant", "Restaurant")
                         .WithMany()
                         .HasForeignKey("RestaurantId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -772,9 +772,9 @@ namespace YLunchApi.Main.Migrations
                     b.Navigation("Restaurant");
                 });
 
-            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.OrderStatus", b =>
+            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Models.OrderStatus", b =>
                 {
-                    b.HasOne("YLunchApi.Domain.RestaurantAggregate.Order", "Order")
+                    b.HasOne("YLunchApi.Domain.RestaurantAggregate.Models.Order", "Order")
                         .WithMany("OrderStatuses")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -783,9 +783,9 @@ namespace YLunchApi.Main.Migrations
                     b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Product", b =>
+            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Models.Product", b =>
                 {
-                    b.HasOne("YLunchApi.Domain.RestaurantAggregate.Restaurant", "Restaurant")
+                    b.HasOne("YLunchApi.Domain.RestaurantAggregate.Models.Restaurant", "Restaurant")
                         .WithMany("Products")
                         .HasForeignKey("RestaurantId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -794,9 +794,9 @@ namespace YLunchApi.Main.Migrations
                     b.Navigation("Restaurant");
                 });
 
-            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Restaurant", b =>
+            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Models.Restaurant", b =>
                 {
-                    b.HasOne("YLunchApi.Domain.UserAggregate.User", "Admin")
+                    b.HasOne("YLunchApi.Domain.UserAggregate.Models.User", "Admin")
                         .WithMany()
                         .HasForeignKey("AdminId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -805,14 +805,14 @@ namespace YLunchApi.Main.Migrations
                     b.Navigation("Admin");
                 });
 
-            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Order", b =>
+            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Models.Order", b =>
                 {
                     b.Navigation("OrderStatuses");
 
                     b.Navigation("OrderedProducts");
                 });
 
-            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Restaurant", b =>
+            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Models.Restaurant", b =>
                 {
                     b.Navigation("OpeningTimes");
 

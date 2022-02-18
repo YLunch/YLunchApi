@@ -48,10 +48,10 @@ public class RestaurantsControllerTest
             new()
             {
                 DayOfWeek = DateTime.UtcNow.DayOfWeek,
-                StartTimeInMinutes = 0,
-                EndTimeInMinutes = 1440,
-                StartOrderTimeInMinutes = 0,
-                EndOrderTimeInMinutes = 1440
+                OffsetOpenMinutes = 0,
+                OpenMinutes = 1439,
+                OrderingOffsetOpenMinutes = 0,
+                OrderingOpenMinutes = 1439
             }
         };
 
@@ -98,70 +98,23 @@ public class RestaurantsControllerTest
         responseBody.Should().Be("Restaurant already exists");
     }
 
-    [Theory]
-    [InlineData(0, 1)]
-    [InlineData(-1, 1)]
-    [InlineData(-2, 1)]
-    [InlineData(-3, 1)]
-    [InlineData(-4, 1)]
-    [InlineData(-5, 1)]
-    [InlineData(-6, 1)]
-    [InlineData(-7, 1)]
-    [InlineData(-8, 1)]
-    [InlineData(-9, 1)]
-    [InlineData(-10, 1)]
-    [InlineData(-11, 1)]
-    [InlineData(-12, 1)]
-    [InlineData(-13, 1)]
-    [InlineData(-14, 1)]
-    [InlineData(-15, 1)]
-    [InlineData(-16, 1)]
-    [InlineData(-17, 1)]
-    [InlineData(-18, 1)]
-    [InlineData(-19, 1)]
-    [InlineData(-20, 1)]
-    [InlineData(-21, 1)]
-    [InlineData(-22, 1)]
-    [InlineData(-23, 1)]
-    [InlineData(-1, 2)]
-    [InlineData(-1, 3)]
-    [InlineData(-1, 4)]
-    [InlineData(-1, 5)]
-    [InlineData(-1, 6)]
-    [InlineData(-1, 7)]
-    [InlineData(-1, 8)]
-    [InlineData(-1, 9)]
-    [InlineData(-1, 10)]
-    [InlineData(-1, 11)]
-    [InlineData(-1, 12)]
-    [InlineData(-1, 13)]
-    [InlineData(-1, 14)]
-    [InlineData(-1, 15)]
-    [InlineData(-1, 16)]
-    [InlineData(-1, 17)]
-    [InlineData(-1, 18)]
-    [InlineData(-1, 19)]
-    [InlineData(-1, 20)]
-    [InlineData(-1, 21)]
-    [InlineData(-1, 22)]
-    [InlineData(-1, 23)]
-    public async Task GetRestaurantById_Should_Return_A_200Ok(int start, int end)
+[Fact]
+    public async Task GetRestaurantById_Should_Return_A_200Ok()
     {
         // Arrange
         var controller = CreateController();
         var restaurantCreateDto = RestaurantMocks.RestaurantCreateDto;
         var utcNow = DateTime.UtcNow;
-        var dateTimeBeforeUtcNow = utcNow.AddHours(start);
-        var dateTimeAfterUtcNow = utcNow.AddHours(end);
+        var dateTimeBeforeUtcNow = utcNow.AddHours(-2);
         restaurantCreateDto.OpeningTimes = new List<OpeningTimeCreateDto>
         {
             new()
             {
                 DayOfWeek = utcNow.DayOfWeek,
-                StartTimeInMinutes = 0,
-                EndTimeInMinutes = 1439,
-                StartOrderTimeInMinutes = dateTimeBeforeUtcNow.MinutesFromMidnight(),
-                EndOrderTimeInMinutes = dateTimeAfterUtcNow.MinutesFromMidnight()
+                OffsetOpenMinutes = 0,
+                OpenMinutes = 1439,
+                OrderingOffsetOpenMinutes = dateTimeBeforeUtcNow.MinutesFromMidnight(),
+                OrderingOpenMinutes = 120
             }
         };
         restaurantCreateDto.AddressExtraInformation = "extra information";
@@ -468,16 +421,15 @@ public class RestaurantsControllerTest
         var restaurantCreateDto = RestaurantMocks.RestaurantCreateDto;
         var tomorrowDateTime = DateTime.UtcNow.AddDays(1);
         var tomorrowDateTimeMinus1H = tomorrowDateTime.AddHours(-1);
-        var tomorrowDateTimePlus1H = tomorrowDateTime.AddHours(1);
         restaurantCreateDto.OpeningTimes = new List<OpeningTimeCreateDto>
         {
             new()
             {
                 DayOfWeek = tomorrowDateTime.DayOfWeek,
-                StartTimeInMinutes = 0,
-                EndTimeInMinutes = 1440,
-                StartOrderTimeInMinutes = tomorrowDateTimeMinus1H.MinutesFromMidnight(),
-                EndOrderTimeInMinutes = tomorrowDateTimePlus1H.MinutesFromMidnight()
+                OffsetOpenMinutes = 0,
+                OpenMinutes = 1439,
+                OrderingOffsetOpenMinutes = tomorrowDateTimeMinus1H.MinutesFromMidnight(),
+                OrderingOpenMinutes = 60
             }
         };
         var restaurantCreationResponse = await controller.CreateRestaurant(restaurantCreateDto);
@@ -504,16 +456,15 @@ public class RestaurantsControllerTest
         var restaurantCreateDto = RestaurantMocks.RestaurantCreateDto;
         var utcNow = DateTime.UtcNow;
         var utcNowMinus3H = utcNow.AddHours(-3);
-        var utcNowMinus1H = utcNow.AddHours(-1);
         restaurantCreateDto.OpeningTimes = new List<OpeningTimeCreateDto>
         {
             new()
             {
                 DayOfWeek = utcNow.DayOfWeek,
-                StartTimeInMinutes = 0,
-                EndTimeInMinutes = 1440,
-                StartOrderTimeInMinutes = utcNowMinus3H.MinutesFromMidnight(),
-                EndOrderTimeInMinutes = utcNowMinus1H.MinutesFromMidnight()
+                OffsetOpenMinutes = 0,
+                OpenMinutes = 1439,
+                OrderingOffsetOpenMinutes = utcNowMinus3H.MinutesFromMidnight(),
+                OrderingOpenMinutes = 120
             }
         };
         var restaurantCreationResponse = await controller.CreateRestaurant(restaurantCreateDto);
@@ -541,16 +492,15 @@ public class RestaurantsControllerTest
         restaurantCreateDto.IsOpen = false;
         var utcNow = DateTime.UtcNow;
         var utcNowMinus2H = utcNow.AddHours(-2);
-        var utcNowPlus1H = utcNow.AddHours(1);
         restaurantCreateDto.OpeningTimes = new List<OpeningTimeCreateDto>
         {
             new()
             {
                 DayOfWeek = utcNow.DayOfWeek,
-                StartTimeInMinutes = 0,
-                EndTimeInMinutes = 1440,
-                StartOrderTimeInMinutes = utcNowMinus2H.MinutesFromMidnight(),
-                EndOrderTimeInMinutes = utcNowPlus1H.MinutesFromMidnight()
+                OffsetOpenMinutes = 0,
+                OpenMinutes = 1439,
+                OrderingOffsetOpenMinutes = utcNowMinus2H.MinutesFromMidnight(),
+                OrderingOpenMinutes = 180
             }
         };
         var restaurantCreationResponse = await controller.CreateRestaurant(restaurantCreateDto);

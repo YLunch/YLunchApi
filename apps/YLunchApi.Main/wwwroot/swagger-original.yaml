@@ -496,28 +496,30 @@ components:
       properties:
         dayOfWeek:
           type: number
-          description: 'Starting from Sunday: 0 to Saturday: 6'
+          description: 'The day to apply this opening time. Starting from Sunday: 0 to Saturday: 6, for example 4 is thursday'
           example: 4
-        startTimeInMinutes:
+        offsetOpenMinutes:
           type: number
-          description: 'Number of minutes past 00:00 for example 10:00 is 600, which means the restaurant is open since 10:00'
+          description: 'Number of minutes past from 00:00 for example 10:00 is 600, which means the restaurant is open since 10:00'
           example: 600
-        endTimeInMinutes:
+        openMinutes:
           type: number
-          description: 'Number of minutes past 00:00 for example 12:00 is 720, which means the restaurant is open until 12:00'
-          example: 720
-        startOrderTimeInMinutes:
+          description: 'Number of minutes the restaurant is open since the offset, for example 120 minutes, which means the restaurant is open during 2h since 10:00'
+          example: 120
+        orderingOffsetOpenMinutes:
           type: number
-          description: 'Number of minutes past 00:00 for example 10:00 is 600, which means the restaurant accepts orders since 10:00'
+          description: 'Number of minutes past from 00:00 for example 10:00 is 600, which means the restaurant accepts orders since 10:00'
           example: 600
-        endOrderTimeInMinutes:
+        orderingOpenMinutes:
           type: number
-          description: 'Number of minutes past 00:00 for example 12:00 is 720, which means the restaurant accepts orders until 12:00'
-          example: 720
+          description: 'Number of minutes the restaurant is open since the offset, for example 120 minutes, which means the restaurant accepts orders during 2h since 10:00'
+          example: 120
       required:
         - dayOfWeek
-        - startTimeInMinutes
-        - endTimeInMinutes
+        - offsetOpenMinutes
+        - openMinutes
+        - orderingOffsetOpenMinutes
+        - orderingOpenMinutes
     OpeningTimeReadDto:
       type: object
       properties:
@@ -526,24 +528,24 @@ components:
           example: a00000e0-aaa0-000a-0000-00e00aa00e00
         dayOfWeek:
           type: number
-          description: 'Starting from Sunday: 0 to Saturday: 6'
+          description: 'The day to apply this opening time. Starting from Sunday: 0 to Saturday: 6, for example 4 is thursday'
           example: 4
-        startTimeInMinutes:
+        offsetOpenMinutes:
           type: number
-          description: 'Number of minutes past 00:00 for example 10:00 is 600, which means the restaurant is open since 10:00'
+          description: 'Number of minutes past from 00:00 for example 10:00 is 600, which means the restaurant is open since 10:00'
           example: 600
-        endTimeInMinutes:
+        openMinutes:
           type: number
-          description: 'Number of minutes past 00:00 for example 12:00 is 720, which means the restaurant is open until 12:00'
-          example: 720
-        startOrderTimeInMinutes:
+          description: 'Number of minutes the restaurant is open since the offset, for example 120 minutes, which means the restaurant is open during 2h since 10:00'
+          example: 120
+        orderingOffsetOpenMinutes:
           type: number
-          description: 'Number of minutes past 00:00 for example 10:00 is 600, which means the restaurant accepts orders since 10:00'
+          description: 'Number of minutes past from 00:00 for example 10:00 is 600, which means the restaurant accepts orders since 10:00'
           example: 600
-        endOrderTimeInMinutes:
+        orderingOpenMinutes:
           type: number
-          description: 'Number of minutes past 00:00 for example 12:00 is 720, which means the restaurant accepts orders until 12:00'
-          example: 720
+          description: 'Number of minutes the restaurant is open since the offset, for example 120 minutes, which means the restaurant accepts orders during 2h since 10:00'
+          example: 120
     RestaurantCreateDto:
       type: object
       properties:

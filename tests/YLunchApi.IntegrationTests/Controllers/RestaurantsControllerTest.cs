@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
 using YLunchApi.Domain.RestaurantAggregate.Dto;
+using YLunchApi.Helpers.Extensions;
 using YLunchApi.IntegrationTests.Core.Extensions;
 using YLunchApi.IntegrationTests.Core.Utils;
 using YLunchApi.TestsShared;
@@ -22,6 +23,7 @@ public class RestaurantsControllerTest : ControllerTestBase
         // Arrange
         var authenticatedUserInfo = await Authenticate(UserMocks.RestaurantAdminCreateDto);
         Client.SetAuthorizationHeader(authenticatedUserInfo.AccessToken);
+        var utcNow = DateTime.UtcNow;
         var body = new
         {
             RestaurantMocks.RestaurantCreateDto.Name,
@@ -43,11 +45,11 @@ public class RestaurantsControllerTest : ControllerTestBase
             {
                 new()
                 {
-                    DayOfWeek = DateTime.UtcNow.DayOfWeek,
-                    StartTimeInMinutes = 0,
-                    EndTimeInMinutes = 1439,
-                    StartOrderTimeInMinutes = 0,
-                    EndOrderTimeInMinutes = 1439
+                    DayOfWeek = utcNow.DayOfWeek,
+                    OffsetOpenMinutes = utcNow.MinutesFromMidnight(),
+                    OpenMinutes = 2 * 60,
+                    OrderingOffsetOpenMinutes = utcNow.MinutesFromMidnight(),
+                    OrderingOpenMinutes = 2 * 60
                 }
             }
         };
@@ -130,10 +132,10 @@ public class RestaurantsControllerTest : ControllerTestBase
                 new
                 {
                     DayOfWeek = 7,
-                    StartTimeInMinutes = 1440,
-                    EndTimeInMinutes = 1440,
-                    StartOrderTimeInMinutes = 1440,
-                    EndOrderTimeInMinutes = 1440
+                    OffsetOpenMinutes = 24 * 60,
+                    OpenMinutes = 7 * 24 * 60,
+                    OrderingOffsetOpenMinutes = 24 * 60,
+                    OrderingOpenMinutes = 7 * 24 * 60
                 }
             }
         };
@@ -152,15 +154,15 @@ public class RestaurantsControllerTest : ControllerTestBase
         responseBody.Should().Contain("DayOfWeek\":[\"Day must be in range 0-6, 0 is sunday, 6 is saturday\"]");
         responseBody.Should()
                     .Contain(
-                        "StartTimeInMinutes\":[\"Minutes from midnight should be in range of 0 and 1439 (23h59)\"]");
+                        "OffsetOpenMinutes\":[\"OffsetOpenMinutes should be less than number of minutes in a day.\"]");
         responseBody.Should()
-                    .Contain("EndTimeInMinutes\":[\"Minutes from midnight should be in range of 0 and 1439 (23h59)\"]");
-        responseBody.Should()
-                    .Contain(
-                        "StartOrderTimeInMinutes\":[\"Minutes from midnight should be in range of 0 and 1439 (23h59)\"]");
+                    .Contain("OpenMinutes\":[\"OpenMinutes should be less than number of minutes in a week.\"]");
         responseBody.Should()
                     .Contain(
-                        "EndOrderTimeInMinutes\":[\"Minutes from midnight should be in range of 0 and 1439 (23h59)\"]");
+                        "OrderingOffsetOpenMinutes\":[\"OrderingOffsetOpenMinutes should be less than number of minutes in a day.\"]");
+        responseBody.Should()
+                    .Contain(
+                        "OrderingOpenMinutes\":[\"OrderingOpenMinutes should be less than number of minutes in a week.\"]");
     }
 
     [Fact]
@@ -189,10 +191,10 @@ public class RestaurantsControllerTest : ControllerTestBase
                 new()
                 {
                     DayOfWeek = DateTime.UtcNow.DayOfWeek,
-                    StartTimeInMinutes = 0,
-                    EndTimeInMinutes = 1440,
-                    StartOrderTimeInMinutes = 0,
-                    EndOrderTimeInMinutes = 1440
+                    OffsetOpenMinutes = 0,
+                    OpenMinutes = 1439, //23H59
+                    OrderingOffsetOpenMinutes = 0,
+                    OrderingOpenMinutes = 1439 //23H59
                 }
             }
         };
@@ -235,10 +237,10 @@ public class RestaurantsControllerTest : ControllerTestBase
                 new()
                 {
                     DayOfWeek = DateTime.UtcNow.DayOfWeek,
-                    StartTimeInMinutes = 0,
-                    EndTimeInMinutes = 1440,
-                    StartOrderTimeInMinutes = 0,
-                    EndOrderTimeInMinutes = 1440
+                    OffsetOpenMinutes = 0,
+                    OpenMinutes = 1439, //23H59
+                    OrderingOffsetOpenMinutes = 0,
+                    OrderingOpenMinutes = 1439 //23H59
                 }
             }
         };

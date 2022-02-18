@@ -9,16 +9,18 @@ public class OpeningTimeCreateDto
     public DayOfWeek DayOfWeek { get; set; }
 
     [Required]
-    [Range(0, 1439, ErrorMessage = "Minutes from midnight should be in range of 0 and 1439 (23h59)")]
-    public int StartTimeInMinutes { get; set; }
+    [Range(0, 1439, ErrorMessage = "OffsetOpenMinutes should be less than number of minutes in a day.")]
+    public int OffsetOpenMinutes { get; set; }
 
     [Required]
-    [Range(0, 1439, ErrorMessage = "Minutes from midnight should be in range of 0 and 1439 (23h59)")]
-    public int EndTimeInMinutes { get; set; }
+    [Range(0, 7*24*60 - 1, ErrorMessage = "OpenMinutes should be less than number of minutes in a week.")]
+    public int OpenMinutes { get; set; }
 
-    [Range(0, 1439, ErrorMessage = "Minutes from midnight should be in range of 0 and 1439 (23h59)")]
-    public int? StartOrderTimeInMinutes { get; set; }
+    [Required]
+    [Range(0, 1439, ErrorMessage = "OrderingOffsetOpenMinutes should be less than number of minutes in a day.")]
+    public int OrderingOffsetOpenMinutes { get; set; }
 
-    [Range(0, 1439, ErrorMessage = "Minutes from midnight should be in range of 0 and 1439 (23h59)")]
-    public int? EndOrderTimeInMinutes { get; set; }
+    [Required]
+    [Range(0, 7*24*60 - 1, ErrorMessage = "OrderingOpenMinutes should be less than number of minutes in a week.")]
+    public int OrderingOpenMinutes { get; set; }
 }
