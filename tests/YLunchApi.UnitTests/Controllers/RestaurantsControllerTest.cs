@@ -98,7 +98,7 @@ public class RestaurantsControllerTest
         responseBody.Should().Be("Restaurant already exists");
     }
 
-[Fact]
+    [Fact]
     public async Task GetRestaurantById_Should_Return_A_200Ok()
     {
         // Arrange
@@ -115,6 +115,64 @@ public class RestaurantsControllerTest
                 OpenMinutes = 1439,
                 OrderingOffsetOpenMinutes = dateTimeBeforeUtcNow.MinutesFromMidnight(),
                 OrderingOpenMinutes = 120
+            }
+        };
+        restaurantCreateDto.AddressExtraInformation = "extra information";
+        restaurantCreateDto.Base64Logo = "my base 64 encoded logo";
+        restaurantCreateDto.Base64Image = "my base 64 encoded image";
+        var restaurantCreationResponse = await controller.CreateRestaurant(restaurantCreateDto);
+        var restaurantCreationResponseResult = Assert.IsType<CreatedResult>(restaurantCreationResponse.Result);
+        var restaurantCreationResponseBody = Assert.IsType<RestaurantReadDto>(restaurantCreationResponseResult.Value);
+        var restaurantId = restaurantCreationResponseBody.Id;
+
+        // Act
+        var response = await controller.GetRestaurantById(restaurantId);
+
+        // Assert
+        var responseResult = Assert.IsType<OkObjectResult>(response.Result);
+        var responseBody = Assert.IsType<RestaurantReadDto>(responseResult.Value);
+
+        responseBody.Id.Should().MatchRegex(GuidUtils.Regex);
+        responseBody.AdminId.Should().Be(_restaurantAdminInfo.UserId);
+        responseBody.Email.Should().Be(restaurantCreateDto.Email);
+        responseBody.PhoneNumber.Should().Be(restaurantCreateDto.PhoneNumber);
+        responseBody.CreationDateTime.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
+        responseBody.Name.Should().Be(restaurantCreateDto.Name);
+        responseBody.City.Should().Be(restaurantCreateDto.City);
+        responseBody.Country.Should().Be(restaurantCreateDto.Country);
+        responseBody.ZipCode.Should().Be(restaurantCreateDto.ZipCode);
+        responseBody.StreetName.Should().Be(restaurantCreateDto.StreetName);
+        responseBody.StreetNumber.Should().Be(restaurantCreateDto.StreetNumber);
+        responseBody.AddressExtraInformation.Should().Be(restaurantCreateDto.AddressExtraInformation);
+        responseBody.IsOpen.Should().Be(restaurantCreateDto.IsOpen);
+        responseBody.IsPublic.Should().Be(restaurantCreateDto.IsPublic);
+        responseBody.Base64Logo.Should().Be(restaurantCreateDto.Base64Logo);
+        responseBody.Base64Image.Should().Be(restaurantCreateDto.Base64Image);
+        responseBody.ClosingDates.Should().BeEquivalentTo(restaurantCreateDto.ClosingDates);
+        responseBody.OpeningTimes.Should().BeEquivalentTo(restaurantCreateDto.OpeningTimes);
+        responseBody.IsCurrentlyOpenToOrder.Should().Be(true);
+        responseBody.IsPublished.Should().Be(true);
+        responseBody.LastUpdateDateTime.Should().BeNull();
+        responseBody.EmailConfirmationDateTime.Should().BeNull();
+        responseBody.IsEmailConfirmed.Should().Be(false);
+    }
+
+    [Fact]
+    public async Task GetRestaurantById_Should_Return_A_200Ok_Having_IsCurrentlyOpenToOrder_True_Even_Day_After()
+    {
+        // Arrange
+        var controller = CreateController();
+        var restaurantCreateDto = RestaurantMocks.RestaurantCreateDto;
+        var utcNow = DateTime.UtcNow;
+        restaurantCreateDto.OpeningTimes = new List<OpeningTimeCreateDto>
+        {
+            new()
+            {
+                DayOfWeek = utcNow.AddDays(-1).DayOfWeek,
+                OffsetOpenMinutes = 0,
+                OpenMinutes = 1439,
+                OrderingOffsetOpenMinutes = 1380, // 23H00
+                OrderingOpenMinutes = utcNow.MinutesFromMidnight() + 60
             }
         };
         restaurantCreateDto.AddressExtraInformation = "extra information";
@@ -449,7 +507,42 @@ public class RestaurantsControllerTest
 
     [Fact]
     public async Task
-        GetRestaurantById_Should_Return_A_200Ok_Having_IsCurrentlyOpenToOrder_False_Because_Of_Time_Out_OpeningTimes_To_Order()
+        GetRestaurantById_Should_Return_A_200Ok_Having_IsCurrentlyOpenToOrder_False_Because_Of_Before_OpeningTimes_To_Order()
+    {
+        // Arrange
+        var controller = CreateController();
+        var restaurantCreateDto = RestaurantMocks.RestaurantCreateDto;
+        var utcNow = DateTime.UtcNow;
+        var utcNowPlus3H = utcNow.AddHours(3);
+        restaurantCreateDto.OpeningTimes = new List<OpeningTimeCreateDto>
+        {
+            new()
+            {
+                DayOfWeek = utcNow.DayOfWeek,
+                OffsetOpenMinutes = 0,
+                OpenMinutes = 1439,
+                OrderingOffsetOpenMinutes = utcNowPlus3H.MinutesFromMidnight(),
+                OrderingOpenMinutes = 120
+            }
+        };
+        var restaurantCreationResponse = await controller.CreateRestaurant(restaurantCreateDto);
+        var restaurantCreationResponseResult = Assert.IsType<CreatedResult>(restaurantCreationResponse.Result);
+        var restaurantCreationResponseBody = Assert.IsType<RestaurantReadDto>(restaurantCreationResponseResult.Value);
+        var restaurantId = restaurantCreationResponseBody.Id;
+
+        // Act
+        var response = await controller.GetRestaurantById(restaurantId);
+
+        // Assert
+        var responseResult = Assert.IsType<OkObjectResult>(response.Result);
+        var responseBody = Assert.IsType<RestaurantReadDto>(responseResult.Value);
+
+        responseBody.IsCurrentlyOpenToOrder.Should().Be(false);
+    }
+
+    [Fact]
+    public async Task
+        GetRestaurantById_Should_Return_A_200Ok_Having_IsCurrentlyOpenToOrder_False_Because_Of_After_OpeningTimes_To_Order()
     {
         // Arrange
         var controller = CreateController();

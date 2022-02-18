@@ -1,6 +1,5 @@
 using YLunchApi.Domain.CommonAggregate.Models;
 using YLunchApi.Domain.UserAggregate.Models;
-using YLunchApi.Helpers.Extensions;
 
 namespace YLunchApi.Domain.RestaurantAggregate.Models;
 
@@ -19,12 +18,7 @@ public class Restaurant : Entity
     public bool IsCurrentlyOpenToOrder =>
         IsOpen &&
         !ClosingDates.Any(x => x.ClosingDateTime.Date.Equals(DateTime.UtcNow.Date)) &&
-        OpeningTimes.Any(x =>
-        {
-            var utcNow = DateTime.UtcNow;
-            return x.DayOfWeek == utcNow.DayOfWeek &&
-                   x.Contains(DateTime.UtcNow);
-        });
+        OpeningTimes.Any(x => x.Contains(DateTime.UtcNow));
 
     public bool IsPublic { get; set; }
     public DateTime CreationDateTime { get; set; }

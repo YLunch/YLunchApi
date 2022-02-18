@@ -13,7 +13,7 @@ public class OpeningTimeCreateDto
     public int OffsetOpenMinutes { get; set; }
 
     [Required]
-    [Range(0, 7*24*60 - 1, ErrorMessage = "OpenMinutes should be less than number of minutes in a week.")]
+    [Range(0, 7 * 24 * 60 - 1, ErrorMessage = "OpenMinutes should be less than number of minutes in a week.")]
     public int OpenMinutes { get; set; }
 
     [Required]
@@ -21,6 +21,6 @@ public class OpeningTimeCreateDto
     public int OrderingOffsetOpenMinutes { get; set; }
 
     [Required]
-    [Range(0, 7*24*60 - 1, ErrorMessage = "OrderingOpenMinutes should be less than number of minutes in a week.")]
+    [Range(0, 7 * 24 * 60 - 1, ErrorMessage = "OrderingOpenMinutes should be less than number of minutes in a week.")]
     public int OrderingOpenMinutes { get; set; }
 }

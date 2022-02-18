@@ -512,7 +512,7 @@ components:
           example: 600
         orderingOpenMinutes:
           type: number
-          description: 'Number of minutes the restaurant is open since the offset, for example 120 minutes, which means the restaurant accepts orders during 2h since 10:00'
+          description: 'Number of minutes the restaurant accepts orders since the offset, for example 120 minutes, which means the restaurant accepts orders during 2h since 10:00'
           example: 120
       required:
         - dayOfWeek
@@ -544,7 +544,7 @@ components:
           example: 600
         orderingOpenMinutes:
           type: number
-          description: 'Number of minutes the restaurant is open since the offset, for example 120 minutes, which means the restaurant accepts orders during 2h since 10:00'
+          description: 'Number of minutes the restaurant accepts orders since the offset, for example 120 minutes, which means the restaurant accepts orders during 2h since 10:00'
           example: 120
     RestaurantCreateDto:
       type: object
