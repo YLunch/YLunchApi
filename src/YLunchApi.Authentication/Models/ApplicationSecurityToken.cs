@@ -15,9 +15,9 @@ public class ApplicationSecurityToken : JwtSecurityToken
         var handler = new JwtSecurityTokenHandler();
         var jwtSecurityToken = handler.ReadJwtToken(jwtEncodedString);
         AccessToken = jwtEncodedString;
-        UserId = jwtSecurityToken.Claims.First(x => x.Type.Equals("Id")).Value;
-        UserEmail = jwtSecurityToken.Claims.First(x => x.Type.Equals(JwtRegisteredClaimNames.Sub)).Value;
-        var roles = jwtSecurityToken.Claims.First(x => x.Type.Equals("role")).Value;
+        UserId = jwtSecurityToken.Claims.First(x => x.Type == "Id").Value;
+        UserEmail = jwtSecurityToken.Claims.First(x => x.Type == JwtRegisteredClaimNames.Sub).Value;
+        var roles = jwtSecurityToken.Claims.First(x => x.Type == "role").Value;
         UserRoles = Roles.StringToList(roles);
     }
 }

@@ -69,7 +69,7 @@ public class JwtServiceTest
                                    .Returns<string>(async refreshTokenString =>
                                        await _context.RefreshTokens
                                                      .FirstOrDefaultAsync(x =>
-                                                         x.Token.Equals(refreshTokenString))
+                                                         x.Token == refreshTokenString)
                                    );
     }
 

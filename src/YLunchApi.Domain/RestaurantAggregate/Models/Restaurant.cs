@@ -17,12 +17,12 @@ public class Restaurant : Entity
 
     public bool IsCurrentlyOpenInPlace =>
         IsOpen &&
-        !ClosingDates.Any(x => x.ClosingDateTime.Date.Equals(DateTime.UtcNow.Date)) &&
+        ClosingDates.All(x => x.ClosingDateTime.Date != DateTime.UtcNow.Date) &&
         PlaceOpeningTimes.Any(x => x.Contains(DateTime.UtcNow));
 
     public bool IsCurrentlyOpenToOrder =>
         IsOpen &&
-        !ClosingDates.Any(x => x.ClosingDateTime.Date.Equals(DateTime.UtcNow.Date)) &&
+        ClosingDates.All(x => x.ClosingDateTime.Date != DateTime.UtcNow.Date) &&
         OrderOpeningTimes.Any(x => x.Contains(DateTime.UtcNow));
 
     public bool IsPublic { get; set; }

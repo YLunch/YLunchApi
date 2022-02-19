@@ -33,7 +33,7 @@ public class Order : Entity
                                              .Last();
 
     public bool IsAcknowledged =>
-        OrderStatuses.Any(os => os.State.Equals(OrderState.Acknowledged));
+        OrderStatuses.Any(os => os.State == OrderState.Acknowledged);
 
     public virtual ICollection<OrderedProduct> OrderedProducts { get; set; } =
         new List<OrderedProduct>();

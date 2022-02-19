@@ -17,12 +17,12 @@ public class RestaurantRepository : IRestaurantRepository
     public async Task Create(Restaurant restaurant)
     {
         var existingRestaurant = await _context.Restaurants.FirstOrDefaultAsync(x =>
-            x.Name.Equals(restaurant.Name) &&
-            x.Country.Equals(restaurant.Country) &&
-            x.City.Equals(restaurant.City) &&
-            x.ZipCode.Equals(restaurant.ZipCode) &&
-            x.StreetName.Equals(restaurant.StreetName) &&
-            x.StreetNumber.Equals(restaurant.StreetNumber));
+            x.Name == restaurant.Name &&
+            x.Country == restaurant.Country &&
+            x.City == restaurant.City &&
+            x.ZipCode == restaurant.ZipCode &&
+            x.StreetName == restaurant.StreetName &&
+            x.StreetNumber == restaurant.StreetNumber);
         if (existingRestaurant != null)
         {
             throw new EntityAlreadyExistsException();
@@ -38,7 +38,7 @@ public class RestaurantRepository : IRestaurantRepository
                                        .Include(x => x.ClosingDates)
                                        .Include(x => x.PlaceOpeningTimes)
                                        .Include(x => x.OrderOpeningTimes)
-                                       .FirstOrDefaultAsync(x => x.Id.Equals(id));
+                                       .FirstOrDefaultAsync(x => x.Id == id);
         if (restaurant == null) throw new EntityNotFoundException($"Restaurant {id} not found");
         return restaurant;
     }

@@ -31,7 +31,7 @@ public static class ManagerMocker
         roleManagerMock.Setup(x => x.UpdateAsync(It.IsAny<IdentityRole>())).ReturnsAsync(IdentityResult.Success);
         roleManagerMock.Setup(x => x.RoleExistsAsync(It.IsAny<string>()))
                        .Returns<string>(async roleName =>
-                           await context.Roles.AnyAsync(x => x.Name.Equals(roleName))
+                           await context.Roles.AnyAsync(x => x.Name == roleName)
                        );
 
         return roleManagerMock;
@@ -65,7 +65,7 @@ public static class ManagerMocker
                        .ReturnsAsync(IdentityResult.Success)
                        .Callback<User, string>(async (x, role) =>
                        {
-                           var identityRole = await context.Roles.FirstOrDefaultAsync(r => r.Name.Equals(role));
+                           var identityRole = await context.Roles.FirstOrDefaultAsync(r => r.Name == role);
 
                            await context.UserRoles.AddAsync(new IdentityUserRole<string>
                                { UserId = x.Id, RoleId = identityRole!.Id });
@@ -75,7 +75,7 @@ public static class ManagerMocker
                        .Returns<User>(async user =>
                        {
                            var userRolesId = await context.UserRoles
-                                                          .Where(x => x.UserId.Equals(user.Id))
+                                                          .Where(x => x.UserId == user.Id)
                                                           .Select(x => x.RoleId)
                                                           .ToListAsync();
                            var roles = await context.Roles
@@ -87,8 +87,8 @@ public static class ManagerMocker
         userManagerMock.Setup(x => x.CheckPasswordAsync(It.IsAny<User>(), It.IsAny<string>()))
                        .Returns<User, string>(async (user, password) =>
                        {
-                           var userDb = await context.Users.FirstOrDefaultAsync(x => x.Email.Equals(user.Email));
-                           return userDb!.PasswordHash.Equals(HashUtils.HashValue(password));
+                           var userDb = await context.Users.FirstOrDefaultAsync(x => x.Email == user.Email);
+                           return userDb!.PasswordHash == HashUtils.HashValue(password);
                        });
 
         return userManagerMock;
