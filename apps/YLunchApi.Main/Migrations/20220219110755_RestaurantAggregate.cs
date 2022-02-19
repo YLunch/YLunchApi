@@ -131,27 +131,26 @@ namespace YLunchApi.Main.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "OpeningTimes",
+                name: "OrderOpeningTimes",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    RestaurantId = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     DayOfWeek = table.Column<int>(type: "int", nullable: false),
                     OffsetOpenMinutes = table.Column<int>(type: "int", nullable: false),
-                    OpenMinutes = table.Column<int>(type: "int", nullable: false),
-                    OrderingOffsetOpenMinutes = table.Column<int>(type: "int", nullable: false),
-                    OrderingOpenMinutes = table.Column<int>(type: "int", nullable: false),
-                    RestaurantId = table.Column<string>(type: "varchar(255)", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4")
+                    OpenMinutes = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OpeningTimes", x => x.Id);
+                    table.PrimaryKey("PK_OrderOpeningTimes", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_OpeningTimes_Restaurants_RestaurantId",
+                        name: "FK_OrderOpeningTimes_Restaurants_RestaurantId",
                         column: x => x.RestaurantId,
                         principalTable: "Restaurants",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -186,6 +185,30 @@ namespace YLunchApi.Main.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Orders_Restaurants_RestaurantId",
+                        column: x => x.RestaurantId,
+                        principalTable: "Restaurants",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "PlaceOpeningTimes",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    RestaurantId = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    DayOfWeek = table.Column<int>(type: "int", nullable: false),
+                    OffsetOpenMinutes = table.Column<int>(type: "int", nullable: false),
+                    OpenMinutes = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PlaceOpeningTimes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PlaceOpeningTimes_Restaurants_RestaurantId",
                         column: x => x.RestaurantId,
                         principalTable: "Restaurants",
                         principalColumn: "Id",
@@ -363,11 +386,6 @@ namespace YLunchApi.Main.Migrations
                 column: "RestaurantsId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OpeningTimes_RestaurantId",
-                table: "OpeningTimes",
-                column: "RestaurantId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_OrderedProducts_OrderId",
                 table: "OrderedProducts",
                 column: "OrderId");
@@ -380,6 +398,11 @@ namespace YLunchApi.Main.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_OrderedProducts_RestaurantId",
                 table: "OrderedProducts",
+                column: "RestaurantId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderOpeningTimes_RestaurantId",
+                table: "OrderOpeningTimes",
                 column: "RestaurantId");
 
             migrationBuilder.CreateIndex(
@@ -396,6 +419,11 @@ namespace YLunchApi.Main.Migrations
                 name: "IX_OrderStatuses_OrderId",
                 table: "OrderStatuses",
                 column: "OrderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PlaceOpeningTimes_RestaurantId",
+                table: "PlaceOpeningTimes",
+                column: "RestaurantId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProductProductTag_ProductsId",
@@ -422,13 +450,16 @@ namespace YLunchApi.Main.Migrations
                 name: "ClosingDateRestaurant");
 
             migrationBuilder.DropTable(
-                name: "OpeningTimes");
-
-            migrationBuilder.DropTable(
                 name: "OrderedProducts");
 
             migrationBuilder.DropTable(
+                name: "OrderOpeningTimes");
+
+            migrationBuilder.DropTable(
                 name: "OrderStatuses");
+
+            migrationBuilder.DropTable(
+                name: "PlaceOpeningTimes");
 
             migrationBuilder.DropTable(
                 name: "ProductProductTag");

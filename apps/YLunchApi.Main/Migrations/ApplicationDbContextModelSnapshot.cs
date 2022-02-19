@@ -255,36 +255,6 @@ namespace YLunchApi.Main.Migrations
                     b.ToTable("ClosingDates");
                 });
 
-            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Models.OpeningTime", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<int>("DayOfWeek")
-                        .HasColumnType("int");
-
-                    b.Property<int>("OffsetOpenMinutes")
-                        .HasColumnType("int");
-
-                    b.Property<int>("OpenMinutes")
-                        .HasColumnType("int");
-
-                    b.Property<int>("OrderingOffsetOpenMinutes")
-                        .HasColumnType("int");
-
-                    b.Property<int>("OrderingOpenMinutes")
-                        .HasColumnType("int");
-
-                    b.Property<string>("RestaurantId")
-                        .HasColumnType("varchar(255)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RestaurantId");
-
-                    b.ToTable("OpeningTimes");
-                });
-
             modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Models.Order", b =>
                 {
                     b.Property<string>("Id")
@@ -381,6 +351,31 @@ namespace YLunchApi.Main.Migrations
                     b.ToTable("OrderedProducts");
                 });
 
+            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Models.OrderOpeningTime", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int>("DayOfWeek")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OffsetOpenMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OpenMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RestaurantId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RestaurantId");
+
+                    b.ToTable("OrderOpeningTimes");
+                });
+
             modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Models.OrderStatus", b =>
                 {
                     b.Property<string>("Id")
@@ -401,6 +396,31 @@ namespace YLunchApi.Main.Migrations
                     b.HasIndex("OrderId");
 
                     b.ToTable("OrderStatuses");
+                });
+
+            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Models.PlaceOpeningTime", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int>("DayOfWeek")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OffsetOpenMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OpenMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RestaurantId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RestaurantId");
+
+                    b.ToTable("PlaceOpeningTimes");
                 });
 
             modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Models.Product", b =>
@@ -719,13 +739,6 @@ namespace YLunchApi.Main.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Models.OpeningTime", b =>
-                {
-                    b.HasOne("YLunchApi.Domain.RestaurantAggregate.Models.Restaurant", null)
-                        .WithMany("OpeningTimes")
-                        .HasForeignKey("RestaurantId");
-                });
-
             modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Models.Order", b =>
                 {
                     b.HasOne("YLunchApi.Domain.RestaurantAggregate.Models.Restaurant", "Restaurant")
@@ -772,6 +785,15 @@ namespace YLunchApi.Main.Migrations
                     b.Navigation("Restaurant");
                 });
 
+            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Models.OrderOpeningTime", b =>
+                {
+                    b.HasOne("YLunchApi.Domain.RestaurantAggregate.Models.Restaurant", null)
+                        .WithMany("OrderOpeningTimes")
+                        .HasForeignKey("RestaurantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Models.OrderStatus", b =>
                 {
                     b.HasOne("YLunchApi.Domain.RestaurantAggregate.Models.Order", "Order")
@@ -781,6 +803,15 @@ namespace YLunchApi.Main.Migrations
                         .IsRequired();
 
                     b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Models.PlaceOpeningTime", b =>
+                {
+                    b.HasOne("YLunchApi.Domain.RestaurantAggregate.Models.Restaurant", null)
+                        .WithMany("PlaceOpeningTimes")
+                        .HasForeignKey("RestaurantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Models.Product", b =>
@@ -814,9 +845,11 @@ namespace YLunchApi.Main.Migrations
 
             modelBuilder.Entity("YLunchApi.Domain.RestaurantAggregate.Models.Restaurant", b =>
                 {
-                    b.Navigation("OpeningTimes");
+                    b.Navigation("OrderOpeningTimes");
 
                     b.Navigation("Orders");
+
+                    b.Navigation("PlaceOpeningTimes");
 
                     b.Navigation("Products");
                 });

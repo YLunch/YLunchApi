@@ -526,6 +526,9 @@ components:
         id:
           type: string
           example: a00000e0-aaa0-000a-0000-00e00aa00e00
+        restaurantId:
+          type: string
+          example: a00000e0-aaa0-000a-0000-00e00aa00e00
         dayOfWeek:
           type: number
           description: 'The day to apply this opening time. Starting from Sunday: 0 to Saturday: 6, for example 4 is thursday'
