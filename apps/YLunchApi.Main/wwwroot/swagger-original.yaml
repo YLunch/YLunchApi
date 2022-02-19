@@ -485,9 +485,6 @@ components:
     ClosingDateReadDto:
       type: object
       properties:
-        id:
-          type: string
-          example: a00000e0-aaa0-000a-0000-00e00aa00e00
         closingDateTime:
           type: string
           example: "2021-12-31T00:00:00.000000"
@@ -506,20 +503,10 @@ components:
           type: number
           description: 'Number of minutes the restaurant is open since the offset, for example 120 minutes, which means the restaurant is open during 2h since 10:00'
           example: 120
-        orderingOffsetOpenMinutes:
-          type: number
-          description: 'Number of minutes past from 00:00 for example 10:00 is 600, which means the restaurant accepts orders since 10:00'
-          example: 600
-        orderingOpenMinutes:
-          type: number
-          description: 'Number of minutes the restaurant accepts orders since the offset, for example 120 minutes, which means the restaurant accepts orders during 2h since 10:00'
-          example: 120
       required:
         - dayOfWeek
         - offsetOpenMinutes
         - openMinutes
-        - orderingOffsetOpenMinutes
-        - orderingOpenMinutes
     OpeningTimeReadDto:
       type: object
       properties:
@@ -541,14 +528,6 @@ components:
           type: number
           description: 'Number of minutes the restaurant is open since the offset, for example 120 minutes, which means the restaurant is open during 2h since 10:00'
           example: 120
-        orderingOffsetOpenMinutes:
-          type: number
-          description: 'Number of minutes past from 00:00 for example 10:00 is 600, which means the restaurant accepts orders since 10:00'
-          example: 600
-        orderingOpenMinutes:
-          type: number
-          description: 'Number of minutes the restaurant accepts orders since the offset, for example 120 minutes, which means the restaurant accepts orders during 2h since 10:00'
-          example: 120
     RestaurantCreateDto:
       type: object
       properties:
@@ -565,7 +544,10 @@ components:
           example: my.restaurant@restaurant.com
         isOpen:
           type: boolean
-          description: 'True if the restaurant is opening based on regular opening times, false if the restaurant is not not open even while opening times are covered'
+          description: |
+            Boolean to set manually if the restaurant is open or not:
+            - `False`: the restaurant will be set as closed regardless of closing dates and opening times
+            - `True`: the restaurant will be set as open regarding closing dates and opening times
           example: true
         isPublic:
           type: boolean
@@ -593,7 +575,11 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ClosingDateCreateDto'
-        openingTimes:
+        placeOpeningTimes:
+          type: array
+          items:
+            $ref: '#/components/schemas/OpeningTimeCreateDto'
+        orderOpeningTimes:
           type: array
           items:
             $ref: '#/components/schemas/OpeningTimeCreateDto'
@@ -635,7 +621,10 @@ components:
           example: my.restaurant@restaurant.com
         isOpen:
           type: boolean
-          description: 'True if the restaurant is opening based on regular opening times, false if the restaurant is not not open even while opening times are covered'
+          description: |
+            Boolean to set manually if the restaurant is open or not:
+            - `False`: the restaurant will be set as closed regardless of closing dates and opening times
+            - `True`: the restaurant will be set as open regarding closing dates and opening times
           example: true
         isPublic:
           type: boolean
@@ -663,7 +652,11 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ClosingDateReadDto'
-        openingTimes:
+        placeOpeningTimes:
+          type: array
+          items:
+            $ref: '#/components/schemas/OpeningTimeReadDto'
+        orderOpeningTimes:
           type: array
           items:
             $ref: '#/components/schemas/OpeningTimeReadDto'
@@ -681,7 +674,10 @@ components:
           example: true
         isCurrentlyOpenToOrder:
           type: boolean
-          description: 'True if now is contained in any startOrderTimeInMinutes and endOrderTimeInMinutes'
+          description: 'True if the restaurant accepts orders'
+        isCurrentlyOpenInPlace:
+          type: boolean
+          description: 'True if the restaurant is open to eat in place'
   securitySchemes:
     Bearer:
       type: http
