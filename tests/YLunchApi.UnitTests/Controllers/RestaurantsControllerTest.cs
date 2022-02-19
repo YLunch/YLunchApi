@@ -85,11 +85,23 @@ public class RestaurantsControllerTest
         responseBody.StreetNumber.Should().Be(restaurantCreateDto.StreetNumber);
         responseBody.IsOpen.Should().Be(restaurantCreateDto.IsOpen);
         responseBody.IsPublic.Should().Be(restaurantCreateDto.IsPublic);
+
         responseBody.ClosingDates.Should().BeEquivalentTo(restaurantCreateDto.ClosingDates);
+
         responseBody.PlaceOpeningTimes.Should().BeEquivalentTo(restaurantCreateDto.PlaceOpeningTimes);
-        responseBody.OrderOpeningTimes.Should().BeEquivalentTo(restaurantCreateDto.OrderOpeningTimes);
+        responseBody.PlaceOpeningTimes.Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
+                    .Should().BeTrue();
+        responseBody.PlaceOpeningTimes.Aggregate(true, (acc, x) => acc && x.RestaurantId.Equals(responseBody.Id))
+                    .Should().BeTrue();
         responseBody.IsCurrentlyOpenInPlace.Should().Be(true);
+
+        responseBody.OrderOpeningTimes.Should().BeEquivalentTo(restaurantCreateDto.OrderOpeningTimes);
+        responseBody.OrderOpeningTimes.Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
+                    .Should().BeTrue();
+        responseBody.OrderOpeningTimes.Aggregate(true, (acc, x) => acc && x.RestaurantId.Equals(responseBody.Id))
+                    .Should().BeTrue();
         responseBody.IsCurrentlyOpenToOrder.Should().Be(true);
+
         responseBody.IsPublished.Should().Be(true);
     }
 
