@@ -15,10 +15,15 @@ public class Restaurant : Entity
     public bool IsEmailConfirmed { get; set; }
     public DateTime? EmailConfirmationDateTime { get; set; }
 
+    public bool IsCurrentlyOpenInPlace =>
+        IsOpen &&
+        !ClosingDates.Any(x => x.ClosingDateTime.Date.Equals(DateTime.UtcNow.Date)) &&
+        PlaceOpeningTimes.Any(x => x.Contains(DateTime.UtcNow));
+
     public bool IsCurrentlyOpenToOrder =>
         IsOpen &&
         !ClosingDates.Any(x => x.ClosingDateTime.Date.Equals(DateTime.UtcNow.Date)) &&
-        OpeningTimes.Any(x => x.Contains(DateTime.UtcNow));
+        OrderOpeningTimes.Any(x => x.Contains(DateTime.UtcNow));
 
     public bool IsPublic { get; set; }
     public DateTime CreationDateTime { get; set; }
@@ -38,7 +43,8 @@ public class Restaurant : Entity
     public string? Base64Logo { get; set; }
 
     public virtual ICollection<ClosingDate> ClosingDates { get; set; } = new List<ClosingDate>();
-    public virtual ICollection<OpeningTime> OpeningTimes { get; set; } = new List<OpeningTime>();
+    public virtual ICollection<PlaceOpeningTime> PlaceOpeningTimes { get; set; } = new List<PlaceOpeningTime>();
+    public virtual ICollection<OrderOpeningTime> OrderOpeningTimes { get; set; } = new List<OrderOpeningTime>();
     public virtual ICollection<Product> Products { get; set; } = new List<Product>();
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
@@ -57,7 +63,7 @@ public class Restaurant : Entity
                !string.IsNullOrEmpty(restaurant.StreetNumber) &&
                !string.IsNullOrEmpty(restaurant.StreetName) &&
                !string.IsNullOrEmpty(restaurant.AdminId) &&
-               restaurant.OpeningTimes.Count > 0;
+               (restaurant.PlaceOpeningTimes.Count > 0 || restaurant.OrderOpeningTimes.Count > 0);
         // Todo uncomment when create product is implemented
         // && Products.Any(x => x.IsActive); //NOSONAR
     }

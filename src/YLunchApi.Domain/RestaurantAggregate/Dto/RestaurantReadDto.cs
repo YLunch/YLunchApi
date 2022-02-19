@@ -12,6 +12,7 @@ public class RestaurantReadDto : EntityReadDto
     public DateTime? EmailConfirmationDateTime { get; set; }
     public bool IsOpen { get; set; }
     public bool IsCurrentlyOpenToOrder { get; set; }
+    public bool IsCurrentlyOpenInPlace { get; set; }
     public bool IsPublic { get; set; }
     public bool IsPublished { get; set; }
     public DateTime CreationDateTime { get; set; }
@@ -28,7 +29,8 @@ public class RestaurantReadDto : EntityReadDto
     // !address
 
     public ICollection<ClosingDateReadDto> ClosingDates { get; set; } = new List<ClosingDateReadDto>();
-    public ICollection<OpeningTimeReadDto> OpeningTimes { get; set; } = new List<OpeningTimeReadDto>();
+    public ICollection<PlaceOpeningTimeReadDto> PlaceOpeningTimes { get; set; } = new List<PlaceOpeningTimeReadDto>();
+    public ICollection<OrderOpeningTimeReadDto> OrderOpeningTimes { get; set; } = new List<OrderOpeningTimeReadDto>();
 
     public string? Base64Image { get; set; }
     public string? Base64Logo { get; set; }

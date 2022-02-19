@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http.Json;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
@@ -40,16 +41,22 @@ public class RestaurantsControllerTest : ControllerTestBase
             {
                 new() { ClosingDateTime = DateTime.Parse("2021-12-25") }
             },
-
-            OpeningTimes = new List<OpeningTimeCreateDto>
+            PlaceOpeningTimes = new List<PlaceOpeningTimeCreateDto>
             {
                 new()
                 {
                     DayOfWeek = utcNow.DayOfWeek,
                     OffsetOpenMinutes = utcNow.MinutesFromMidnight(),
-                    OpenMinutes = 2 * 60,
-                    OrderingOffsetOpenMinutes = utcNow.MinutesFromMidnight(),
-                    OrderingOpenMinutes = 2 * 60
+                    OpenMinutes = 2 * 60
+                }
+            },
+            OrderOpeningTimes = new List<OrderOpeningTimeCreateDto>
+            {
+                new()
+                {
+                    DayOfWeek = utcNow.DayOfWeek,
+                    OffsetOpenMinutes = utcNow.MinutesFromMidnight(),
+                    OpenMinutes = 2 * 60
                 }
             }
         };
@@ -75,7 +82,9 @@ public class RestaurantsControllerTest : ControllerTestBase
         responseBody.IsOpen.Should().Be(body.IsOpen);
         responseBody.IsPublic.Should().Be(body.IsPublic);
         responseBody.ClosingDates.Should().BeEquivalentTo(body.ClosingDates);
-        responseBody.OpeningTimes.Should().BeEquivalentTo(body.OpeningTimes);
+        responseBody.PlaceOpeningTimes.Should().BeEquivalentTo(body.PlaceOpeningTimes);
+        responseBody.OrderOpeningTimes.Should().BeEquivalentTo(body.OrderOpeningTimes);
+        responseBody.IsCurrentlyOpenInPlace.Should().Be(true);
         responseBody.IsCurrentlyOpenToOrder.Should().Be(true);
         responseBody.IsPublished.Should().Be(true);
     }
@@ -127,15 +136,22 @@ public class RestaurantsControllerTest : ControllerTestBase
             RestaurantMocks.RestaurantCreateDto.IsOpen,
             RestaurantMocks.RestaurantCreateDto.IsPublic,
             ClosingDates = new List<dynamic>(),
-            OpeningTimes = new List<dynamic>
+            PlaceOpeningTimes = new List<dynamic>
             {
                 new
                 {
                     DayOfWeek = 7,
                     OffsetOpenMinutes = 24 * 60,
                     OpenMinutes = 7 * 24 * 60,
-                    OrderingOffsetOpenMinutes = 24 * 60,
-                    OrderingOpenMinutes = 7 * 24 * 60
+                }
+            },
+            OrderOpeningTimes = new List<dynamic>
+            {
+                new
+                {
+                    DayOfWeek = 7,
+                    OffsetOpenMinutes = 24 * 60,
+                    OpenMinutes = 7 * 24 * 60,
                 }
             }
         };
@@ -151,18 +167,20 @@ public class RestaurantsControllerTest : ControllerTestBase
         responseBody.Should().Contain("ZipCode is invalid. Example: '06560'.");
         responseBody.Should()
                     .Contain("Email is invalid. It should be lowercase email format. Example: example@example.com.");
-        responseBody.Should().Contain("DayOfWeek\":[\"Day must be in range 0-6, 0 is sunday, 6 is saturday\"]");
+
+        responseBody.Should().MatchRegex(@"PlaceOpeningTimes.*Day must be in range 0-6, 0 is sunday, 6 is saturday\.");
         responseBody.Should()
-                    .Contain(
-                        "OffsetOpenMinutes\":[\"OffsetOpenMinutes should be less than number of minutes in a day.\"]");
+                    .MatchRegex(
+                        @"PlaceOpeningTimes.*OffsetOpenMinutes should be less than number of minutes in a day\.");
         responseBody.Should()
-                    .Contain("OpenMinutes\":[\"OpenMinutes should be less than number of minutes in a week.\"]");
+                    .MatchRegex(@"PlaceOpeningTimes.*OpenMinutes should be less than number of minutes in a week\.");
+
+        responseBody.Should().MatchRegex(@"OrderOpeningTimes.*Day must be in range 0-6, 0 is sunday, 6 is saturday\.");
         responseBody.Should()
-                    .Contain(
-                        "OrderingOffsetOpenMinutes\":[\"OrderingOffsetOpenMinutes should be less than number of minutes in a day.\"]");
+                    .MatchRegex(
+                        @"OrderOpeningTimes.*OffsetOpenMinutes should be less than number of minutes in a day\.");
         responseBody.Should()
-                    .Contain(
-                        "OrderingOpenMinutes\":[\"OrderingOpenMinutes should be less than number of minutes in a week.\"]");
+                    .MatchRegex(@"OrderOpeningTimes.*OpenMinutes should be less than number of minutes in a week\.");
     }
 
     [Fact]
@@ -185,16 +203,22 @@ public class RestaurantsControllerTest : ControllerTestBase
             {
                 new() { ClosingDateTime = DateTime.Parse("2021-12-25") }
             },
-
-            OpeningTimes = new List<OpeningTimeCreateDto>
+            PlaceOpeningTimes = new List<PlaceOpeningTimeCreateDto>
             {
                 new()
                 {
                     DayOfWeek = DateTime.UtcNow.DayOfWeek,
                     OffsetOpenMinutes = 0,
                     OpenMinutes = 1439, //23H59
-                    OrderingOffsetOpenMinutes = 0,
-                    OrderingOpenMinutes = 1439 //23H59
+                }
+            },
+            OrderOpeningTimes = new List<OrderOpeningTimeCreateDto>
+            {
+                new()
+                {
+                    DayOfWeek = DateTime.UtcNow.DayOfWeek,
+                    OffsetOpenMinutes = 0,
+                    OpenMinutes = 1439, //23H59
                 }
             }
         };
@@ -231,16 +255,22 @@ public class RestaurantsControllerTest : ControllerTestBase
             {
                 new() { ClosingDateTime = DateTime.Parse("2021-12-25") }
             },
-
-            OpeningTimes = new List<OpeningTimeCreateDto>
+            PlaceOpeningTimes = new List<PlaceOpeningTimeCreateDto>
             {
                 new()
                 {
                     DayOfWeek = DateTime.UtcNow.DayOfWeek,
                     OffsetOpenMinutes = 0,
                     OpenMinutes = 1439, //23H59
-                    OrderingOffsetOpenMinutes = 0,
-                    OrderingOpenMinutes = 1439 //23H59
+                }
+            },
+            OrderOpeningTimes = new List<OrderOpeningTimeCreateDto>
+            {
+                new()
+                {
+                    DayOfWeek = DateTime.UtcNow.DayOfWeek,
+                    OffsetOpenMinutes = 0,
+                    OpenMinutes = 1439, //23H59
                 }
             }
         };
