@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
@@ -171,8 +173,16 @@ public class RestaurantsControllerTest
         responseBody.Base64Image.Should().Be(restaurantCreateDto.Base64Image);
         responseBody.ClosingDates.Should().BeEquivalentTo(restaurantCreateDto.ClosingDates);
         responseBody.PlaceOpeningTimes.Should().BeEquivalentTo(restaurantCreateDto.PlaceOpeningTimes);
-        responseBody.OrderOpeningTimes.Should().BeEquivalentTo(restaurantCreateDto.OrderOpeningTimes);
+        responseBody.PlaceOpeningTimes.Aggregate(true, (acc, x) => acc && x.RestaurantId == restaurantId).Should()
+                    .BeTrue();
+        responseBody.PlaceOpeningTimes.Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
+                    .Should().BeTrue();
         responseBody.IsCurrentlyOpenInPlace.Should().Be(true);
+        responseBody.OrderOpeningTimes.Should().BeEquivalentTo(restaurantCreateDto.OrderOpeningTimes);
+        responseBody.OrderOpeningTimes.Aggregate(true, (acc, x) => acc && x.RestaurantId == restaurantId).Should()
+                    .BeTrue();
+        responseBody.OrderOpeningTimes.Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
+                    .Should().BeTrue();
         responseBody.IsCurrentlyOpenToOrder.Should().Be(true);
         responseBody.IsPublished.Should().Be(true);
         responseBody.LastUpdateDateTime.Should().BeNull();

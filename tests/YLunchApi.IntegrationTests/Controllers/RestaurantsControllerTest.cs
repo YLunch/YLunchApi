@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http.Json;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
@@ -17,6 +19,8 @@ namespace YLunchApi.IntegrationTests.Controllers;
 [Collection("Sequential")]
 public class RestaurantsControllerTest : ControllerTestBase
 {
+    #region Post_Restaurant_Tests
+
     [Fact]
     public async Task Post_Restaurant_Should_Return_A_201Created()
     {
@@ -80,11 +84,23 @@ public class RestaurantsControllerTest : ControllerTestBase
         responseBody.StreetNumber.Should().Be(body.StreetNumber);
         responseBody.IsOpen.Should().Be(body.IsOpen);
         responseBody.IsPublic.Should().Be(body.IsPublic);
+
         responseBody.ClosingDates.Should().BeEquivalentTo(body.ClosingDates);
+
         responseBody.PlaceOpeningTimes.Should().BeEquivalentTo(body.PlaceOpeningTimes);
-        responseBody.OrderOpeningTimes.Should().BeEquivalentTo(body.OrderOpeningTimes);
+        responseBody.PlaceOpeningTimes.Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
+                    .Should().BeTrue();
+        responseBody.PlaceOpeningTimes.Aggregate(true, (acc, x) => acc && x.RestaurantId.Equals(responseBody.Id))
+                    .Should().BeTrue();
         responseBody.IsCurrentlyOpenInPlace.Should().Be(true);
+
+        responseBody.OrderOpeningTimes.Should().BeEquivalentTo(body.OrderOpeningTimes);
+        responseBody.OrderOpeningTimes.Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
+                    .Should().BeTrue();
+        responseBody.OrderOpeningTimes.Aggregate(true, (acc, x) => acc && x.RestaurantId.Equals(responseBody.Id))
+                    .Should().BeTrue();
         responseBody.IsCurrentlyOpenToOrder.Should().Be(true);
+
         responseBody.IsPublished.Should().Be(true);
     }
 
@@ -141,7 +157,7 @@ public class RestaurantsControllerTest : ControllerTestBase
                 {
                     DayOfWeek = 7,
                     OffsetOpenMinutes = 24 * 60,
-                    OpenMinutes = 7 * 24 * 60,
+                    OpenMinutes = 7 * 24 * 60
                 }
             },
             OrderOpeningTimes = new List<dynamic>
@@ -150,7 +166,7 @@ public class RestaurantsControllerTest : ControllerTestBase
                 {
                     DayOfWeek = 7,
                     OffsetOpenMinutes = 24 * 60,
-                    OpenMinutes = 7 * 24 * 60,
+                    OpenMinutes = 7 * 24 * 60
                 }
             }
         };
@@ -208,7 +224,7 @@ public class RestaurantsControllerTest : ControllerTestBase
                 {
                     DayOfWeek = DateTime.UtcNow.DayOfWeek,
                     OffsetOpenMinutes = 0,
-                    OpenMinutes = 1439, //23H59
+                    OpenMinutes = 1439 //23H59
                 }
             },
             OrderOpeningTimes = new List<OrderOpeningTimeCreateDto>
@@ -217,7 +233,7 @@ public class RestaurantsControllerTest : ControllerTestBase
                 {
                     DayOfWeek = DateTime.UtcNow.DayOfWeek,
                     OffsetOpenMinutes = 0,
-                    OpenMinutes = 1439, //23H59
+                    OpenMinutes = 1439 //23H59
                 }
             }
         };
@@ -260,7 +276,7 @@ public class RestaurantsControllerTest : ControllerTestBase
                 {
                     DayOfWeek = DateTime.UtcNow.DayOfWeek,
                     OffsetOpenMinutes = 0,
-                    OpenMinutes = 1439, //23H59
+                    OpenMinutes = 1439 //23H59
                 }
             },
             OrderOpeningTimes = new List<OrderOpeningTimeCreateDto>
@@ -269,7 +285,7 @@ public class RestaurantsControllerTest : ControllerTestBase
                 {
                     DayOfWeek = DateTime.UtcNow.DayOfWeek,
                     OffsetOpenMinutes = 0,
-                    OpenMinutes = 1439, //23H59
+                    OpenMinutes = 1439 //23H59
                 }
             }
         };
@@ -283,4 +299,6 @@ public class RestaurantsControllerTest : ControllerTestBase
 
         responseBody.Should().Be("");
     }
+
+    #endregion
 }
