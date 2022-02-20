@@ -17,6 +17,13 @@ public class NoOverridingOpeningTimesAttributeTest
     }
 
     [Fact]
+    public void Null_Should_Be_Invalid()
+    {
+        // Arrange & Act & Assert
+        _attribute.IsValid(null).Should().BeFalse();
+    }
+
+    [Fact]
     public void Opening_Times_Should_Be_Valid()
     {
         // Arrange
@@ -64,5 +71,15 @@ public class NoOverridingOpeningTimesAttributeTest
 
         // Act & Assert
         _attribute.IsValid(openingTimes).Should().BeFalse();
+    }
+
+    [Fact]
+    public void FormatErrorMessage_Should_Return_Right_Message()
+    {
+        // Arrange & Act
+        var errorMessage = _attribute.FormatErrorMessage("");
+
+        // Assert
+        errorMessage.Should().Be("Some opening times override others.");
     }
 }
