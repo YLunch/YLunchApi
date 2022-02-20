@@ -5,14 +5,14 @@ namespace YLunchApi.Domain.Core.Utils;
 
 public static class OpeningTimeUtils
 {
-    public static int StartMinutesInWeek(OpeningTimeCreateDto openingTime)
+    public static int StartMinutesFromFirstDayOfWeek(OpeningTimeCreateDto openingTime)
     {
         return (int)openingTime.DayOfWeek * 24 * 60 + openingTime.OffsetOpenMinutes;
     }
 
 
-    public static int EndMinutesInWeek(OpeningTimeCreateDto openingTime)
+    public static int EndMinutesFromFirstDayOfWeek(OpeningTimeCreateDto openingTime)
     {
-        return StartMinutesInWeek(openingTime) + openingTime.OpenMinutes;
+        return StartMinutesFromFirstDayOfWeek(openingTime) + openingTime.OpenMinutes;
     }
 }

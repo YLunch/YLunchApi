@@ -14,8 +14,8 @@ public class NoOverridingOpeningTimesAttribute : ValidationAttribute
         }
 
         var orderedOpeningTimes = ((ICollection<OpeningTimeCreateDto>)value)
-                                  .OrderBy(OpeningTimeUtils.StartMinutesInWeek)
-                                  .ThenBy(OpeningTimeUtils.EndMinutesInWeek)
+                                  .OrderBy(OpeningTimeUtils.StartMinutesFromFirstDayOfWeek)
+                                  .ThenBy(OpeningTimeUtils.EndMinutesFromFirstDayOfWeek)
                                   .ToList();
 
         for (var i = 1; i < orderedOpeningTimes.Count; i++)
@@ -23,8 +23,8 @@ public class NoOverridingOpeningTimesAttribute : ValidationAttribute
             var previousOpeningTimes = orderedOpeningTimes[i - 1];
             var currentOpeningTimes = orderedOpeningTimes[i];
 
-            if (OpeningTimeUtils.StartMinutesInWeek(currentOpeningTimes) <=
-                OpeningTimeUtils.EndMinutesInWeek(previousOpeningTimes))
+            if (OpeningTimeUtils.StartMinutesFromFirstDayOfWeek(currentOpeningTimes) <=
+                OpeningTimeUtils.EndMinutesFromFirstDayOfWeek(previousOpeningTimes))
             {
                 return false;
             }
