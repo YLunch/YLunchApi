@@ -4,7 +4,9 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
 using YLunchApi.Domain.UserAggregate.Dto;
+using YLunchApi.Helpers.Extensions;
 using YLunchApi.IntegrationTests.Core.Utils;
+using YLunchApi.TestsShared;
 using YLunchApi.TestsShared.Mocks;
 
 namespace YLunchApi.IntegrationTests.Controllers;
@@ -12,17 +14,26 @@ namespace YLunchApi.IntegrationTests.Controllers;
 [Collection("Sequential")]
 public class UsersControllerTest : ControllerTestBase
 {
-    [Fact]
-    public async Task Post_RestaurantAdmin_Should_Return_A_201Created()
+    [Theory]
+    [InlineData("admin@restaurant.com", "Jean-Marc", "Dupont Henri", "0612345678", "Password1234.")]
+    [InlineData("admin.rest@rest-aurant.com", "Jean Marc", "Dupont Henri", "0612345678", "PaSSword1234$")]
+    [InlineData("admin-rest@rest.aurant.com", "Jean-Marc", "Dupont-Henri", "0712345678", "paSS@1234word")]
+    [InlineData("admin-rest@rest.aurant.com", "Jo", "Do do-do", "0712345678", "paSS@1234word")]
+    [InlineData("admin-rest@rest.aurant.com", "John", "Doe", "0712345678", "paSS@1234word")]
+    public async Task Post_RestaurantAdmin_Should_Return_A_201Created(string email,
+                                                                      string firstname,
+                                                                      string lastname,
+                                                                      string phoneNumber,
+                                                                      string password)
     {
         // Arrange
         var body = new
         {
-            UserMocks.RestaurantAdminCreateDto.Email,
-            UserMocks.RestaurantAdminCreateDto.Password,
-            UserMocks.RestaurantAdminCreateDto.PhoneNumber,
-            UserMocks.RestaurantAdminCreateDto.Lastname,
-            UserMocks.RestaurantAdminCreateDto.Firstname
+            Email = email,
+            Password = password,
+            PhoneNumber = phoneNumber,
+            Lastname = lastname,
+            Firstname = firstname
         };
 
         // Act
@@ -30,8 +41,12 @@ public class UsersControllerTest : ControllerTestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Created);
-        var content = await ResponseUtils.DeserializeContentAsync<UserReadDto>(response);
-        content.Should().BeEquivalentTo(UserMocks.RestaurantAdminUserReadDto(content.Id));
+        var responseBody = await ResponseUtils.DeserializeContentAsync<UserReadDto>(response);
+        responseBody.Id.Should().MatchRegex(GuidUtils.Regex);
+        responseBody.Email.Should().Be(body.Email);
+        responseBody.PhoneNumber.Should().Be(body.PhoneNumber);
+        responseBody.Lastname.Should().Be(body.Lastname.Capitalize());
+        responseBody.Firstname.Should().Be(body.Firstname.Capitalize());
     }
 
     [Fact]
