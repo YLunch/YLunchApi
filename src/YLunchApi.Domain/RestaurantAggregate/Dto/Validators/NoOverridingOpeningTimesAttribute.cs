@@ -1,9 +1,10 @@
 using System.ComponentModel.DataAnnotations;
+using YLunchApi.Domain.Core.Utils;
 
 namespace YLunchApi.Domain.RestaurantAggregate.Dto.Validators;
 
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
-public class NoConflictOpeningTimes : ValidationAttribute
+public class NoOverridingOpeningTimesAttribute : ValidationAttribute
 {
     public override bool IsValid(object? value)
     {
@@ -13,8 +14,8 @@ public class NoConflictOpeningTimes : ValidationAttribute
         }
 
         var orderedOpeningTimes = ((ICollection<OpeningTimeCreateDto>)value)
-                                  .OrderBy(x => x.Start)
-                                  .ThenBy(x => x.End)
+                                  .OrderBy(OpeningTimeUtils.StartMinutesInWeek)
+                                  .ThenBy(OpeningTimeUtils.EndMinutesInWeek)
                                   .ToList();
 
         for (var i = 1; i < orderedOpeningTimes.Count; i++)
@@ -22,7 +23,8 @@ public class NoConflictOpeningTimes : ValidationAttribute
             var previousOpeningTimes = orderedOpeningTimes[i - 1];
             var currentOpeningTimes = orderedOpeningTimes[i];
 
-            if (previousOpeningTimes.End >= currentOpeningTimes.Start)
+            if (OpeningTimeUtils.StartMinutesInWeek(currentOpeningTimes) <=
+                OpeningTimeUtils.EndMinutesInWeek(previousOpeningTimes))
             {
                 return false;
             }
@@ -33,6 +35,6 @@ public class NoConflictOpeningTimes : ValidationAttribute
 
     public override string FormatErrorMessage(string name)
     {
-        return "Some opening times override others";
+        return "Some opening times override others.";
     }
 }

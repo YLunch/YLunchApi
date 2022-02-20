@@ -15,7 +15,4 @@ public class OpeningTimeCreateDto
     [Required]
     [Range(0, 7 * 24 * 60 - 1, ErrorMessage = "OpenMinutes should be less than number of minutes in a week.")]
     public int OpenMinutes { get; set; }
-
-    public int Start => (int)DayOfWeek * 24 * 60 + OffsetOpenMinutes;
-    public int End => Start + OpenMinutes;
 }

@@ -38,11 +38,11 @@ public class RestaurantCreateDto
 
     public ICollection<ClosingDateCreateDto> ClosingDates { get; set; } = new List<ClosingDateCreateDto>();
 
-    [NoConflictOpeningTimes]
+    [NoOverridingOpeningTimes]
     public ICollection<OpeningTimeCreateDto> PlaceOpeningTimes { get; set; } =
         new List<OpeningTimeCreateDto>();
 
-    [NoConflictOpeningTimes]
+    [NoOverridingOpeningTimes]
     public ICollection<OpeningTimeCreateDto> OrderOpeningTimes { get; set; } =
         new List<OpeningTimeCreateDto>();
 
