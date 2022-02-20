@@ -209,7 +209,7 @@ public class UsersControllerTest : ControllerTestBase
     [InlineData("anne.marie@ynov.com", "Anne Marie", "Martin Jacques", "0787654321", "PaSSword1234$")]
     [InlineData("anne.marie@ynov.com", "An-Ma", "Du-He", "0798765432", "paSS@1234word")]
     [InlineData("anne.marie@ynov.com", "An ma", "Du he", "0712345678", "paSS@1234word")]
-    [InlineData("anne.m.arie@ynov.com", "An", "Du", "0712345678", "paSS@1234word")]
+    [InlineData("anne.marie@ynov.com", "An", "Du", "0712345678", "paSS@1234word")]
     public async Task Post_Customer_Should_Return_A_201Created(string email,
                                                                string firstname,
                                                                string lastname,
@@ -245,7 +245,7 @@ public class UsersControllerTest : ControllerTestBase
         // Arrange
         var body = new
         {
-            Email = $"post_customer_should_return_a_409conflict_{UserMocks.CustomerCreateDto.Email}",
+            UserMocks.CustomerCreateDto.Email,
             UserMocks.CustomerCreateDto.Password,
             UserMocks.CustomerCreateDto.PhoneNumber,
             UserMocks.CustomerCreateDto.Lastname,
