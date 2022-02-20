@@ -14,11 +14,14 @@ public abstract class OpeningTime : Entity
     public bool Contains(DateTime dateTime)
     {
         // Computation of difference between days
-        var dateTimeMinutesToCompare =
+        var dateTimeMinutesInput =
             (dateTime.DayOfWeek < DayOfWeek ? 7 : 0 + dateTime.DayOfWeek - DayOfWeek) * 24 * 60 +
             dateTime.MinutesFromMidnight();
 
-        return dateTimeMinutesToCompare >= OffsetOpenMinutes &&
-               dateTimeMinutesToCompare <= OffsetOpenMinutes + OpenMinutes;
+        return dateTimeMinutesInput >= Start &&
+               dateTimeMinutesInput <= End;
     }
+
+    private int Start => (int)DayOfWeek * 24 * 60 + OffsetOpenMinutes;
+    private int End => Start + OpenMinutes;
 }
