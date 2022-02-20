@@ -23,13 +23,13 @@ public abstract class UserCreateDto
     public string PhoneNumber { get; set; } = null!;
 
     [RegularExpression(
-        @"^(:?[^\W0-9]{2,20}[ -]*[^\W0-9]{2,20})+$",
+        @"^(:?[^\W0-9]{2,20}(?:[ -](?:[^\W0-9]{2,20})+)*)$",
         ErrorMessage = "Firstname is invalid. Should contain only letters and '-'")]
     [Required]
     public string Firstname { get; set; } = null!;
 
     [RegularExpression(
-        @"^(:?[^\W0-9]{2,20}[ -]*[^\W0-9]{2,20})+$",
+        @"^(:?[^\W0-9]{2,20}(?:[ -](?:[^\W0-9]{2,20})+)*)$",
         ErrorMessage = "Lastname is invalid. Should contain only letters and '-'")]
     [Required]
     public string Lastname { get; set; } = null!;
