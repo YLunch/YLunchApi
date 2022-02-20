@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using YLunchApi.Domain.RestaurantAggregate.Dto.Validators;
 
 namespace YLunchApi.Domain.RestaurantAggregate.Dto;
 
@@ -37,11 +38,13 @@ public class RestaurantCreateDto
 
     public ICollection<ClosingDateCreateDto> ClosingDates { get; set; } = new List<ClosingDateCreateDto>();
 
-    public ICollection<PlaceOpeningTimeCreateDto> PlaceOpeningTimes { get; set; } =
-        new List<PlaceOpeningTimeCreateDto>();
+    [NoConflictOpeningTimes]
+    public ICollection<OpeningTimeCreateDto> PlaceOpeningTimes { get; set; } =
+        new List<OpeningTimeCreateDto>();
 
-    public ICollection<OrderOpeningTimeCreateDto> OrderOpeningTimes { get; set; } =
-        new List<OrderOpeningTimeCreateDto>();
+    [NoConflictOpeningTimes]
+    public ICollection<OpeningTimeCreateDto> OrderOpeningTimes { get; set; } =
+        new List<OpeningTimeCreateDto>();
 
     public string? Base64Image { get; set; }
     public string? Base64Logo { get; set; }

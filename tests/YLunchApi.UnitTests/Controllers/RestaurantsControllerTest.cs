@@ -46,7 +46,7 @@ public class RestaurantsControllerTest
         {
             new() { ClosingDateTime = DateTime.Parse("2021-12-25") }
         };
-        restaurantCreateDto.PlaceOpeningTimes = new List<PlaceOpeningTimeCreateDto>
+        restaurantCreateDto.PlaceOpeningTimes = new List<OpeningTimeCreateDto>
         {
             new()
             {
@@ -55,7 +55,7 @@ public class RestaurantsControllerTest
                 OpenMinutes = 1439
             }
         };
-        restaurantCreateDto.OrderOpeningTimes = new List<OrderOpeningTimeCreateDto>
+        restaurantCreateDto.OrderOpeningTimes = new List<OpeningTimeCreateDto>
         {
             new()
             {
@@ -134,7 +134,7 @@ public class RestaurantsControllerTest
         var restaurantCreateDto = RestaurantMocks.RestaurantCreateDto;
         var utcNow = DateTime.UtcNow;
         var dateTimeBeforeUtcNow = utcNow.AddHours(-2);
-        restaurantCreateDto.PlaceOpeningTimes = new List<PlaceOpeningTimeCreateDto>
+        restaurantCreateDto.PlaceOpeningTimes = new List<OpeningTimeCreateDto>
         {
             new()
             {
@@ -143,7 +143,7 @@ public class RestaurantsControllerTest
                 OpenMinutes = 1439
             }
         };
-        restaurantCreateDto.OrderOpeningTimes = new List<OrderOpeningTimeCreateDto>
+        restaurantCreateDto.OrderOpeningTimes = new List<OpeningTimeCreateDto>
         {
             new()
             {
@@ -464,7 +464,7 @@ public class RestaurantsControllerTest
         var controller = CreateController();
         var restaurantCreateDto = RestaurantMocks.RestaurantCreateDto;
         var utcNow = DateTime.UtcNow;
-        restaurantCreateDto.OrderOpeningTimes = new List<OrderOpeningTimeCreateDto>
+        restaurantCreateDto.OrderOpeningTimes = new List<OpeningTimeCreateDto>
         {
             new()
             {
@@ -526,7 +526,7 @@ public class RestaurantsControllerTest
         var restaurantCreateDto = RestaurantMocks.RestaurantCreateDto;
         var tomorrowDateTime = DateTime.UtcNow.AddDays(1);
         var tomorrowDateTimeMinus1H = tomorrowDateTime.AddHours(-1);
-        restaurantCreateDto.OrderOpeningTimes = new List<OrderOpeningTimeCreateDto>
+        restaurantCreateDto.OrderOpeningTimes = new List<OpeningTimeCreateDto>
         {
             new()
             {
@@ -559,7 +559,7 @@ public class RestaurantsControllerTest
         var restaurantCreateDto = RestaurantMocks.RestaurantCreateDto;
         var utcNow = DateTime.UtcNow;
         var utcNowPlus3H = utcNow.AddHours(3);
-        restaurantCreateDto.OrderOpeningTimes = new List<OrderOpeningTimeCreateDto>
+        restaurantCreateDto.OrderOpeningTimes = new List<OpeningTimeCreateDto>
         {
             new()
             {
@@ -592,7 +592,7 @@ public class RestaurantsControllerTest
         var restaurantCreateDto = RestaurantMocks.RestaurantCreateDto;
         var utcNow = DateTime.UtcNow;
         var utcNowMinus3H = utcNow.AddHours(-3);
-        restaurantCreateDto.OrderOpeningTimes = new List<OrderOpeningTimeCreateDto>
+        restaurantCreateDto.OrderOpeningTimes = new List<OpeningTimeCreateDto>
         {
             new()
             {
@@ -626,7 +626,7 @@ public class RestaurantsControllerTest
         restaurantCreateDto.IsOpen = false;
         var utcNow = DateTime.UtcNow;
         var utcNowMinus2H = utcNow.AddHours(-2);
-        restaurantCreateDto.OrderOpeningTimes = new List<OrderOpeningTimeCreateDto>
+        restaurantCreateDto.OrderOpeningTimes = new List<OpeningTimeCreateDto>
         {
             new()
             {

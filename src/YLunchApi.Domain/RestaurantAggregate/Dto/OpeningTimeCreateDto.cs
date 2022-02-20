@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace YLunchApi.Domain.RestaurantAggregate.Dto;
 
-public abstract class OpeningTimeCreateDto
+public class OpeningTimeCreateDto
 {
     [Required]
     [Range(0, 6, ErrorMessage = "Day must be in range 0-6, 0 is sunday, 6 is saturday.")]
@@ -15,4 +15,7 @@ public abstract class OpeningTimeCreateDto
     [Required]
     [Range(0, 7 * 24 * 60 - 1, ErrorMessage = "OpenMinutes should be less than number of minutes in a week.")]
     public int OpenMinutes { get; set; }
+
+    public int Start => (int)DayOfWeek * 24 * 60 + OffsetOpenMinutes;
+    public int End => Start + OpenMinutes;
 }

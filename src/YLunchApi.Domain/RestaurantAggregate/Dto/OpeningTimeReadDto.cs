@@ -2,7 +2,7 @@ using YLunchApi.Domain.CommonAggregate.Dto;
 
 namespace YLunchApi.Domain.RestaurantAggregate.Dto;
 
-public abstract class OpeningTimeReadDto : EntityReadDto
+public class OpeningTimeReadDto : EntityReadDto
 {
     public string RestaurantId { get; set; } = null!;
     public DayOfWeek DayOfWeek { get; set; }

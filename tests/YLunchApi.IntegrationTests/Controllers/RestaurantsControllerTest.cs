@@ -44,7 +44,7 @@ public class RestaurantsControllerTest : ControllerTestBase
             {
                 new() { ClosingDateTime = DateTime.Parse("2021-12-25") }
             },
-            PlaceOpeningTimes = new List<PlaceOpeningTimeCreateDto>
+            PlaceOpeningTimes = new List<OpeningTimeCreateDto>
             {
                 new()
                 {
@@ -53,7 +53,7 @@ public class RestaurantsControllerTest : ControllerTestBase
                     OpenMinutes = 2 * 60
                 }
             },
-            OrderOpeningTimes = new List<OrderOpeningTimeCreateDto>
+            OrderOpeningTimes = new List<OpeningTimeCreateDto>
             {
                 new()
                 {
@@ -218,7 +218,7 @@ public class RestaurantsControllerTest : ControllerTestBase
             {
                 new() { ClosingDateTime = DateTime.Parse("2021-12-25") }
             },
-            PlaceOpeningTimes = new List<PlaceOpeningTimeCreateDto>
+            PlaceOpeningTimes = new List<OpeningTimeCreateDto>
             {
                 new()
                 {
@@ -227,7 +227,7 @@ public class RestaurantsControllerTest : ControllerTestBase
                     OpenMinutes = 1439 //23H59
                 }
             },
-            OrderOpeningTimes = new List<OrderOpeningTimeCreateDto>
+            OrderOpeningTimes = new List<OpeningTimeCreateDto>
             {
                 new()
                 {
@@ -270,7 +270,7 @@ public class RestaurantsControllerTest : ControllerTestBase
             {
                 new() { ClosingDateTime = DateTime.Parse("2021-12-25") }
             },
-            PlaceOpeningTimes = new List<PlaceOpeningTimeCreateDto>
+            PlaceOpeningTimes = new List<OpeningTimeCreateDto>
             {
                 new()
                 {
@@ -279,7 +279,7 @@ public class RestaurantsControllerTest : ControllerTestBase
                     OpenMinutes = 1439 //23H59
                 }
             },
-            OrderOpeningTimes = new List<OrderOpeningTimeCreateDto>
+            OrderOpeningTimes = new List<OpeningTimeCreateDto>
             {
                 new()
                 {
