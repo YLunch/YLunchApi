@@ -14,6 +14,8 @@ namespace YLunchApi.IntegrationTests.Controllers;
 [Collection("Sequential")]
 public class UsersControllerTest : ControllerTestBase
 {
+    #region Post_RestaurantAdmin_Tests
+
     [Theory]
     [InlineData("admin@restaurant.com", "Jean-Marc", "Dupont Henri", "0612345678", "Password1234.")]
     [InlineData("admin.rest@rest-aurant.com", "Jean Marc", "Dupont Henri", "0612345678", "PaSSword1234$")]
@@ -198,17 +200,30 @@ public class UsersControllerTest : ControllerTestBase
                .Contain("Lastname is invalid");
     }
 
-    [Fact]
-    public async Task Post_Customer_Should_Return_A_201Created()
+    #endregion
+
+    #region Post_Customer_Tests
+
+    [Theory]
+    [InlineData("anne-marie.martin@ynov.com", "Anne-Marie", "Martin-Jacques", "0687654321", "Password1234.")]
+    [InlineData("anne.marie@ynov.com", "Anne Marie", "Martin Jacques", "0787654321", "PaSSword1234$")]
+    [InlineData("anne.marie@ynov.com", "An-Ma", "Du-He", "0798765432", "paSS@1234word")]
+    [InlineData("anne.marie@ynov.com", "An ma", "Du he", "0712345678", "paSS@1234word")]
+    [InlineData("anne.m.arie@ynov.com", "An", "Du", "0712345678", "paSS@1234word")]
+    public async Task Post_Customer_Should_Return_A_201Created(string email,
+                                                               string firstname,
+                                                               string lastname,
+                                                               string phoneNumber,
+                                                               string password)
     {
         // Arrange
         var body = new
         {
-            UserMocks.CustomerCreateDto.Email,
-            UserMocks.CustomerCreateDto.Password,
-            UserMocks.CustomerCreateDto.PhoneNumber,
-            UserMocks.CustomerCreateDto.Lastname,
-            UserMocks.CustomerCreateDto.Firstname
+            Email = email,
+            Password = password,
+            PhoneNumber = phoneNumber,
+            Lastname = lastname,
+            Firstname = firstname
         };
 
         // Act
@@ -216,8 +231,12 @@ public class UsersControllerTest : ControllerTestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Created);
-        var content = await ResponseUtils.DeserializeContentAsync<UserReadDto>(response);
-        content.Should().BeEquivalentTo(UserMocks.CustomerUserReadDto(content.Id));
+        var responseBody = await ResponseUtils.DeserializeContentAsync<UserReadDto>(response);
+        responseBody.Id.Should().MatchRegex(GuidUtils.Regex);
+        responseBody.Email.Should().Be(body.Email);
+        responseBody.PhoneNumber.Should().Be(body.PhoneNumber);
+        responseBody.Lastname.Should().Be(body.Lastname.Capitalize());
+        responseBody.Firstname.Should().Be(body.Firstname.Capitalize());
     }
 
     [Fact]
@@ -363,4 +382,6 @@ public class UsersControllerTest : ControllerTestBase
                .And
                .Contain("Lastname is invalid");
     }
+
+    #endregion
 }
