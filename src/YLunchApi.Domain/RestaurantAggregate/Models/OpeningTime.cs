@@ -1,4 +1,5 @@
 using YLunchApi.Domain.CommonAggregate.Models;
+using YLunchApi.Domain.Core.Utils;
 using YLunchApi.Helpers.Extensions;
 
 namespace YLunchApi.Domain.RestaurantAggregate.Models;
@@ -13,15 +14,12 @@ public abstract class OpeningTime : Entity
 
     public bool Contains(DateTime dateTime)
     {
-        // Computation of difference between days
+        // Computation of difference during all the week
         var dateTimeMinutesInput =
             (dateTime.DayOfWeek < DayOfWeek ? 7 : 0 + dateTime.DayOfWeek - DayOfWeek) * 24 * 60 +
             dateTime.MinutesFromMidnight();
 
-        return dateTimeMinutesInput >= Start &&
-               dateTimeMinutesInput <= End;
+        return dateTimeMinutesInput >= OpeningTimeUtils.StartMinutesFromFirstDayOfWeek(this) &&
+               dateTimeMinutesInput <= OpeningTimeUtils.EndMinutesFromFirstDayOfWeek(this);
     }
-
-    private int Start => (int)DayOfWeek * 24 * 60 + OffsetOpenMinutes;
-    private int End => Start + OpenMinutes;
 }

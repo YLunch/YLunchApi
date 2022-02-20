@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
+using YLunchApi.Domain.Core.Utils;
 using YLunchApi.Domain.RestaurantAggregate.Dto;
 using YLunchApi.Helpers.Extensions;
 using YLunchApi.IntegrationTests.Core.Extensions;
@@ -88,10 +89,17 @@ public class RestaurantsControllerTest : ControllerTestBase
             RestaurantMocks.RestaurantCreateDto.IsPublic,
             ClosingDates = new List<ClosingDateCreateDto>
             {
+                new() { ClosingDateTime = DateTime.Parse("2021-12-31") },
                 new() { ClosingDateTime = DateTime.Parse("2021-12-25") }
             },
             PlaceOpeningTimes = new List<OpeningTimeCreateDto>
             {
+                new()
+                {
+                    DayOfWeek = utcNow.AddDays(-1).DayOfWeek,
+                    OffsetOpenMinutes = utcNow.MinutesFromMidnight(),
+                    OpenMinutes = 2 * 60
+                },
                 new()
                 {
                     DayOfWeek = utcNow.DayOfWeek,
@@ -101,6 +109,12 @@ public class RestaurantsControllerTest : ControllerTestBase
             },
             OrderOpeningTimes = new List<OpeningTimeCreateDto>
             {
+                new()
+                {
+                    DayOfWeek = utcNow.AddDays(-1).DayOfWeek,
+                    OffsetOpenMinutes = utcNow.MinutesFromMidnight(),
+                    OpenMinutes = 2 * 60
+                },
                 new()
                 {
                     DayOfWeek = utcNow.DayOfWeek,
@@ -131,16 +145,22 @@ public class RestaurantsControllerTest : ControllerTestBase
         responseBody.IsOpen.Should().Be(body.IsOpen);
         responseBody.IsPublic.Should().Be(body.IsPublic);
 
-        responseBody.ClosingDates.Should().BeEquivalentTo(body.ClosingDates);
+        responseBody.ClosingDates.Should().BeEquivalentTo(body.ClosingDates)
+                    .And
+                    .BeInAscendingOrder(x => x.ClosingDateTime);
 
-        responseBody.PlaceOpeningTimes.Should().BeEquivalentTo(body.PlaceOpeningTimes);
+        responseBody.PlaceOpeningTimes.Should().BeEquivalentTo(
+            OpeningTimeUtils.AscendingOrder(body.PlaceOpeningTimes),
+            options => options.WithStrictOrdering());
         responseBody.PlaceOpeningTimes.Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
                     .Should().BeTrue();
         responseBody.PlaceOpeningTimes.Aggregate(true, (acc, x) => acc && x.RestaurantId == responseBody.Id)
                     .Should().BeTrue();
         responseBody.IsCurrentlyOpenInPlace.Should().Be(true);
 
-        responseBody.OrderOpeningTimes.Should().BeEquivalentTo(body.OrderOpeningTimes);
+        responseBody.OrderOpeningTimes.Should().BeEquivalentTo(
+            OpeningTimeUtils.AscendingOrder(body.OrderOpeningTimes),
+            options => options.WithStrictOrdering());
         responseBody.OrderOpeningTimes.Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
                     .Should().BeTrue();
         responseBody.OrderOpeningTimes.Aggregate(true, (acc, x) => acc && x.RestaurantId == responseBody.Id)

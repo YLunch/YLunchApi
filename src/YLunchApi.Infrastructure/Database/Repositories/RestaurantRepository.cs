@@ -42,12 +42,8 @@ public class RestaurantRepository : IRestaurantRepository
                                        .FirstOrDefaultAsync(x => x.Id == id);
         if (restaurant == null) throw new EntityNotFoundException($"Restaurant {id} not found");
         restaurant.ClosingDates = restaurant.ClosingDates.OrderBy(x => x.ClosingDateTime).ToList();
-        restaurant.PlaceOpeningTimes = restaurant.PlaceOpeningTimes
-                                                 .OrderBy(OpeningTimeUtils.StartMinutesFromFirstDayOfWeek)
-                                                 .ThenBy(OpeningTimeUtils.EndMinutesFromFirstDayOfWeek).ToList();
-        restaurant.OrderOpeningTimes = restaurant.OrderOpeningTimes
-                                                 .OrderBy(OpeningTimeUtils.StartMinutesFromFirstDayOfWeek)
-                                                 .ThenBy(OpeningTimeUtils.EndMinutesFromFirstDayOfWeek).ToList();
+        restaurant.PlaceOpeningTimes = OpeningTimeUtils.AscendingOrder(restaurant.PlaceOpeningTimes);
+        restaurant.OrderOpeningTimes = OpeningTimeUtils.AscendingOrder(restaurant.OrderOpeningTimes);
         return restaurant;
     }
 }
