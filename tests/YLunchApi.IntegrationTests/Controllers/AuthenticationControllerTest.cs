@@ -14,6 +14,8 @@ namespace YLunchApi.IntegrationTests.Controllers;
 [Collection("Sequential")]
 public class AuthenticationControllerTest : ControllerTestBase
 {
+    #region Login_Tests
+
     [Fact]
     public async Task Login_Should_Return_A_200Ok()
     {
@@ -62,6 +64,10 @@ public class AuthenticationControllerTest : ControllerTestBase
         content.Should()
                .Contain("Email is invalid.");
     }
+
+    #endregion
+
+    #region RefreshTokens_Tests
 
     [Fact]
     public async Task RefreshTokens_Should_Return_A_200Ok()
@@ -126,6 +132,10 @@ public class AuthenticationControllerTest : ControllerTestBase
         content.Should().Be("Invalid tokens, please login to generate new valid tokens");
     }
 
+    #endregion
+
+    #region GetCurrentUser_Tests
+
     [Fact]
     public async Task GetCurrentUser_Should_Return_A_200Ok()
     {
@@ -166,4 +176,6 @@ public class AuthenticationControllerTest : ControllerTestBase
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         await AssertResponseUtils.AssertUnauthorizedResponse(response);
     }
+
+    #endregion
 }

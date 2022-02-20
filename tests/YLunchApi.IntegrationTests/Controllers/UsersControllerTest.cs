@@ -14,7 +14,7 @@ namespace YLunchApi.IntegrationTests.Controllers;
 [Collection("Sequential")]
 public class UsersControllerTest : ControllerTestBase
 {
-    #region Post_RestaurantAdmin_Tests
+    #region CreateRestaurantAdmin_Tests
 
     [Theory]
     [InlineData("admin@restaurant.com", "Jean-Marc", "Dupont Henri", "0612345678", "Password1234.")]
@@ -22,7 +22,7 @@ public class UsersControllerTest : ControllerTestBase
     [InlineData("admin-rest@rest.aurant.com", "Jean-Marc", "Dupont-Henri", "0712345678", "paSS@1234word")]
     [InlineData("admin-rest@rest.aurant.com", "Jo", "Do do-do", "0712345678", "paSS@1234word")]
     [InlineData("admin-rest@rest.aurant.com", "John", "Doe", "0712345678", "paSS@1234word")]
-    public async Task Post_RestaurantAdmin_Should_Return_A_201Created(string email,
+    public async Task CreateRestaurantAdmin_Should_Return_A_201Created(string email,
                                                                       string firstname,
                                                                       string lastname,
                                                                       string phoneNumber,
@@ -52,7 +52,7 @@ public class UsersControllerTest : ControllerTestBase
     }
 
     [Fact]
-    public async Task Post_RestaurantAdmin_Should_Return_A_409Conflict()
+    public async Task CreateRestaurantAdmin_Should_Return_A_409Conflict()
     {
         // Arrange
         var body = new
@@ -75,7 +75,7 @@ public class UsersControllerTest : ControllerTestBase
     }
 
     [Fact]
-    public async Task Post_RestaurantAdmin_Should_Return_A_400BadRequest_When_Fields_Are_Empty()
+    public async Task CreateRestaurantAdmin_Should_Return_A_400BadRequest_When_Fields_Are_Empty()
     {
         // Arrange
         var body = new { };
@@ -101,7 +101,7 @@ public class UsersControllerTest : ControllerTestBase
     [InlineData("jean.dupont@restaurant")]
     [InlineData("jean.dupont@restaurant.c")]
     [InlineData("Jean.Dupont@Restaurant.com")]
-    public async Task Post_RestaurantAdmin_Should_Return_A_400BadRequest_When_Email_Is_Invalid(
+    public async Task CreateRestaurantAdmin_Should_Return_A_400BadRequest_When_Email_Is_Invalid(
         string email
     )
     {
@@ -125,7 +125,7 @@ public class UsersControllerTest : ControllerTestBase
     [InlineData("password1234")]
     [InlineData("password1234.")]
     [InlineData("Pass12.")]
-    public async Task Post_RestaurantAdmin_Should_Return_A_400BadRequest_When_Password_Is_Invalid(
+    public async Task CreateRestaurantAdmin_Should_Return_A_400BadRequest_When_Password_Is_Invalid(
         string password
     )
     {
@@ -151,7 +151,7 @@ public class UsersControllerTest : ControllerTestBase
     [InlineData("0512345678")]
     [InlineData("06123456789")]
     [InlineData("07123456789")]
-    public async Task Post_RestaurantAdmin_Should_Return_A_400BadRequest_When_PhoneNumber_Is_Invalid(
+    public async Task CreateRestaurantAdmin_Should_Return_A_400BadRequest_When_PhoneNumber_Is_Invalid(
         string phoneNumber
     )
     {
@@ -176,7 +176,7 @@ public class UsersControllerTest : ControllerTestBase
     [InlineData("Je.", "Du.")]
     [InlineData("Je-A", "Du-P")]
     [InlineData("Je-A", "Du P")]
-    public async Task Post_RestaurantAdmin_Should_Return_A_400BadRequest_When_Firstname_Or_Lastname_Is_Invalid(
+    public async Task CreateRestaurantAdmin_Should_Return_A_400BadRequest_When_Firstname_Or_Lastname_Is_Invalid(
         string firstname,
         string lastname
     )
@@ -202,7 +202,7 @@ public class UsersControllerTest : ControllerTestBase
 
     #endregion
 
-    #region Post_Customer_Tests
+    #region CreateCustomer_Tests
 
     [Theory]
     [InlineData("anne-marie.martin@ynov.com", "Anne-Marie", "Martin-Jacques", "0687654321", "Password1234.")]
@@ -210,7 +210,7 @@ public class UsersControllerTest : ControllerTestBase
     [InlineData("anne.marie@ynov.com", "An-Ma", "Du-He", "0798765432", "paSS@1234word")]
     [InlineData("anne.marie@ynov.com", "An ma", "Du he", "0712345678", "paSS@1234word")]
     [InlineData("anne.marie@ynov.com", "An", "Du", "0712345678", "paSS@1234word")]
-    public async Task Post_Customer_Should_Return_A_201Created(string email,
+    public async Task CreateCustomer_Should_Return_A_201Created(string email,
                                                                string firstname,
                                                                string lastname,
                                                                string phoneNumber,
@@ -240,7 +240,7 @@ public class UsersControllerTest : ControllerTestBase
     }
 
     [Fact]
-    public async Task Post_Customer_Should_Return_A_409Conflict()
+    public async Task CreateCustomer_Should_Return_A_409Conflict()
     {
         // Arrange
         var body = new
@@ -263,7 +263,7 @@ public class UsersControllerTest : ControllerTestBase
     }
 
     [Fact]
-    public async Task Post_Customer_Should_Return_A_400BadRequest_When_Fields_Are_Empty()
+    public async Task CreateCustomer_Should_Return_A_400BadRequest_When_Fields_Are_Empty()
     {
         // Arrange
         var body = new { };
@@ -284,7 +284,7 @@ public class UsersControllerTest : ControllerTestBase
     [InlineData("jean.dupont@")]
     [InlineData("@ynov.com")]
     [InlineData("jean.dupont@ynov.c")]
-    public async Task Post_Customer_Should_Return_A_400BadRequest_When_Email_Is_Invalid(
+    public async Task CreateCustomer_Should_Return_A_400BadRequest_When_Email_Is_Invalid(
         string email
     )
     {
@@ -308,7 +308,7 @@ public class UsersControllerTest : ControllerTestBase
     [InlineData("password1234")]
     [InlineData("password1234.")]
     [InlineData("Pass12.")]
-    public async Task Post_Customer_Should_Return_A_400BadRequest_When_Password_Is_Invalid(
+    public async Task CreateCustomer_Should_Return_A_400BadRequest_When_Password_Is_Invalid(
         string password
     )
     {
@@ -334,7 +334,7 @@ public class UsersControllerTest : ControllerTestBase
     [InlineData("0512345678")]
     [InlineData("06123456789")]
     [InlineData("07123456789")]
-    public async Task Post_Customer_Should_Return_A_400BadRequest_When_PhoneNumber_Is_Invalid(
+    public async Task CreateCustomer_Should_Return_A_400BadRequest_When_PhoneNumber_Is_Invalid(
         string phoneNumber
     )
     {
@@ -359,7 +359,7 @@ public class UsersControllerTest : ControllerTestBase
     [InlineData("Je.", "Du.")]
     [InlineData("Je-A", "Du-P")]
     [InlineData("Je-A", "Du P")]
-    public async Task Post_Customer_Should_Return_A_400BadRequest_When_Firstname_Or_Lastname_Is_Invalid(
+    public async Task CreateCustomer_Should_Return_A_400BadRequest_When_Firstname_Or_Lastname_Is_Invalid(
         string firstname,
         string lastname
     )

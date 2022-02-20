@@ -14,6 +14,8 @@ namespace YLunchApi.IntegrationTests.Controllers;
 [Collection("Sequential")]
 public class TrialsControllerTest : ControllerTestBase
 {
+    #region GetAnonymousTry_Tests
+
     [Fact]
     public async Task GetAnonymousTry_Should_Return_A_200Ok()
     {
@@ -23,6 +25,10 @@ public class TrialsControllerTest : ControllerTestBase
 
         content.Should().BeEquivalentTo("YLunchApi is running, you are anonymous");
     }
+
+    #endregion
+
+    #region GetAuthenticatedTry_Tests
 
     [Fact]
     public async Task GetAuthenticatedTry_As_Customer_Should_Return_A_200Ok()
@@ -121,6 +127,9 @@ public class TrialsControllerTest : ControllerTestBase
         await AssertResponseUtils.AssertUnauthorizedResponse(response);
     }
 
+    #endregion
+
+    #region GetAuthenticatedRestaurantAdminTry_Tests
 
     [Fact]
     public async Task GetAuthenticatedRestaurantAdminTry_Should_Return_A_200Ok()
@@ -153,6 +162,10 @@ public class TrialsControllerTest : ControllerTestBase
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
+    #endregion
+
+    #region GetAuthenticatedCustomerTry_Tests
+
     [Fact]
     public async Task GetAuthenticatedCustomerTry_Should_Return_A_200Ok()
     {
@@ -183,4 +196,6 @@ public class TrialsControllerTest : ControllerTestBase
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
+
+    #endregion
 }
