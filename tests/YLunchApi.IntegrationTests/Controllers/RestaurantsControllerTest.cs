@@ -19,7 +19,6 @@ namespace YLunchApi.IntegrationTests.Controllers;
 [Collection("Sequential")]
 public class RestaurantsControllerTest : ControllerTestBase
 {
-
     private async Task<RestaurantReadDto> CreateRestaurant()
     {
         var authenticatedUserInfo = await Authenticate(UserMocks.RestaurantAdminCreateDto);

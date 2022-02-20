@@ -23,10 +23,10 @@ public class UsersControllerTest : ControllerTestBase
     [InlineData("admin-rest@rest.aurant.com", "Jo", "Do do-do", "0712345678", "paSS@1234word")]
     [InlineData("admin-rest@rest.aurant.com", "John", "Doe", "0712345678", "paSS@1234word")]
     public async Task CreateRestaurantAdmin_Should_Return_A_201Created(string email,
-                                                                      string firstname,
-                                                                      string lastname,
-                                                                      string phoneNumber,
-                                                                      string password)
+                                                                       string firstname,
+                                                                       string lastname,
+                                                                       string phoneNumber,
+                                                                       string password)
     {
         // Arrange
         var body = new
@@ -211,10 +211,10 @@ public class UsersControllerTest : ControllerTestBase
     [InlineData("anne.marie@ynov.com", "An ma", "Du he", "0712345678", "paSS@1234word")]
     [InlineData("anne.marie@ynov.com", "An", "Du", "0712345678", "paSS@1234word")]
     public async Task CreateCustomer_Should_Return_A_201Created(string email,
-                                                               string firstname,
-                                                               string lastname,
-                                                               string phoneNumber,
-                                                               string password)
+                                                                string firstname,
+                                                                string lastname,
+                                                                string phoneNumber,
+                                                                string password)
     {
         // Arrange
         var body = new
