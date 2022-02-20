@@ -19,10 +19,10 @@ namespace YLunchApi.IntegrationTests.Controllers;
 [Collection("Sequential")]
 public class RestaurantsControllerTest : ControllerTestBase
 {
-    #region Post_Restaurant_Tests
+    #region Post_Tests
 
     [Fact]
-    public async Task Post_Restaurant_Should_Return_A_201Created()
+    public async Task Post_Should_Return_A_201Created()
     {
         // Arrange
         var authenticatedUserInfo = await Authenticate(UserMocks.RestaurantAdminCreateDto);
@@ -105,7 +105,7 @@ public class RestaurantsControllerTest : ControllerTestBase
     }
 
     [Fact]
-    public async Task Post_Restaurant_Should_Return_A_400BadRequest_When_Missing_Fields()
+    public async Task Post_Should_Return_A_400BadRequest_When_Missing_Fields()
     {
         // Arrange
         var authenticatedUserInfo = await Authenticate(UserMocks.RestaurantAdminCreateDto);
@@ -133,7 +133,7 @@ public class RestaurantsControllerTest : ControllerTestBase
     }
 
     [Fact]
-    public async Task Post_Restaurant_Should_Return_A_400BadRequest_When_Invalid_Fields()
+    public async Task Post_Should_Return_A_400BadRequest_When_Invalid_Fields()
     {
         // Arrange
         var authenticatedUserInfo = await Authenticate(UserMocks.RestaurantAdminCreateDto);
@@ -202,7 +202,7 @@ public class RestaurantsControllerTest : ControllerTestBase
     }
 
     [Fact]
-    public async Task Post_Restaurant_Should_Return_A_400BadRequest_When_Overriding_Opening_Times()
+    public async Task Post_Should_Return_A_400BadRequest_When_Overriding_Opening_Times()
     {
         // Arrange
         var authenticatedUserInfo = await Authenticate(UserMocks.RestaurantAdminCreateDto);
@@ -268,7 +268,7 @@ public class RestaurantsControllerTest : ControllerTestBase
     }
 
     [Fact]
-    public async Task Post_Restaurant_Should_Return_A_401Unauthorized()
+    public async Task Post_Should_Return_A_401Unauthorized()
     {
         // Arrange
         var body = new
@@ -318,7 +318,7 @@ public class RestaurantsControllerTest : ControllerTestBase
     }
 
     [Fact]
-    public async Task Post_Restaurant_Should_Return_A_403Forbidden()
+    public async Task Post_Should_Return_A_403Forbidden()
     {
         // Arrange
         var authenticatedUserInfo = await Authenticate(UserMocks.CustomerCreateDto);
@@ -367,6 +367,97 @@ public class RestaurantsControllerTest : ControllerTestBase
         var responseBody = await ResponseUtils.DeserializeContentAsync(response);
 
         responseBody.Should().Be("");
+    }
+
+    #endregion
+
+    #region GetRestaurantByIdTests
+
+    [Fact]
+    public async Task GetRestaurantById_Should_Return_A_200Ok()
+    {
+        // Arrange
+        var authenticatedUserInfo = await Authenticate(UserMocks.RestaurantAdminCreateDto);
+        Client.SetAuthorizationHeader(authenticatedUserInfo.AccessToken);
+        var utcNow = DateTime.UtcNow;
+        var body = new
+        {
+            RestaurantMocks.RestaurantCreateDto.Name,
+            RestaurantMocks.RestaurantCreateDto.Email,
+            RestaurantMocks.RestaurantCreateDto.PhoneNumber,
+            RestaurantMocks.RestaurantCreateDto.Country,
+            RestaurantMocks.RestaurantCreateDto.City,
+            RestaurantMocks.RestaurantCreateDto.ZipCode,
+            RestaurantMocks.RestaurantCreateDto.StreetName,
+            RestaurantMocks.RestaurantCreateDto.StreetNumber,
+            RestaurantMocks.RestaurantCreateDto.IsOpen,
+            RestaurantMocks.RestaurantCreateDto.IsPublic,
+            ClosingDates = new List<ClosingDateCreateDto>
+            {
+                new() { ClosingDateTime = DateTime.Parse("2021-12-25") }
+            },
+            PlaceOpeningTimes = new List<OpeningTimeCreateDto>
+            {
+                new()
+                {
+                    DayOfWeek = utcNow.DayOfWeek,
+                    OffsetOpenMinutes = utcNow.MinutesFromMidnight(),
+                    OpenMinutes = 2 * 60
+                }
+            },
+            OrderOpeningTimes = new List<OpeningTimeCreateDto>
+            {
+                new()
+                {
+                    DayOfWeek = utcNow.DayOfWeek,
+                    OffsetOpenMinutes = utcNow.MinutesFromMidnight(),
+                    OpenMinutes = 2 * 60
+                }
+            }
+        };
+
+        var restaurantCreationResponse = await Client.PostAsJsonAsync("restaurants", body);
+        restaurantCreationResponse.StatusCode.Should().Be(HttpStatusCode.Created);
+        var restaurantCreationResponseBody = await ResponseUtils.DeserializeContentAsync<RestaurantReadDto>(restaurantCreationResponse);
+
+        // Act
+        var response = await Client.GetAsync($"restaurants/{restaurantCreationResponseBody.Id}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var responseBody = await ResponseUtils.DeserializeContentAsync<RestaurantReadDto>(response);
+
+        responseBody.Id.Should().Be(restaurantCreationResponseBody.Id);
+        responseBody.AdminId.Should().Be(authenticatedUserInfo.UserId);
+        responseBody.Email.Should().Be(body.Email);
+        responseBody.PhoneNumber.Should().Be(body.PhoneNumber);
+        responseBody.CreationDateTime.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
+        responseBody.Name.Should().Be(body.Name);
+        responseBody.City.Should().Be(body.City);
+        responseBody.Country.Should().Be(body.Country);
+        responseBody.StreetName.Should().Be(body.StreetName);
+        responseBody.ZipCode.Should().Be(body.ZipCode);
+        responseBody.StreetNumber.Should().Be(body.StreetNumber);
+        responseBody.IsOpen.Should().Be(body.IsOpen);
+        responseBody.IsPublic.Should().Be(body.IsPublic);
+
+        responseBody.ClosingDates.Should().BeEquivalentTo(body.ClosingDates);
+
+        responseBody.PlaceOpeningTimes.Should().BeEquivalentTo(body.PlaceOpeningTimes);
+        responseBody.PlaceOpeningTimes.Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
+                    .Should().BeTrue();
+        responseBody.PlaceOpeningTimes.Aggregate(true, (acc, x) => acc && x.RestaurantId == responseBody.Id)
+                    .Should().BeTrue();
+        responseBody.IsCurrentlyOpenInPlace.Should().Be(true);
+
+        responseBody.OrderOpeningTimes.Should().BeEquivalentTo(body.OrderOpeningTimes);
+        responseBody.OrderOpeningTimes.Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
+                    .Should().BeTrue();
+        responseBody.OrderOpeningTimes.Aggregate(true, (acc, x) => acc && x.RestaurantId == responseBody.Id)
+                    .Should().BeTrue();
+        responseBody.IsCurrentlyOpenToOrder.Should().Be(true);
+
+        responseBody.IsPublished.Should().Be(true);
     }
 
     #endregion
