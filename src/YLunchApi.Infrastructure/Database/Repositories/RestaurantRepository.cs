@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using YLunchApi.Domain.Core.Utils;
 using YLunchApi.Domain.Exceptions;
 using YLunchApi.Domain.RestaurantAggregate.Models;
 using YLunchApi.Domain.RestaurantAggregate.Services;
@@ -40,6 +41,13 @@ public class RestaurantRepository : IRestaurantRepository
                                        .Include(x => x.OrderOpeningTimes)
                                        .FirstOrDefaultAsync(x => x.Id == id);
         if (restaurant == null) throw new EntityNotFoundException($"Restaurant {id} not found");
+        restaurant.ClosingDates = restaurant.ClosingDates.OrderBy(x => x.ClosingDateTime).ToList();
+        restaurant.PlaceOpeningTimes = restaurant.PlaceOpeningTimes
+                                                 .OrderBy(OpeningTimeUtils.StartMinutesFromFirstDayOfWeek)
+                                                 .ThenBy(OpeningTimeUtils.EndMinutesFromFirstDayOfWeek).ToList();
+        restaurant.OrderOpeningTimes = restaurant.OrderOpeningTimes
+                                                 .OrderBy(OpeningTimeUtils.StartMinutesFromFirstDayOfWeek)
+                                                 .ThenBy(OpeningTimeUtils.EndMinutesFromFirstDayOfWeek).ToList();
         return restaurant;
     }
 }

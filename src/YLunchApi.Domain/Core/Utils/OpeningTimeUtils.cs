@@ -1,4 +1,5 @@
 using YLunchApi.Domain.RestaurantAggregate.Dto;
+using YLunchApi.Domain.RestaurantAggregate.Models;
 
 namespace YLunchApi.Domain.Core.Utils;
 
@@ -9,8 +10,17 @@ public static class OpeningTimeUtils
         return (int)openingTime.DayOfWeek * 24 * 60 + openingTime.OffsetOpenMinutes;
     }
 
+    public static int StartMinutesFromFirstDayOfWeek(OpeningTime openingTime)
+    {
+        return (int)openingTime.DayOfWeek * 24 * 60 + openingTime.OffsetOpenMinutes;
+    }
 
     public static int EndMinutesFromFirstDayOfWeek(OpeningTimeCreateDto openingTime)
+    {
+        return StartMinutesFromFirstDayOfWeek(openingTime) + openingTime.OpenMinutes;
+    }
+
+    public static int EndMinutesFromFirstDayOfWeek(OpeningTime openingTime)
     {
         return StartMinutesFromFirstDayOfWeek(openingTime) + openingTime.OpenMinutes;
     }
