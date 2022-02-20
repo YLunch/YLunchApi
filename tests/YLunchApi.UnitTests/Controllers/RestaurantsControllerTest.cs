@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Xunit;
 using YLunchApi.Application.RestaurantAggregate;
 using YLunchApi.Authentication.Models;
+using YLunchApi.Domain.Core.Utils;
 using YLunchApi.Domain.RestaurantAggregate.Dto;
 using YLunchApi.Helpers.Extensions;
 using YLunchApi.Infrastructure.Database.Repositories;
@@ -42,26 +43,43 @@ public class RestaurantsControllerTest
         // Arrange
         var controller = CreateController();
         var restaurantCreateDto = RestaurantMocks.RestaurantCreateDto;
+        var utcNow = DateTime.UtcNow;
+
         restaurantCreateDto.ClosingDates = new List<ClosingDateCreateDto>
         {
+            new() { ClosingDateTime = DateTime.Parse("2021-12-31") },
             new() { ClosingDateTime = DateTime.Parse("2021-12-25") }
         };
+
         restaurantCreateDto.PlaceOpeningTimes = new List<OpeningTimeCreateDto>
         {
             new()
             {
-                DayOfWeek = DateTime.UtcNow.DayOfWeek,
-                OffsetOpenMinutes = 0,
-                OpenMinutes = 1439
+                DayOfWeek = utcNow.AddDays(-1).DayOfWeek,
+                OffsetOpenMinutes = utcNow.MinutesFromMidnight(),
+                OpenMinutes = 2 * 60
+            },
+            new()
+            {
+                DayOfWeek = utcNow.DayOfWeek,
+                OffsetOpenMinutes = utcNow.MinutesFromMidnight(),
+                OpenMinutes = 2 * 60
             }
         };
+
         restaurantCreateDto.OrderOpeningTimes = new List<OpeningTimeCreateDto>
         {
             new()
             {
-                DayOfWeek = DateTime.UtcNow.DayOfWeek,
-                OffsetOpenMinutes = 0,
-                OpenMinutes = 1439
+                DayOfWeek = utcNow.AddDays(-1).DayOfWeek,
+                OffsetOpenMinutes = utcNow.MinutesFromMidnight(),
+                OpenMinutes = 2 * 60
+            },
+            new()
+            {
+                DayOfWeek = utcNow.DayOfWeek,
+                OffsetOpenMinutes = utcNow.MinutesFromMidnight(),
+                OpenMinutes = 2 * 60
             }
         };
 
@@ -86,16 +104,22 @@ public class RestaurantsControllerTest
         responseBody.IsOpen.Should().Be(restaurantCreateDto.IsOpen);
         responseBody.IsPublic.Should().Be(restaurantCreateDto.IsPublic);
 
-        responseBody.ClosingDates.Should().BeEquivalentTo(restaurantCreateDto.ClosingDates);
+        responseBody.ClosingDates.Should().BeEquivalentTo(restaurantCreateDto.ClosingDates)
+                    .And
+                    .BeInAscendingOrder(x => x.ClosingDateTime);
 
-        responseBody.PlaceOpeningTimes.Should().BeEquivalentTo(restaurantCreateDto.PlaceOpeningTimes);
+        responseBody.PlaceOpeningTimes.Should().BeEquivalentTo(
+            OpeningTimeUtils.AscendingOrder(restaurantCreateDto.PlaceOpeningTimes),
+            options => options.WithStrictOrdering());
         responseBody.PlaceOpeningTimes.Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
                     .Should().BeTrue();
         responseBody.PlaceOpeningTimes.Aggregate(true, (acc, x) => acc && x.RestaurantId == responseBody.Id)
                     .Should().BeTrue();
         responseBody.IsCurrentlyOpenInPlace.Should().Be(true);
 
-        responseBody.OrderOpeningTimes.Should().BeEquivalentTo(restaurantCreateDto.OrderOpeningTimes);
+        responseBody.OrderOpeningTimes.Should().BeEquivalentTo(
+            OpeningTimeUtils.AscendingOrder(restaurantCreateDto.OrderOpeningTimes),
+            options => options.WithStrictOrdering());
         responseBody.OrderOpeningTimes.Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
                     .Should().BeTrue();
         responseBody.OrderOpeningTimes.Aggregate(true, (acc, x) => acc && x.RestaurantId == responseBody.Id)
