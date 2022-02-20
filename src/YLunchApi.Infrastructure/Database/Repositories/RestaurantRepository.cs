@@ -29,6 +29,14 @@ public class RestaurantRepository : IRestaurantRepository
             throw new EntityAlreadyExistsException();
         }
 
+        restaurant.ClosingDates = restaurant.ClosingDates.Select(x =>
+        {
+            var existingClosingDate =
+                _context.ClosingDates.FirstOrDefault(
+                    closingDateDb => closingDateDb.ClosingDateTime == x.ClosingDateTime);
+            return existingClosingDate ?? x;
+        }).ToList();
+
         await _context.Restaurants.AddAsync(restaurant);
         await _context.SaveChangesAsync();
     }
