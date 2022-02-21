@@ -1,5 +1,6 @@
 using YLunchApi.Domain.RestaurantAggregate.Dto;
 using YLunchApi.Domain.RestaurantAggregate.Models;
+using YLunchApi.Helpers.Extensions;
 
 namespace YLunchApi.Domain.Core.Utils;
 

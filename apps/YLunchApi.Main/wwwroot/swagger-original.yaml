@@ -153,6 +153,15 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/LoginRequestDto'
+            examples:
+              restaurantAdmin:
+                value:
+                  email: admin@restaurant.com
+                  password: Password1234.
+              customer:
+                value:
+                  email: anne-marie.martin@ynov.com
+                  password: Password1234.
       responses:
         '200':
           description: |

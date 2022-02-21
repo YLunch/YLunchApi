@@ -14,12 +14,12 @@ public abstract class OpeningTime : Entity
 
     public bool Contains(DateTime dateTime)
     {
-        // Computation of difference during all the week
-        var dateTimeMinutesInput =
-            (dateTime.DayOfWeek < DayOfWeek ? 7 : 0 + dateTime.DayOfWeek - DayOfWeek) * 24 * 60 +
+        var dateTimeMinutesFromFirstDayOfWeek =
+            (dateTime.DayOfWeek < DayOfWeek ? 7 : 0 + (int)dateTime.DayOfWeek) * 24 * 60 +
             dateTime.MinutesFromMidnight();
 
-        return dateTimeMinutesInput >= OpeningTimeUtils.StartMinutesFromFirstDayOfWeek(this) &&
-               dateTimeMinutesInput <= OpeningTimeUtils.EndMinutesFromFirstDayOfWeek(this);
+
+        return dateTimeMinutesFromFirstDayOfWeek >= OpeningTimeUtils.StartMinutesFromFirstDayOfWeek(this) &&
+               dateTimeMinutesFromFirstDayOfWeek <= OpeningTimeUtils.EndMinutesFromFirstDayOfWeek(this);
     }
 }
