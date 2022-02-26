@@ -192,7 +192,15 @@ public class RestaurantsControllerTest : ControllerTestBase
         Client.SetAuthorizationHeader(authenticatedUserInfo.AccessToken);
         var body = new
         {
-            Name = ""
+            Name = "",
+            PlaceOpeningTimes = new List<dynamic>
+            {
+                new { }
+            },
+            OrderOpeningTimes = new List<dynamic>
+            {
+                new { }
+            }
         };
 
         // Act
@@ -210,6 +218,21 @@ public class RestaurantsControllerTest : ControllerTestBase
         responseBody.Should().Contain("The ZipCode field is required.");
         responseBody.Should().Contain("The StreetName field is required.");
         responseBody.Should().Contain("The StreetNumber field is required.");
+        responseBody.Should().MatchRegex(@"PlaceOpeningTimes.*The DayOfWeek field is required\.");
+        responseBody.Should()
+                    .MatchRegex(
+                        @"PlaceOpeningTimes.*The OffsetInMinutes field is required\.");
+        responseBody.Should()
+                    .MatchRegex(
+                        @"PlaceOpeningTimes.*The DurationInMinutes field is required\.");
+
+        responseBody.Should().MatchRegex(@"OrderOpeningTimes.*The DayOfWeek field is required\.");
+        responseBody.Should()
+                    .MatchRegex(
+                        @"OrderOpeningTimes.*The OffsetInMinutes field is required\.");
+        responseBody.Should()
+                    .MatchRegex(
+                        @"OrderOpeningTimes.*The DurationInMinutes field is required\.");
     }
 
     [Fact]
@@ -271,14 +294,16 @@ public class RestaurantsControllerTest : ControllerTestBase
                     .MatchRegex(
                         @"PlaceOpeningTimes.*OffsetInMinutes should be less than number of minutes in a day\.");
         responseBody.Should()
-                    .MatchRegex(@"PlaceOpeningTimes.*DurationInMinutes should be less than number of minutes in a week\.");
+                    .MatchRegex(
+                        @"PlaceOpeningTimes.*DurationInMinutes should be less than number of minutes in a week\.");
 
         responseBody.Should().MatchRegex(@"OrderOpeningTimes.*Day must be in range 0-6, 0 is sunday, 6 is saturday\.");
         responseBody.Should()
                     .MatchRegex(
                         @"OrderOpeningTimes.*OffsetInMinutes should be less than number of minutes in a day\.");
         responseBody.Should()
-                    .MatchRegex(@"OrderOpeningTimes.*DurationInMinutes should be less than number of minutes in a week\.");
+                    .MatchRegex(
+                        @"OrderOpeningTimes.*DurationInMinutes should be less than number of minutes in a week\.");
     }
 
     [Fact]
