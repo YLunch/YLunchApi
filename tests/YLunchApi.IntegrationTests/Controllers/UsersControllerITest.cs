@@ -12,7 +12,7 @@ using YLunchApi.TestsShared.Mocks;
 namespace YLunchApi.IntegrationTests.Controllers;
 
 [Collection("Sequential")]
-public class UsersControllerTest : ControllerTestBase
+public class UsersControllerITest : ControllerITestBase
 {
     #region CreateRestaurantAdmin_Tests
 

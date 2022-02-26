@@ -19,7 +19,7 @@ using YLunchApi.TestsShared.Mocks;
 namespace YLunchApi.IntegrationTests.Controllers;
 
 [Collection("Sequential")]
-public class RestaurantsControllerTest : ControllerTestBase
+public class RestaurantsControllerITest : ControllerITestBase
 {
     private async Task<RestaurantReadDto> CreateRestaurant()
     {

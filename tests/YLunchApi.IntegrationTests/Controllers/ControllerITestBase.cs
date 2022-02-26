@@ -16,11 +16,11 @@ using YLunchApi.TestsShared.Models;
 
 namespace YLunchApi.IntegrationTests.Controllers;
 
-public abstract class ControllerTestBase : IClassFixture<WebApplicationFactory<Program>>
+public abstract class ControllerITestBase : IClassFixture<WebApplicationFactory<Program>>
 {
     protected readonly HttpClient Client;
 
-    protected ControllerTestBase()
+    protected ControllerITestBase()
     {
         var webApplication = new CustomWebApplicationFactory<Program>();
         Client = webApplication.CreateClient();
