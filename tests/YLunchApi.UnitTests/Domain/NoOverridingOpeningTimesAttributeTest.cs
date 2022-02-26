@@ -33,14 +33,14 @@ public class NoOverridingOpeningTimesAttributeTest
             new()
             {
                 DayOfWeek = utcNow.DayOfWeek,
-                OffsetOpenMinutes = 2 * 60,
-                OpenMinutes = 3 * 60
+                OffsetInMinutes = 2 * 60,
+                DurationInMinutes = 3 * 60
             },
             new()
             {
                 DayOfWeek = utcNow.DayOfWeek,
-                OffsetOpenMinutes = 6 * 60,
-                OpenMinutes = 3 * 60
+                OffsetInMinutes = 6 * 60,
+                DurationInMinutes = 3 * 60
             }
         };
 
@@ -58,14 +58,14 @@ public class NoOverridingOpeningTimesAttributeTest
             new()
             {
                 DayOfWeek = utcNow.DayOfWeek,
-                OffsetOpenMinutes = 2 * 60,
-                OpenMinutes = 3 * 60
+                OffsetInMinutes = 2 * 60,
+                DurationInMinutes = 3 * 60
             },
             new()
             {
                 DayOfWeek = utcNow.DayOfWeek,
-                OffsetOpenMinutes = 1 * 60,
-                OpenMinutes = 3 * 60
+                OffsetInMinutes = 1 * 60,
+                DurationInMinutes = 3 * 60
             }
         };
 

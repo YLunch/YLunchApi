@@ -56,14 +56,14 @@ public class RestaurantsControllerTest
             new()
             {
                 DayOfWeek = utcNow.AddDays(-1).DayOfWeek,
-                OffsetOpenMinutes = utcNow.MinutesFromMidnight(),
-                OpenMinutes = 2 * 60
+                OffsetInMinutes = utcNow.MinutesFromMidnight(),
+                DurationInMinutes = 2 * 60
             },
             new()
             {
                 DayOfWeek = utcNow.DayOfWeek,
-                OffsetOpenMinutes = utcNow.MinutesFromMidnight(),
-                OpenMinutes = 2 * 60
+                OffsetInMinutes = utcNow.MinutesFromMidnight(),
+                DurationInMinutes = 2 * 60
             }
         };
 
@@ -72,14 +72,14 @@ public class RestaurantsControllerTest
             new()
             {
                 DayOfWeek = utcNow.AddDays(-1).DayOfWeek,
-                OffsetOpenMinutes = utcNow.MinutesFromMidnight(),
-                OpenMinutes = 2 * 60
+                OffsetInMinutes = utcNow.MinutesFromMidnight(),
+                DurationInMinutes = 2 * 60
             },
             new()
             {
                 DayOfWeek = utcNow.DayOfWeek,
-                OffsetOpenMinutes = utcNow.MinutesFromMidnight(),
-                OpenMinutes = 2 * 60
+                OffsetInMinutes = utcNow.MinutesFromMidnight(),
+                DurationInMinutes = 2 * 60
             }
         };
 
@@ -163,8 +163,8 @@ public class RestaurantsControllerTest
             new()
             {
                 DayOfWeek = DateTime.UtcNow.DayOfWeek,
-                OffsetOpenMinutes = 0,
-                OpenMinutes = 1439
+                OffsetInMinutes = 0,
+                DurationInMinutes = 1439
             }
         };
         restaurantCreateDto.OrderOpeningTimes = new List<OpeningTimeCreateDto>
@@ -172,8 +172,8 @@ public class RestaurantsControllerTest
             new()
             {
                 DayOfWeek = DateTime.UtcNow.DayOfWeek,
-                OffsetOpenMinutes = dateTimeBeforeUtcNow.MinutesFromMidnight(),
-                OpenMinutes = 2 * 60
+                OffsetInMinutes = dateTimeBeforeUtcNow.MinutesFromMidnight(),
+                DurationInMinutes = 2 * 60
             }
         };
         restaurantCreateDto.AddressExtraInformation = "extra information";
@@ -493,8 +493,8 @@ public class RestaurantsControllerTest
             new()
             {
                 DayOfWeek = utcNow.AddDays(-1).DayOfWeek,
-                OffsetOpenMinutes = 1380, // 23H00
-                OpenMinutes = utcNow.MinutesFromMidnight() + 60
+                OffsetInMinutes = 1380, // 23H00
+                DurationInMinutes = utcNow.MinutesFromMidnight() + 60
             }
         };
         restaurantCreateDto.AddressExtraInformation = "extra information";
@@ -555,8 +555,8 @@ public class RestaurantsControllerTest
             new()
             {
                 DayOfWeek = tomorrowDateTime.DayOfWeek,
-                OffsetOpenMinutes = tomorrowDateTimeMinus1H.MinutesFromMidnight(),
-                OpenMinutes = 60
+                OffsetInMinutes = tomorrowDateTimeMinus1H.MinutesFromMidnight(),
+                DurationInMinutes = 60
             }
         };
         var restaurantCreationResponse = await controller.CreateRestaurant(restaurantCreateDto);
@@ -588,8 +588,8 @@ public class RestaurantsControllerTest
             new()
             {
                 DayOfWeek = utcNow.DayOfWeek,
-                OffsetOpenMinutes = utcNowPlus3H.MinutesFromMidnight(),
-                OpenMinutes = 120
+                OffsetInMinutes = utcNowPlus3H.MinutesFromMidnight(),
+                DurationInMinutes = 120
             }
         };
         var restaurantCreationResponse = await controller.CreateRestaurant(restaurantCreateDto);
@@ -621,8 +621,8 @@ public class RestaurantsControllerTest
             new()
             {
                 DayOfWeek = utcNow.DayOfWeek,
-                OffsetOpenMinutes = utcNowMinus3H.MinutesFromMidnight(),
-                OpenMinutes = 120
+                OffsetInMinutes = utcNowMinus3H.MinutesFromMidnight(),
+                DurationInMinutes = 120
             }
         };
         var restaurantCreationResponse = await controller.CreateRestaurant(restaurantCreateDto);
@@ -655,8 +655,8 @@ public class RestaurantsControllerTest
             new()
             {
                 DayOfWeek = utcNow.DayOfWeek,
-                OffsetOpenMinutes = utcNowMinus2H.MinutesFromMidnight(),
-                OpenMinutes = 180
+                OffsetInMinutes = utcNowMinus2H.MinutesFromMidnight(),
+                DurationInMinutes = 180
             }
         };
         var restaurantCreationResponse = await controller.CreateRestaurant(restaurantCreateDto);
@@ -690,8 +690,8 @@ public class RestaurantsControllerTest
             new()
             {
                 DayOfWeek = utcNow.AddDays(-1).DayOfWeek,
-                OffsetOpenMinutes = 1380, // 23H00
-                OpenMinutes = utcNow.MinutesFromMidnight() + 60
+                OffsetInMinutes = 1380, // 23H00
+                DurationInMinutes = utcNow.MinutesFromMidnight() + 60
             }
         };
         restaurantCreateDto.AddressExtraInformation = "extra information";
@@ -752,8 +752,8 @@ public class RestaurantsControllerTest
             new()
             {
                 DayOfWeek = tomorrowDateTime.DayOfWeek,
-                OffsetOpenMinutes = tomorrowDateTimeMinus1H.MinutesFromMidnight(),
-                OpenMinutes = 60
+                OffsetInMinutes = tomorrowDateTimeMinus1H.MinutesFromMidnight(),
+                DurationInMinutes = 60
             }
         };
         var restaurantCreationResponse = await controller.CreateRestaurant(restaurantCreateDto);
@@ -785,8 +785,8 @@ public class RestaurantsControllerTest
             new()
             {
                 DayOfWeek = utcNow.DayOfWeek,
-                OffsetOpenMinutes = utcNowPlus3H.MinutesFromMidnight(),
-                OpenMinutes = 120
+                OffsetInMinutes = utcNowPlus3H.MinutesFromMidnight(),
+                DurationInMinutes = 120
             }
         };
         var restaurantCreationResponse = await controller.CreateRestaurant(restaurantCreateDto);
@@ -818,8 +818,8 @@ public class RestaurantsControllerTest
             new()
             {
                 DayOfWeek = utcNow.DayOfWeek,
-                OffsetOpenMinutes = utcNowMinus3H.MinutesFromMidnight(),
-                OpenMinutes = 120
+                OffsetInMinutes = utcNowMinus3H.MinutesFromMidnight(),
+                DurationInMinutes = 120
             }
         };
         var restaurantCreationResponse = await controller.CreateRestaurant(restaurantCreateDto);
@@ -852,8 +852,8 @@ public class RestaurantsControllerTest
             new()
             {
                 DayOfWeek = utcNow.DayOfWeek,
-                OffsetOpenMinutes = utcNowMinus2H.MinutesFromMidnight(),
-                OpenMinutes = 180
+                OffsetInMinutes = utcNowMinus2H.MinutesFromMidnight(),
+                DurationInMinutes = 180
             }
         };
         var restaurantCreationResponse = await controller.CreateRestaurant(restaurantCreateDto);
