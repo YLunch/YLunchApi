@@ -35,4 +35,10 @@ public class RestaurantService : IRestaurantService
         var restaurant = await _restaurantRepository.GetById(restaurantId);
         return restaurant.Adapt<RestaurantReadDto>();
     }
+
+    public async Task<ICollection<RestaurantReadDto>> GetRestaurants()
+    {
+        var restaurants = await _restaurantRepository.GetRestaurants();
+        return restaurants.Select(x => x.Adapt<RestaurantReadDto>()).ToList();
+    }
 }

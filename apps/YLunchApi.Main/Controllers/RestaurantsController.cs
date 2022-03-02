@@ -5,6 +5,7 @@ using YLunchApi.Domain.RestaurantAggregate.Dto;
 using YLunchApi.Domain.RestaurantAggregate.Services;
 using YLunchApi.Domain.UserAggregate.Models;
 
+
 namespace YLunchApi.Main.Controllers;
 
 [ApiController]
@@ -48,4 +49,16 @@ public class RestaurantsController : ApplicationControllerBase
             return NotFound($"Restaurant {restaurantId} not found");
         }
     }
+    
+    
+    //get All restaurants
+    [HttpGet]
+    public async Task<ActionResult<ICollection<RestaurantReadDto>>> GetRestaurants()
+    {
+        var restaurantReadDto = await _restaurantService.GetRestaurants();
+        return Ok(restaurantReadDto);
+       
+    }
+    //Fin
+   
 }

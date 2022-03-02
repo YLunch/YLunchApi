@@ -54,4 +54,9 @@ public class RestaurantRepository : IRestaurantRepository
         restaurant.OrderOpeningTimes = OpeningTimeUtils.AscendingOrder(restaurant.OrderOpeningTimes);
         return restaurant;
     }
+
+    public async Task<ICollection<Restaurant>> GetRestaurants()
+    {
+        return await _context.Restaurants.ToListAsync();
+    }
 }
