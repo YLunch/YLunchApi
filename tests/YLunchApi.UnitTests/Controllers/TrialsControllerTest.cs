@@ -2,6 +2,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 using YLunchApi.Authentication.Models;
+using YLunchApi.Domain.CommonAggregate.Dto;
 using YLunchApi.Domain.UserAggregate.Models;
 using YLunchApi.Main.Controllers;
 using YLunchApi.TestsShared.Mocks;
@@ -22,9 +23,9 @@ public class TrialsControllerTest
 
         // Assert
         var responseResult = Assert.IsType<OkObjectResult>(response.Result);
-        var responseBody = Assert.IsType<string>(responseResult.Value);
+        var responseBody = Assert.IsType<MessageDto>(responseResult.Value);
 
-        responseBody.Should().Be("YLunchApi is running, you are anonymous");
+        responseBody.Should().BeEquivalentTo(new MessageDto("YLunchApi is running, you are anonymous."));
     }
 
     [Fact]
@@ -39,11 +40,11 @@ public class TrialsControllerTest
 
         // Assert
         var responseResult = Assert.IsType<OkObjectResult>(response.Result);
-        var responseBody = Assert.IsType<string>(responseResult.Value);
+        var responseBody = Assert.IsType<MessageDto>(responseResult.Value);
 
         var authenticatedUserInfo = new ApplicationSecurityToken(TokenMocks.ValidCustomerAccessToken);
-        responseBody.Should().BeEquivalentTo(
-            $"YLunchApi is running, you are authenticated as {authenticatedUserInfo.UserEmail} with Id: {authenticatedUserInfo.UserId} and Roles: {Roles.ListToString(authenticatedUserInfo.UserRoles)}");
+        responseBody.Should().BeEquivalentTo(new MessageDto(
+            $"YLunchApi is running, you are authenticated as {authenticatedUserInfo.UserEmail} with Id: {authenticatedUserInfo.UserId} and Roles: {Roles.ListToString(authenticatedUserInfo.UserRoles)}."));
     }
 
     [Fact]
@@ -59,11 +60,11 @@ public class TrialsControllerTest
 
         // Assert
         var responseResult = Assert.IsType<OkObjectResult>(response.Result);
-        var responseBody = Assert.IsType<string>(responseResult.Value);
+        var responseBody = Assert.IsType<MessageDto>(responseResult.Value);
 
         var authenticatedUserInfo = new ApplicationSecurityToken(TokenMocks.ValidRestaurantAdminAccessToken);
-        responseBody.Should().BeEquivalentTo(
-            $"YLunchApi is running, you are authenticated as {authenticatedUserInfo.UserEmail} with Id: {authenticatedUserInfo.UserId} and Roles: {Roles.RestaurantAdmin}");
+        responseBody.Should().BeEquivalentTo(new MessageDto(
+            $"YLunchApi is running, you are authenticated as {authenticatedUserInfo.UserEmail} with Id: {authenticatedUserInfo.UserId} and Roles: {Roles.RestaurantAdmin}."));
     }
 
     [Fact]
@@ -78,10 +79,10 @@ public class TrialsControllerTest
 
         // Assert
         var responseResult = Assert.IsType<OkObjectResult>(response.Result);
-        var responseBody = Assert.IsType<string>(responseResult.Value);
+        var responseBody = Assert.IsType<MessageDto>(responseResult.Value);
 
         var authenticatedUserInfo = new ApplicationSecurityToken(TokenMocks.ValidCustomerAccessToken);
-        responseBody.Should().BeEquivalentTo(
-            $"YLunchApi is running, you are authenticated as {authenticatedUserInfo.UserEmail} with Id: {authenticatedUserInfo.UserId} and Roles: {Roles.Customer}");
+        responseBody.Should().BeEquivalentTo(new MessageDto(
+            $"YLunchApi is running, you are authenticated as {authenticatedUserInfo.UserEmail} with Id: {authenticatedUserInfo.UserId} and Roles: {Roles.Customer}."));
     }
 }

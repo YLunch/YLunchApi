@@ -44,11 +44,18 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnonymousTryDto'
+                $ref: '#/components/schemas/MessageDto'
+              example:
+                message: YLunchApi is running, you are anonymous.
         '400':
           description: |
             Bad request:
-            - Something went wrong, please try again later
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+              example:
+                message: Something went wrong, please try again later.
   /trials/authenticated:
     get:
       tags:
@@ -67,15 +74,27 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthenticatedTryDto'
+                $ref: '#/components/schemas/MessageDto'
+              example:
+                message: 'YLunchApi is running, you are authenticated as {CurrentUserEmail} with Id: {CurrentUserId} and Roles: {CurrentUserRoles}.'
         '400':
           description: |
             Bad request:
-            - Something went wrong, please try again later
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+              example:
+                message: Something went wrong, please try again later.
         '401':
           description: |
             Unauthorized:
-            - Please login and use provided tokens
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+              example:
+                message: Please login and use provided tokens.
   /trials/authenticated-customer:
     get:
       tags:
@@ -94,15 +113,27 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthenticatedTryDto'
+                $ref: '#/components/schemas/MessageDto'
+              example:
+                message: 'YLunchApi is running, you are authenticated as {CurrentUserEmail} with Id: {CurrentUserId} and Roles: {CurrentUserRoles}.'
         '400':
           description: |
             Bad request:
-            - Something went wrong, please try again later
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+              example:
+                message: Something went wrong, please try again later.
         '401':
           description: |
             Unauthorized:
-            - Please login and use provided tokens
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+              example:
+                message: Please login and use provided tokens.
         '403':
           description: |
             Forbidden:
@@ -125,15 +156,27 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthenticatedTryDto'
+                $ref: '#/components/schemas/MessageDto'
+              example:
+                message: 'YLunchApi is running, you are authenticated as {CurrentUserEmail} with Id: {CurrentUserId} and Roles: {CurrentUserRoles}.'
         '400':
           description: |
             Bad request:
-            - Something went wrong, please try again later
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+              example:
+                message: Something went wrong, please try again later.
         '401':
           description: |
             Unauthorized:
-            - Please login and use provided tokens
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+              example:
+                message: Please login and use provided tokens.
         '403':
           description: |
             Forbidden:
@@ -174,11 +217,31 @@ paths:
         '400':
           description: |
             Bad request:
-            - Something went wrong, please try again later
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+              examples:
+                Other:
+                  value:
+                    message: Something went wrong, please try again later.
+                ValidationError:
+                  value:
+                    type: "https://tools.ietf.org/html/rfc7231#section-6.5.1"
+                    title: "One or more validation errors occurred."
+                    status: 400
+                    traceId: "00-9393a6db2a571eaf5be54665fe54611b-9b403c28dba47801-00"
+                    errors:
+                      Email: [ "The Email field is required." ]
         '401':
           description: |
             Unauthorized:
-            - Please login and use provided tokens
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+              example:
+                message: Please login and use provided tokens.
   /authentication/refresh-tokens:
     post:
       tags:
@@ -206,12 +269,31 @@ paths:
         '400':
           description: |
             Bad request:
-            - Something went wrong, please try again later
-            - invalid input, object invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+              examples:
+                Other:
+                  value:
+                    message: Something went wrong, please try again later.
+                ValidationError:
+                  value:
+                    type: "https://tools.ietf.org/html/rfc7231#section-6.5.1"
+                    title: "One or more validation errors occurred."
+                    status: 400
+                    traceId: "00-9393a6db2a571eaf5be54665fe54611b-9b403c28dba47801-00"
+                    errors:
+                      AccessToken: [ "The AccessToken field is required." ]
         '401':
           description: |
             Unauthorized:
-            - Please login and use provided tokens
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+              example:
+                message: Please login and use provided tokens.
   /authentication/current-user:
     get:
       tags:
@@ -234,11 +316,21 @@ paths:
         '400':
           description: |
             Bad request:
-            - Something went wrong, please try again later
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+              example:
+                message: Something went wrong, please try again later.
         '401':
           description: |
             Unauthorized:
-            - Please login and use provided tokens
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+              example:
+                message: Please login and use provided tokens.
   /restaurant-admins:
     post:
       tags:
@@ -261,9 +353,33 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserReadDto'
         '400':
-          description: invalid input, object invalid
+          description: |
+            Bad request:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+              examples:
+                Other:
+                  value:
+                    message: Something went wrong, please try again later.
+                ValidationError:
+                  value:
+                    type: "https://tools.ietf.org/html/rfc7231#section-6.5.1"
+                    title: "One or more validation errors occurred."
+                    status: 400
+                    traceId: "00-9393a6db2a571eaf5be54665fe54611b-9b403c28dba47801-00"
+                    errors:
+                      Name: [ "The Name field is required." ]
         '409':
-          description: User already exists
+          description: |
+            Conflict:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+              example:
+                message: User already exists.
   /customers:
     post:
       tags:
@@ -286,9 +402,33 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserReadDto'
         '400':
-          description: invalid input, object invalid
+          description: |
+            Bad request:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+              examples:
+                Other:
+                  value:
+                    message: Something went wrong, please try again later.
+                ValidationError:
+                  value:
+                    type: "https://tools.ietf.org/html/rfc7231#section-6.5.1"
+                    title: "One or more validation errors occurred."
+                    status: 400
+                    traceId: "00-9393a6db2a571eaf5be54665fe54611b-9b403c28dba47801-00"
+                    errors:
+                      Name: [ "The Name field is required." ]
         '409':
-          description: User already exists
+          description: |
+            Conflict:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+              example:
+                message: User already exists.
   /restaurants:
     post:
       tags:
@@ -313,9 +453,33 @@ paths:
               schema:
                 $ref: '#/components/schemas/RestaurantReadDto'
         '400':
-          description: invalid input, object invalid
+          description: |
+            Bad request:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+              examples:
+                Other:
+                  value:
+                    message: Something went wrong, please try again later.
+                ValidationError:
+                  value:
+                    type: "https://tools.ietf.org/html/rfc7231#section-6.5.1"
+                    title: "One or more validation errors occurred."
+                    status: 400
+                    traceId: "00-9393a6db2a571eaf5be54665fe54611b-9b403c28dba47801-00"
+                    errors:
+                      Name: [ "The Name field is required." ]
         '409':
-          description: Restaurant already exists
+          description: |
+            Conflict:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+              example:
+                message: Restaurant already exists.
   /restaurants/{restaurantId}:
     description: |
       - Authorization header: **yes**
@@ -345,28 +509,37 @@ paths:
         '400':
           description: |
             Bad request:
-            - Something went wrong, please try again later
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+              example:
+                message: Something went wrong, please try again later.
         '401':
           description: |
             Unauthorized:
-            - Please login and use provided tokens
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+              example:
+                message: Please login and use provided tokens.
         '404':
           description: |
             Not found:
-            - Restaurant not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+              example:
+                message: Restaurant not found.
 components:
   schemas:
-    AnonymousTryDto:
+    MessageDto:
       properties:
         message:
           type: string
-          description: YLunchApi is running, you are anonymous
-    AuthenticatedTryDto:
-      properties:
-        message:
-          type: string
-          description: |
-            YLunchApi is running, you are authenticated as {CurrentUserEmail} with Id: {CurrentUserId} and Roles: {CurrentUserRoles}
+          description: The message.
     LoginRequestDto:
       type: object
       properties:
@@ -502,15 +675,15 @@ components:
       properties:
         dayOfWeek:
           type: number
-          description: 'The day to apply this opening time. Starting from Sunday: 0 to Saturday: 6, for example 4 is thursday'
+          description: 'The day to apply this opening time. Starting from Sunday: 0 to Saturday: 6, for example 4 is thursday.'
           example: 4
         OffsetInMinutes:
           type: number
-          description: 'Number of minutes past from 00:00 for example 10:00 is 600, which means the restaurant is open since 10:00'
+          description: 'Number of minutes past from 00:00 for example 10:00 is 600, which means the restaurant is open since 10:00.'
           example: 600
         DurationInMinutes:
           type: number
-          description: 'Number of minutes the restaurant is open since the offset, for example 120 minutes, which means the restaurant is open during 2h since 10:00'
+          description: 'Number of minutes the restaurant is open since the offset, for example 120 minutes, which means the restaurant is open during 2h since 10:00.'
           example: 120
       required:
         - dayOfWeek
@@ -527,15 +700,15 @@ components:
           example: a00000e0-aaa0-000a-0000-00e00aa00e00
         dayOfWeek:
           type: number
-          description: 'The day to apply this opening time. Starting from Sunday: 0 to Saturday: 6, for example 4 is thursday'
+          description: 'The day to apply this opening time. Starting from Sunday: 0 to Saturday: 6, for example 4 is thursday.'
           example: 4
         OffsetInMinutes:
           type: number
-          description: 'Number of minutes past from 00:00 for example 10:00 is 600, which means the restaurant is open since 10:00'
+          description: 'Number of minutes past from 00:00 for example 10:00 is 600, which means the restaurant is open since 10:00.'
           example: 600
         DurationInMinutes:
           type: number
-          description: 'Number of minutes the restaurant is open since the offset, for example 120 minutes, which means the restaurant is open during 2h since 10:00'
+          description: 'Number of minutes the restaurant is open since the offset, for example 120 minutes, which means the restaurant is open during 2h since 10:00.'
           example: 120
     RestaurantCreateDto:
       type: object
@@ -560,7 +733,7 @@ components:
           example: true
         isPublic:
           type: boolean
-          description: 'True if the restaurant wants to be visible for customers, actual visibility value is `isPublished` (refer to that field in `RestaurantReadDto`for details)'
+          description: 'True if the restaurant wants to be visible for customers, actual visibility value is `isPublished` (refer to that field in `RestaurantReadDto`for details).'
           example: true
         zipCode:
           type: string
@@ -637,7 +810,7 @@ components:
           example: true
         isPublic:
           type: boolean
-          description: 'True if the restaurant wants to be visible for customers, actual display value is `isPublished` (refer to that field for details)'
+          description: 'True if the restaurant wants to be visible for customers, actual display value is `isPublished` (refer to that field for details).'
           example: true
         zipCode:
           type: string
@@ -683,13 +856,13 @@ components:
           example: true
         isCurrentlyOpenToOrder:
           type: boolean
-          description: 'True if the restaurant accepts orders'
+          description: 'True if the restaurant accepts orders.'
         isCurrentlyOpenInPlace:
           type: boolean
-          description: 'True if the restaurant is open to eat in place'
+          description: 'True if the restaurant is open to eat in place.'
   securitySchemes:
     Bearer:
       type: http
       description: |
-        JWT Authorization header using the Bearer scheme. Example: 'Authorization: Bearer {token}',
+        JWT Authorization header using the Bearer scheme. Example: 'Authorization: Bearer {token}'.
       scheme: bearer

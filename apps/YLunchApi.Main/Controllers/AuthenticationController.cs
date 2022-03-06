@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using YLunchApi.Authentication.Models.Dto;
 using YLunchApi.Authentication.Services;
+using YLunchApi.Domain.CommonAggregate.Dto;
 using YLunchApi.Domain.Core.Utils;
 using YLunchApi.Domain.Exceptions;
 using YLunchApi.Domain.UserAggregate.Dto;
@@ -25,7 +26,7 @@ public class AuthenticationController : ApplicationControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<string>> Login([FromBody] LoginRequestDto loginRequestDto)
+    public async Task<ActionResult<TokenReadDto>> Login([FromBody] LoginRequestDto loginRequestDto)
     {
         try
         {
@@ -34,7 +35,7 @@ public class AuthenticationController : ApplicationControllerBase
         }
         catch
         {
-            return Unauthorized("Please login with valid credentials");
+            return Unauthorized(new MessageDto("Please login with valid credentials."));
         }
     }
 
@@ -50,7 +51,7 @@ public class AuthenticationController : ApplicationControllerBase
         {
             if (EnvironmentUtils.IsDevelopment) throw;
 
-            return Unauthorized("Invalid tokens, please login to generate new valid tokens");
+            return Unauthorized(new MessageDto("Invalid tokens, please login to generate new valid tokens."));
         }
     }
 
@@ -64,7 +65,7 @@ public class AuthenticationController : ApplicationControllerBase
         }
         catch (EntityNotFoundException)
         {
-            return Unauthorized("Invalid tokens, please login to generate new valid tokens");
+            return Unauthorized(new MessageDto("Invalid tokens, please login to generate new valid tokens."));
         }
     }
 }

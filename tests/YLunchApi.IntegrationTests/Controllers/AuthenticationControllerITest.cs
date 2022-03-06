@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
 using YLunchApi.Authentication.Models.Dto;
+using YLunchApi.Domain.CommonAggregate.Dto;
 using YLunchApi.Domain.UserAggregate.Dto;
 using YLunchApi.IntegrationTests.Core.Extensions;
 using YLunchApi.IntegrationTests.Core.Utils;
@@ -128,8 +129,8 @@ public class AuthenticationControllerITest : ControllerITestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
-        var content = await ResponseUtils.DeserializeContentAsync(response);
-        content.Should().Be("Invalid tokens, please login to generate new valid tokens");
+        var content = await ResponseUtils.DeserializeContentAsync<MessageDto>(response);
+        content.Should().BeEquivalentTo(new MessageDto("Invalid tokens, please login to generate new valid tokens."));
     }
 
     #endregion

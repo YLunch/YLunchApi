@@ -16,6 +16,7 @@ using YLunchApi.Authentication.Models.Dto;
 using YLunchApi.Authentication.Repositories;
 using YLunchApi.Authentication.Services;
 using YLunchApi.AuthenticationShared.Repositories;
+using YLunchApi.Domain.CommonAggregate.Dto;
 using YLunchApi.Domain.UserAggregate.Dto;
 using YLunchApi.Domain.UserAggregate.Models;
 using YLunchApi.Domain.UserAggregate.Services;
@@ -136,8 +137,8 @@ public class AuthenticationControllerTest
         // Act
         var response = await controller.Login(loginRequestDto);
         var responseResult = Assert.IsType<UnauthorizedObjectResult>(response.Result);
-        var responseBody = Assert.IsType<string>(responseResult.Value);
-        responseBody.Should().Be("Please login with valid credentials");
+        var responseBody = Assert.IsType<MessageDto>(responseResult.Value);
+        responseBody.Should().BeEquivalentTo(new MessageDto("Please login with valid credentials."));
     }
 
     [Fact]
@@ -203,8 +204,9 @@ public class AuthenticationControllerTest
 
         // Assert
         var responseResult = Assert.IsType<UnauthorizedObjectResult>(response.Result);
-        var responseBody = Assert.IsType<string>(responseResult.Value);
-        responseBody.Should().Be("Invalid tokens, please login to generate new valid tokens");
+        var responseBody = Assert.IsType<MessageDto>(responseResult.Value);
+        responseBody.Should()
+                    .BeEquivalentTo(new MessageDto("Invalid tokens, please login to generate new valid tokens."));
     }
 
     [Fact]
@@ -258,7 +260,8 @@ public class AuthenticationControllerTest
 
         // Assert
         var responseResult = Assert.IsType<UnauthorizedObjectResult>(response.Result);
-        var responseBody = Assert.IsType<string>(responseResult.Value);
-        responseBody.Should().Be("Invalid tokens, please login to generate new valid tokens");
+        var responseBody = Assert.IsType<MessageDto>(responseResult.Value);
+        responseBody.Should()
+                    .BeEquivalentTo(new MessageDto("Invalid tokens, please login to generate new valid tokens."));
     }
 }

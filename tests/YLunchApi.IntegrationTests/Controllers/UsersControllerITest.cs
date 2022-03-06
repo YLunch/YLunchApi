@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
+using YLunchApi.Domain.CommonAggregate.Dto;
 using YLunchApi.Domain.UserAggregate.Dto;
 using YLunchApi.Helpers.Extensions;
 using YLunchApi.IntegrationTests.Core.Utils;
@@ -70,8 +71,8 @@ public class UsersControllerITest : ControllerITestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Conflict);
-        var content = await ResponseUtils.DeserializeContentAsync(response);
-        content.Should().BeEquivalentTo("User already exists");
+        var content = await ResponseUtils.DeserializeContentAsync<MessageDto>(response);
+        content.Should().BeEquivalentTo(new MessageDto("User already exists"));
     }
 
     [Fact]
@@ -258,8 +259,8 @@ public class UsersControllerITest : ControllerITestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Conflict);
-        var content = await ResponseUtils.DeserializeContentAsync(response);
-        content.Should().BeEquivalentTo("User already exists");
+        var content = await ResponseUtils.DeserializeContentAsync<MessageDto>(response);
+        content.Should().BeEquivalentTo(new MessageDto("User already exists"));
     }
 
     [Fact]

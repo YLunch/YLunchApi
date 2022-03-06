@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Xunit;
 using YLunchApi.Application.RestaurantAggregate;
 using YLunchApi.Authentication.Models;
+using YLunchApi.Domain.CommonAggregate.Dto;
 using YLunchApi.Domain.Core.Utils;
 using YLunchApi.Domain.RestaurantAggregate.Dto;
 using YLunchApi.Helpers.Extensions;
@@ -142,8 +143,8 @@ public class RestaurantsControllerTest
 
         // Assert
         var responseResult = Assert.IsType<ConflictObjectResult>(response.Result);
-        var responseBody = Assert.IsType<string>(responseResult.Value);
-        responseBody.Should().Be("Restaurant already exists");
+        var responseBody = Assert.IsType<MessageDto>(responseResult.Value);
+        responseBody.Should().BeEquivalentTo(new MessageDto("Restaurant already exists"));
     }
 
     #endregion
@@ -238,8 +239,8 @@ public class RestaurantsControllerTest
 
         // Assert
         var responseResult = Assert.IsType<NotFoundObjectResult>(response.Result);
-        var responseBody = Assert.IsType<string>(responseResult.Value);
-        responseBody.Should().Be($"Restaurant {notExistingRestaurantId} not found");
+        var responseBody = Assert.IsType<MessageDto>(responseResult.Value);
+        responseBody.Should().BeEquivalentTo(new MessageDto($"Restaurant {notExistingRestaurantId} not found"));
     }
 
     #endregion

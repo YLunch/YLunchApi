@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using YLunchApi.Domain.CommonAggregate.Dto;
 using YLunchApi.Domain.Exceptions;
 using YLunchApi.Domain.UserAggregate.Dto;
 using YLunchApi.Domain.UserAggregate.Models;
@@ -39,7 +40,7 @@ public class UsersController : ApplicationControllerBase
         }
         catch (EntityAlreadyExistsException)
         {
-            return Conflict("User already exists");
+            return Conflict(new MessageDto("User already exists"));
         }
     }
 }

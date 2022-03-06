@@ -3,6 +3,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 using YLunchApi.Application.UserAggregate;
+using YLunchApi.Domain.CommonAggregate.Dto;
 using YLunchApi.Domain.UserAggregate.Dto;
 using YLunchApi.Infrastructure.Database.Repositories;
 using YLunchApi.Main.Controllers;
@@ -64,8 +65,8 @@ public class UsersControllerTest
 
         // Assert
         var responseResult = Assert.IsType<ConflictObjectResult>(response.Result);
-        var responseBody = Assert.IsType<string>(responseResult.Value);
+        var responseBody = Assert.IsType<MessageDto>(responseResult.Value);
 
-        responseBody.Should().Be("User already exists");
+        responseBody.Should().BeEquivalentTo(new MessageDto("User already exists"));
     }
 }

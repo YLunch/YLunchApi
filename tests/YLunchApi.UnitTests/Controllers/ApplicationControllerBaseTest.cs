@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
+using YLunchApi.Domain.CommonAggregate.Dto;
 using YLunchApi.Main.Controllers;
 using YLunchApi.UnitTests.Core.Mockers;
 
@@ -20,10 +21,10 @@ public class ApplicationControllerBaseTest
 
         // Assert
         var responseResult = Assert.IsType<OkObjectResult>(response.Result);
-        var responseBody = Assert.IsType<string>(responseResult.Value);
+        var responseBody = Assert.IsType<MessageDto>(responseResult.Value);
 
-        responseBody.Should().BeEquivalentTo(
-            $"YLunchApi is running, you are authenticated as {string.Empty} with Id: {string.Empty} and Roles: {string.Empty}");
+        responseBody.Should().BeEquivalentTo(new MessageDto(
+            $"YLunchApi is running, you are authenticated as {string.Empty} with Id: {string.Empty} and Roles: {string.Empty}."));
     }
 
     [Fact]
@@ -38,9 +39,9 @@ public class ApplicationControllerBaseTest
 
         // Assert
         var responseResult = Assert.IsType<OkObjectResult>(response.Result);
-        var responseBody = Assert.IsType<string>(responseResult.Value);
+        var responseBody = Assert.IsType<MessageDto>(responseResult.Value);
 
-        responseBody.Should().BeEquivalentTo(
-            $"YLunchApi is running, you are authenticated as {string.Empty} with Id: {string.Empty} and Roles: {string.Empty}");
+        responseBody.Should().BeEquivalentTo(new MessageDto(
+            $"YLunchApi is running, you are authenticated as {string.Empty} with Id: {string.Empty} and Roles: {string.Empty}."));
     }
 }

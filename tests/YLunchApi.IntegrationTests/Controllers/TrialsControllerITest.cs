@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
 using YLunchApi.Authentication.Models.Dto;
+using YLunchApi.Domain.CommonAggregate.Dto;
 using YLunchApi.Domain.UserAggregate.Models;
 using YLunchApi.IntegrationTests.Core.Extensions;
 using YLunchApi.IntegrationTests.Core.Utils;
@@ -21,9 +22,9 @@ public class TrialsControllerITest : ControllerITestBase
     {
         var response = await Client.GetAsync("trials/anonymous");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var content = await ResponseUtils.DeserializeContentAsync(response);
+        var content = await ResponseUtils.DeserializeContentAsync<MessageDto>(response);
 
-        content.Should().BeEquivalentTo("YLunchApi is running, you are anonymous");
+        content.Should().BeEquivalentTo(new MessageDto("YLunchApi is running, you are anonymous."));
     }
 
     #endregion
@@ -40,12 +41,13 @@ public class TrialsControllerITest : ControllerITestBase
         // Act
         var authenticatedTrialResponse = await Client.GetAsync("trials/authenticated");
         authenticatedTrialResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-        var authenticatedTrialResponseContent = await ResponseUtils.DeserializeContentAsync(authenticatedTrialResponse);
+        var authenticatedTrialResponseContent =
+            await ResponseUtils.DeserializeContentAsync<MessageDto>(authenticatedTrialResponse);
 
         // Assert
         authenticatedTrialResponseContent.Should()
-                                         .BeEquivalentTo(
-                                             $"YLunchApi is running, you are authenticated as {authenticatedUserInfo.UserEmail} with Id: {authenticatedUserInfo.UserId} and Roles: {Roles.ListToString(authenticatedUserInfo.UserRoles)}");
+                                         .BeEquivalentTo(new MessageDto(
+                                             $"YLunchApi is running, you are authenticated as {authenticatedUserInfo.UserEmail} with Id: {authenticatedUserInfo.UserId} and Roles: {Roles.ListToString(authenticatedUserInfo.UserRoles)}."));
 
         var refreshTokensBody = new
         {
@@ -61,10 +63,10 @@ public class TrialsControllerITest : ControllerITestBase
         var authenticatedTrialRefreshedTokensResponse = await Client.GetAsync("trials/authenticated");
         authenticatedTrialRefreshedTokensResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var authenticatedTrialWithExpiredTokensResponseContent =
-            await ResponseUtils.DeserializeContentAsync(authenticatedTrialRefreshedTokensResponse);
+            await ResponseUtils.DeserializeContentAsync<MessageDto>(authenticatedTrialRefreshedTokensResponse);
         authenticatedTrialWithExpiredTokensResponseContent.Should()
-                                                          .BeEquivalentTo(
-                                                              $"YLunchApi is running, you are authenticated as {authenticatedUserInfo.UserEmail} with Id: {authenticatedUserInfo.UserId} and Roles: {Roles.ListToString(authenticatedUserInfo.UserRoles)}");
+                                                          .BeEquivalentTo(new MessageDto(
+                                                              $"YLunchApi is running, you are authenticated as {authenticatedUserInfo.UserEmail} with Id: {authenticatedUserInfo.UserId} and Roles: {Roles.ListToString(authenticatedUserInfo.UserRoles)}."));
     }
 
     [Fact]
@@ -77,12 +79,13 @@ public class TrialsControllerITest : ControllerITestBase
         // Act
         var authenticatedTrialResponse = await Client.GetAsync("trials/authenticated");
         authenticatedTrialResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-        var authenticatedTrialResponseContent = await ResponseUtils.DeserializeContentAsync(authenticatedTrialResponse);
+        var authenticatedTrialResponseContent =
+            await ResponseUtils.DeserializeContentAsync<MessageDto>(authenticatedTrialResponse);
 
         // Assert
         authenticatedTrialResponseContent.Should()
-                                         .BeEquivalentTo(
-                                             $"YLunchApi is running, you are authenticated as {authenticatedUserInfo.UserEmail} with Id: {authenticatedUserInfo.UserId} and Roles: {Roles.ListToString(authenticatedUserInfo.UserRoles)}");
+                                         .BeEquivalentTo(new MessageDto(
+                                             $"YLunchApi is running, you are authenticated as {authenticatedUserInfo.UserEmail} with Id: {authenticatedUserInfo.UserId} and Roles: {Roles.ListToString(authenticatedUserInfo.UserRoles)}."));
 
         var refreshTokensBody = new
         {
@@ -98,10 +101,10 @@ public class TrialsControllerITest : ControllerITestBase
         var authenticatedTrialRefreshedTokensResponse = await Client.GetAsync("trials/authenticated");
         authenticatedTrialRefreshedTokensResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var authenticatedTrialWithExpiredTokensResponseContent =
-            await ResponseUtils.DeserializeContentAsync(authenticatedTrialRefreshedTokensResponse);
+            await ResponseUtils.DeserializeContentAsync<MessageDto>(authenticatedTrialRefreshedTokensResponse);
         authenticatedTrialWithExpiredTokensResponseContent.Should()
-                                                          .BeEquivalentTo(
-                                                              $"YLunchApi is running, you are authenticated as {authenticatedUserInfo.UserEmail} with Id: {authenticatedUserInfo.UserId} and Roles: {Roles.ListToString(authenticatedUserInfo.UserRoles)}");
+                                                          .BeEquivalentTo(new MessageDto(
+                                                              $"YLunchApi is running, you are authenticated as {authenticatedUserInfo.UserEmail} with Id: {authenticatedUserInfo.UserId} and Roles: {Roles.ListToString(authenticatedUserInfo.UserRoles)}."));
     }
 
     [Fact]
@@ -141,11 +144,11 @@ public class TrialsControllerITest : ControllerITestBase
         // Act
         var response = await Client.GetAsync("trials/authenticated-restaurant-admin");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var content = await ResponseUtils.DeserializeContentAsync(response);
+        var content = await ResponseUtils.DeserializeContentAsync<MessageDto>(response);
 
         // Assert
-        content.Should().BeEquivalentTo(
-            $"YLunchApi is running, you are authenticated as {authenticatedUserInfo.UserEmail} with Id: {authenticatedUserInfo.UserId} and Roles: {Roles.ListToString(authenticatedUserInfo.UserRoles)}");
+        content.Should().BeEquivalentTo(new MessageDto(
+            $"YLunchApi is running, you are authenticated as {authenticatedUserInfo.UserEmail} with Id: {authenticatedUserInfo.UserId} and Roles: {Roles.ListToString(authenticatedUserInfo.UserRoles)}."));
     }
 
     [Fact]
@@ -176,11 +179,11 @@ public class TrialsControllerITest : ControllerITestBase
         // Act
         var response = await Client.GetAsync("trials/authenticated-customer");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var content = await ResponseUtils.DeserializeContentAsync(response);
+        var content = await ResponseUtils.DeserializeContentAsync<MessageDto>(response);
 
         // Assert
-        content.Should().BeEquivalentTo(
-            $"YLunchApi is running, you are authenticated as {authenticatedUserInfo.UserEmail} with Id: {authenticatedUserInfo.UserId} and Roles: {Roles.ListToString(authenticatedUserInfo.UserRoles)}");
+        content.Should().BeEquivalentTo(new MessageDto(
+            $"YLunchApi is running, you are authenticated as {authenticatedUserInfo.UserEmail} with Id: {authenticatedUserInfo.UserId} and Roles: {Roles.ListToString(authenticatedUserInfo.UserRoles)}."));
     }
 
     [Fact]

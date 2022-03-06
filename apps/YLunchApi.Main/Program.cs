@@ -150,7 +150,7 @@ else
         {
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
             context.Response.ContentType = "application/json";
-            await context.Response.WriteAsJsonAsync(new { Message = "Something went wrong, try again later" });
+            await context.Response.WriteAsJsonAsync(new { Message = "Something went wrong, try again later." });
         });
     });
 }
