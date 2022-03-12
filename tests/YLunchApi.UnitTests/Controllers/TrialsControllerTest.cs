@@ -6,17 +6,25 @@ using YLunchApi.Domain.CommonAggregate.Dto;
 using YLunchApi.Domain.UserAggregate.Models;
 using YLunchApi.Main.Controllers;
 using YLunchApi.TestsShared.Mocks;
-using YLunchApi.UnitTests.Core.Mockers;
+using YLunchApi.UnitTests.Configuration;
 
 namespace YLunchApi.UnitTests.Controllers;
 
-public class TrialsControllerTest
+public class TrialsControllerTest : IClassFixture<UnitTestFixture>
 {
+    private readonly UnitTestFixture _fixture;
+
+    public TrialsControllerTest(UnitTestFixture fixture)
+    {
+        _fixture = fixture;
+    }
+
     [Fact]
     public void GetAnonymousTry_Should_Return_A_200Ok()
     {
         // Arrange
-        var controller = new TrialsController(HttpContextAccessorMocker.GetWithoutAuthorization());
+        _fixture.InitFixture();
+        var controller = _fixture.GetImplementationFromService<TrialsController>();
 
         // Act
         var response = controller.GetAnonymousTry();
@@ -32,8 +40,9 @@ public class TrialsControllerTest
     public void GetAuthenticatedTry_Should_Return_A_200Ok()
     {
         // Arrange
-        var controller =
-            new TrialsController(HttpContextAccessorMocker.GetWithAuthorization(TokenMocks.ValidCustomerAccessToken));
+        _fixture.InitFixture(configuration =>
+            configuration.AccessToken = TokenMocks.ValidCustomerAccessToken);
+        var controller = _fixture.GetImplementationFromService<TrialsController>();
 
         // Act
         var response = controller.GetAuthenticatedTry();
@@ -51,9 +60,9 @@ public class TrialsControllerTest
     public void GetAuthenticatedRestaurantAdminTry_Should_Return_A_200Ok()
     {
         // Arrange
-        var controller =
-            new TrialsController(
-                HttpContextAccessorMocker.GetWithAuthorization(TokenMocks.ValidRestaurantAdminAccessToken));
+        _fixture.InitFixture(configuration =>
+            configuration.AccessToken = TokenMocks.ValidRestaurantAdminAccessToken);
+        var controller = _fixture.GetImplementationFromService<TrialsController>();
 
         // Act
         var response = controller.GetAuthenticatedRestaurantAdminTry();
@@ -71,8 +80,9 @@ public class TrialsControllerTest
     public void GetAuthenticatedCustomerTry_Should_Return_A_200Ok()
     {
         // Arrange
-        var controller =
-            new TrialsController(HttpContextAccessorMocker.GetWithAuthorization(TokenMocks.ValidCustomerAccessToken));
+        _fixture.InitFixture(configuration =>
+            configuration.AccessToken = TokenMocks.ValidCustomerAccessToken);
+        var controller = _fixture.GetImplementationFromService<TrialsController>();
 
         // Act
         var response = controller.GetAuthenticatedCustomerTry();
