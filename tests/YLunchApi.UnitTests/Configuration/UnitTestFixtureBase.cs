@@ -10,8 +10,10 @@ using YLunchApi.Authentication.Services;
 using YLunchApi.AuthenticationShared.Repositories;
 using YLunchApi.Domain.RestaurantAggregate.Services;
 using YLunchApi.Domain.UserAggregate.Services;
+using YLunchApi.Infrastructure.Database;
 using YLunchApi.Infrastructure.Database.Repositories;
 using YLunchApi.Main.Controllers;
+using YLunchApi.UnitTests.Core;
 using YLunchApi.UnitTests.Core.Mockers;
 
 namespace YLunchApi.UnitTests.Configuration;
@@ -23,14 +25,15 @@ public class UnitTestFixtureBase
     public UnitTestFixtureBase InitFixture(Action<FixtureConfiguration>? configureOptions = null)
     {
         var fixtureConfiguration = new FixtureConfiguration();
-        if (configureOptions != null)
-        {
-            configureOptions(fixtureConfiguration);
-        }
+        configureOptions?.Invoke(fixtureConfiguration);
 
         var serviceCollection = new ServiceCollection();
 
         serviceCollection.AddScoped<TrialsController>();
+        serviceCollection.AddScoped<RestaurantsController>();
+
+        serviceCollection.TryAddScoped<ApplicationDbContext>(_ =>
+            ContextBuilder.BuildContext());
 
         serviceCollection.TryAddScoped<IHttpContextAccessor>(_ =>
             new HttpContextAccessorMock(fixtureConfiguration.AccessToken));
