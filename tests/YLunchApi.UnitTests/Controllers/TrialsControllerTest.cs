@@ -10,21 +10,17 @@ using YLunchApi.UnitTests.Configuration;
 
 namespace YLunchApi.UnitTests.Controllers;
 
-public class TrialsControllerTest : IClassFixture<UnitTestFixture>
+public class TrialsControllerTest : UnitTestFixture
 {
-    private readonly UnitTestFixture _fixture;
-
-    public TrialsControllerTest(UnitTestFixture fixture)
+    public TrialsControllerTest(UnitTestFixtureBase fixture) : base(fixture)
     {
-        _fixture = fixture;
     }
 
     [Fact]
     public void GetAnonymousTry_Should_Return_A_200Ok()
     {
         // Arrange
-        _fixture.InitFixture();
-        var controller = _fixture.GetImplementationFromService<TrialsController>();
+        var controller = AnonymousUserFixture.GetImplementationFromService<TrialsController>();
 
         // Act
         var response = controller.GetAnonymousTry();
@@ -40,9 +36,7 @@ public class TrialsControllerTest : IClassFixture<UnitTestFixture>
     public void GetAuthenticatedTry_Should_Return_A_200Ok()
     {
         // Arrange
-        _fixture.InitFixture(configuration =>
-            configuration.AccessToken = TokenMocks.ValidCustomerAccessToken);
-        var controller = _fixture.GetImplementationFromService<TrialsController>();
+        var controller = AuthenticatedCustomerFixture.GetImplementationFromService<TrialsController>();
 
         // Act
         var response = controller.GetAuthenticatedTry();
@@ -60,9 +54,7 @@ public class TrialsControllerTest : IClassFixture<UnitTestFixture>
     public void GetAuthenticatedRestaurantAdminTry_Should_Return_A_200Ok()
     {
         // Arrange
-        _fixture.InitFixture(configuration =>
-            configuration.AccessToken = TokenMocks.ValidRestaurantAdminAccessToken);
-        var controller = _fixture.GetImplementationFromService<TrialsController>();
+        var controller = AuthenticatedRestaurantAdminFixture.GetImplementationFromService<TrialsController>();
 
         // Act
         var response = controller.GetAuthenticatedRestaurantAdminTry();
@@ -80,9 +72,7 @@ public class TrialsControllerTest : IClassFixture<UnitTestFixture>
     public void GetAuthenticatedCustomerTry_Should_Return_A_200Ok()
     {
         // Arrange
-        _fixture.InitFixture(configuration =>
-            configuration.AccessToken = TokenMocks.ValidCustomerAccessToken);
-        var controller = _fixture.GetImplementationFromService<TrialsController>();
+        var controller = AuthenticatedCustomerFixture.GetImplementationFromService<TrialsController>();
 
         // Act
         var response = controller.GetAuthenticatedCustomerTry();
