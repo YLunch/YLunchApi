@@ -8,26 +8,19 @@ using YLunchApi.Domain.UserAggregate.Dto;
 using YLunchApi.Infrastructure.Database.Repositories;
 using YLunchApi.Main.Controllers;
 using YLunchApi.TestsShared.Mocks;
+using YLunchApi.UnitTests.Configuration;
 using YLunchApi.UnitTests.Core;
 using YLunchApi.UnitTests.Core.Mockers;
 
 namespace YLunchApi.UnitTests.Controllers;
 
-public class UsersControllerTest
+public class UsersControllerTest : UnitTestFixture
 {
     private readonly UsersController _usersController;
 
-    public UsersControllerTest()
+    public UsersControllerTest(UnitTestFixtureBase fixtureBase) : base(fixtureBase)
     {
-        var context = ContextBuilder.BuildContext();
-
-        var roleManagerMock = ManagerMocker.GetRoleManagerMock(context);
-        var userManagerMock = ManagerMocker.GetUserManagerMock(context);
-
-        var userRepository = new UserRepository(context, userManagerMock.Object, roleManagerMock.Object);
-        var userService = new UserService(userRepository);
-
-        _usersController = new UsersController(userService, HttpContextAccessorMocker.GetWithoutAuthorization());
+        _usersController = AnonymousUserFixture.GetImplementationFromService<UsersController>();
     }
 
     [Fact]

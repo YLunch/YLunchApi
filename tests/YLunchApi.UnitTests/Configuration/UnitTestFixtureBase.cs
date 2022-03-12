@@ -1,6 +1,7 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using YLunchApi.Application.RestaurantAggregate;
@@ -9,6 +10,7 @@ using YLunchApi.Authentication.Repositories;
 using YLunchApi.Authentication.Services;
 using YLunchApi.AuthenticationShared.Repositories;
 using YLunchApi.Domain.RestaurantAggregate.Services;
+using YLunchApi.Domain.UserAggregate.Models;
 using YLunchApi.Domain.UserAggregate.Services;
 using YLunchApi.Infrastructure.Database;
 using YLunchApi.Infrastructure.Database.Repositories;
@@ -30,10 +32,20 @@ public class UnitTestFixtureBase
         var serviceCollection = new ServiceCollection();
 
         serviceCollection.AddScoped<TrialsController>();
+        serviceCollection.AddScoped<UsersController>();
         serviceCollection.AddScoped<RestaurantsController>();
 
+
+        var context = ContextBuilder.BuildContext();
+
         serviceCollection.TryAddScoped<ApplicationDbContext>(_ =>
-            ContextBuilder.BuildContext());
+            context);
+
+        serviceCollection.TryAddScoped<RoleManager<IdentityRole>>(_ =>
+            ManagerMocker.GetRoleManagerMock(context).Object);
+
+        serviceCollection.TryAddScoped<UserManager<User>>(_ =>
+            ManagerMocker.GetUserManagerMock(context).Object);
 
         serviceCollection.TryAddScoped<IHttpContextAccessor>(_ =>
             new HttpContextAccessorMock(fixtureConfiguration.AccessToken));
