@@ -1,87 +1,39 @@
-using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Moq;
-using NSubstitute;
 using Xunit;
 using YLunchApi.Authentication.Exceptions;
-using YLunchApi.Authentication.Models;
 using YLunchApi.Authentication.Models.Dto;
 using YLunchApi.Authentication.Repositories;
 using YLunchApi.Authentication.Services;
 using YLunchApi.AuthenticationShared.Repositories;
 using YLunchApi.Infrastructure.Database;
-using YLunchApi.Infrastructure.Database.Repositories;
 using YLunchApi.TestsShared.Mocks;
-using YLunchApi.UnitTests.Core;
-using YLunchApi.UnitTests.Core.Mocks;
+using YLunchApi.UnitTests.Configuration;
 
 namespace YLunchApi.UnitTests.Application.Authentication;
 
-public class JwtServiceTest
+public class JwtServiceTest : UnitTestFixture
 {
     private readonly ApplicationDbContext _context;
     private readonly Mock<IRefreshTokenRepository> _refreshTokenRepositoryMock;
-    private readonly IOptionsMonitor<JwtConfig> _optionsMonitorMock;
-    private readonly UserRepository _userRepository;
-    private readonly TokenValidationParameters _tokenValidationParameter;
 
-    public JwtServiceTest()
+    public JwtServiceTest(UnitTestFixtureBase fixture) : base(fixture)
     {
-        _context = ContextBuilder.BuildContext();
-
-        var roleManagerMock = ManagerMocker.GetRoleManagerMock(_context);
-        var userManagerMock = ManagerMocker.GetUserManagerMock(_context);
-
-        _userRepository = new UserRepository(_context, userManagerMock.Object, roleManagerMock.Object);
-
-        const string jwtSecret = "JsonWebTokenSecretForTests";
-        _optionsMonitorMock = Substitute.For<IOptionsMonitor<JwtConfig>>();
-        _optionsMonitorMock.CurrentValue.Returns(new JwtConfig
-        {
-            Secret = jwtSecret
-        });
-
-        var key = Encoding.ASCII.GetBytes(jwtSecret);
-
-        _tokenValidationParameter = new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(key),
-            ValidateIssuer = false,
-            ValidateAudience = false,
-            ValidateLifetime = true,
-            RequireExpirationTime = false,
-
-            // Allow to use seconds for expiration of token
-            // Required only when token lifetime less than 5 minutes
-            ClockSkew = TimeSpan.Zero
-        };
-
+        Fixture.InitFixture();
+        _context = Fixture.GetImplementationFromService<ApplicationDbContext>();
         _refreshTokenRepositoryMock = new Mock<RefreshTokenRepository>(_context).As<IRefreshTokenRepository>();
-
         _refreshTokenRepositoryMock.Setup(x => x.GetByToken(It.IsAny<string>()))
                                    .Returns<string>(async refreshTokenString =>
                                        await _context.RefreshTokens
                                                      .FirstOrDefaultAsync(x =>
                                                          x.Token == refreshTokenString)
                                    );
-    }
 
-    private IJwtService CreateJwtService(Mock<JwtSecurityTokenHandler>? jwtSecurityTokenHandlerMock = null)
-    {
-        return new JwtService(
-            _refreshTokenRepositoryMock.Object,
-            _optionsMonitorMock,
-            _tokenValidationParameter,
-            _userRepository,
-            jwtSecurityTokenHandlerMock == null ? new JwtSecurityTokenHandler() : jwtSecurityTokenHandlerMock.Object
-        );
+        Fixture.InitFixture(configuration => configuration.RefreshTokenRepository = _refreshTokenRepositoryMock.Object);
     }
 
     [Fact]
@@ -100,8 +52,12 @@ public class JwtServiceTest
                 x.ValidateToken(It.IsAny<string>(), It.IsAny<TokenValidationParameters>(), out validatedToken))
             .Returns(new ClaimsPrincipal());
 
+        Fixture.InitFixture(configuration =>
+            configuration.JwtSecurityTokenHandler = jwtSecurityTokenHandlerMock.Object);
+        var jwtService = Fixture.GetImplementationFromService<IJwtService>();
+
         // Act
-        async Task Act() => await CreateJwtService(jwtSecurityTokenHandlerMock).RefreshJwtToken(refreshTokensRequest);
+        async Task Act() => await jwtService.RefreshJwtToken(refreshTokensRequest);
 
         // Assert
         await Assert.ThrowsAsync<InvalidTokenException>(Act);
@@ -123,8 +79,12 @@ public class JwtServiceTest
                 x.ValidateToken(It.IsAny<string>(), It.IsAny<TokenValidationParameters>(), out validatedToken))
             .Returns<ClaimsPrincipal>(null);
 
+        Fixture.InitFixture(configuration =>
+            configuration.JwtSecurityTokenHandler = jwtSecurityTokenHandlerMock.Object);
+        var jwtService = Fixture.GetImplementationFromService<IJwtService>();
+
         // Act
-        async Task Act() => await CreateJwtService(jwtSecurityTokenHandlerMock).RefreshJwtToken(refreshTokensRequest);
+        async Task Act() => await jwtService.RefreshJwtToken(refreshTokensRequest);
 
         // Assert
         await Assert.ThrowsAsync<InvalidTokenException>(Act);
@@ -139,9 +99,10 @@ public class JwtServiceTest
             AccessToken = TokenMocks.BadAlgorithmAccessToken,
             RefreshToken = TokenMocks.RefreshToken.Token
         };
+        var jwtService = Fixture.GetImplementationFromService<IJwtService>();
 
         // Act
-        async Task Act() => await CreateJwtService().RefreshJwtToken(refreshTokensRequest);
+        async Task Act() => await jwtService.RefreshJwtToken(refreshTokensRequest);
 
         // Assert
         await Assert.ThrowsAsync<InvalidTokenException>(Act);
@@ -156,9 +117,10 @@ public class JwtServiceTest
             AccessToken = TokenMocks.ExpiredAccessToken,
             RefreshToken = "unknownToken"
         };
+        var jwtService = Fixture.GetImplementationFromService<IJwtService>();
 
         // Act
-        async Task Act() => await CreateJwtService().RefreshJwtToken(refreshTokensRequest);
+        async Task Act() => await jwtService.RefreshJwtToken(refreshTokensRequest);
 
         // Assert
         await Assert.ThrowsAsync<RefreshTokenNotFoundException>(Act);
@@ -173,14 +135,16 @@ public class JwtServiceTest
         await _context.RefreshTokens.AddAsync(refreshToken);
         _refreshTokenRepositoryMock.Setup(x => x.GetByToken(It.IsAny<string>()))
                                    .ReturnsAsync(() => refreshToken);
+        Fixture.InitFixture(configuration => configuration.RefreshTokenRepository = _refreshTokenRepositoryMock.Object);
         var refreshTokensRequest = new TokenUpdateDto
         {
             AccessToken = TokenMocks.ExpiredAccessToken,
             RefreshToken = refreshToken.Token
         };
+        var jwtService = Fixture.GetImplementationFromService<IJwtService>();
 
         // Act
-        async Task Act() => await CreateJwtService().RefreshJwtToken(refreshTokensRequest);
+        async Task Act() => await jwtService.RefreshJwtToken(refreshTokensRequest);
 
         // Assert
         await Assert.ThrowsAsync<RefreshTokenExpiredException>(Act);
@@ -196,14 +160,16 @@ public class JwtServiceTest
         await _context.AddAsync(refreshToken);
         _refreshTokenRepositoryMock.Setup(x => x.GetByToken(It.IsAny<string>()))
                                    .ReturnsAsync(() => refreshToken);
+        Fixture.InitFixture(configuration => configuration.RefreshTokenRepository = _refreshTokenRepositoryMock.Object);
         var refreshTokensRequest = new TokenUpdateDto
         {
             AccessToken = TokenMocks.ExpiredAccessToken,
             RefreshToken = refreshToken.Token
         };
+        var jwtService = Fixture.GetImplementationFromService<IJwtService>();
 
         // Act
-        async Task Act() => await CreateJwtService().RefreshJwtToken(refreshTokensRequest);
+        async Task Act() => await jwtService.RefreshJwtToken(refreshTokensRequest);
 
         // Assert
         await Assert.ThrowsAsync<RefreshTokenAlreadyUsedException>(Act);
@@ -218,14 +184,16 @@ public class JwtServiceTest
         await _context.AddAsync(refreshToken);
         _refreshTokenRepositoryMock.Setup(x => x.GetByToken(It.IsAny<string>()))
                                    .ReturnsAsync(() => refreshToken);
+        Fixture.InitFixture(configuration => configuration.RefreshTokenRepository = _refreshTokenRepositoryMock.Object);
         var refreshTokensRequest = new TokenUpdateDto
         {
             AccessToken = TokenMocks.ExpiredAccessToken,
             RefreshToken = refreshToken.Token
         };
+        var jwtService = Fixture.GetImplementationFromService<IJwtService>();
 
         // Act
-        async Task Act() => await CreateJwtService().RefreshJwtToken(refreshTokensRequest);
+        async Task Act() => await jwtService.RefreshJwtToken(refreshTokensRequest);
 
         // Assert
         await Assert.ThrowsAsync<RefreshTokenRevokedException>(Act);
@@ -240,14 +208,16 @@ public class JwtServiceTest
         await _context.AddAsync(refreshToken);
         _refreshTokenRepositoryMock.Setup(x => x.GetByToken(It.IsAny<string>()))
                                    .ReturnsAsync(() => refreshToken);
+        Fixture.InitFixture(configuration => configuration.RefreshTokenRepository = _refreshTokenRepositoryMock.Object);
         var refreshTokensRequest = new TokenUpdateDto
         {
             AccessToken = TokenMocks.ExpiredAccessToken,
             RefreshToken = refreshToken.Token
         };
+        var jwtService = Fixture.GetImplementationFromService<IJwtService>();
 
         // Act
-        async Task Act() => await CreateJwtService().RefreshJwtToken(refreshTokensRequest);
+        async Task Act() => await jwtService.RefreshJwtToken(refreshTokensRequest);
 
         // Assert
         await Assert.ThrowsAsync<AccessAndRefreshTokensNotMatchException>(Act);

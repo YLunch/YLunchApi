@@ -1,5 +1,6 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -28,43 +29,41 @@ namespace YLunchApi.UnitTests.Configuration;
 public class UnitTestFixtureBase
 {
     private ServiceProvider _serviceProvider = null!;
+    private ServiceCollection _serviceCollection = null!;
     public string DatabaseId { get; set; } = null!;
 
-    public void InitFixture(Action<FixtureConfiguration>? configureOptions = null)
+    private void PrepareDependencies(FixtureConfiguration fixtureConfiguration)
     {
-        var fixtureConfiguration = new FixtureConfiguration();
-        configureOptions?.Invoke(fixtureConfiguration);
+        _serviceCollection = new ServiceCollection();
 
-        var serviceCollection = new ServiceCollection();
-
-        serviceCollection.AddScoped<TrialsController>();
-        serviceCollection.AddScoped<UsersController>();
-        serviceCollection.AddScoped<RestaurantsController>();
-        serviceCollection.AddScoped<AuthenticationController>();
+        _serviceCollection.AddScoped<TrialsController>();
+        _serviceCollection.AddScoped<UsersController>();
+        _serviceCollection.AddScoped<RestaurantsController>();
+        _serviceCollection.AddScoped<AuthenticationController>();
 
 
         var context = ContextBuilder.BuildContext(DatabaseId);
 
-        serviceCollection.TryAddScoped<ApplicationDbContext>(_ =>
+        _serviceCollection.TryAddScoped<ApplicationDbContext>(_ =>
             context);
 
-        serviceCollection.TryAddScoped<RoleManager<IdentityRole>>(_ =>
+        _serviceCollection.TryAddScoped<RoleManager<IdentityRole>>(_ =>
             ManagerMocker.GetRoleManagerMock(context).Object);
 
-        serviceCollection.TryAddScoped<UserManager<User>>(_ =>
+        _serviceCollection.TryAddScoped<UserManager<User>>(_ =>
             ManagerMocker.GetUserManagerMock(context).Object);
 
-        serviceCollection.TryAddScoped<IHttpContextAccessor>(_ =>
+        _serviceCollection.TryAddScoped<IHttpContextAccessor>(_ =>
             new HttpContextAccessorMock(fixtureConfiguration.AccessToken));
 
-        serviceCollection.TryAddScoped(_ => new JwtSecurityTokenHandler());
-        serviceCollection.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        _serviceCollection.TryAddScoped<JwtSecurityTokenHandler>(_ => new JwtSecurityTokenHandler());
+        _serviceCollection.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
-        serviceCollection.AddScoped<IUserRepository, UserRepository>();
-        serviceCollection.AddScoped<IUserService, UserService>();
+        _serviceCollection.AddScoped<IUserRepository, UserRepository>();
+        _serviceCollection.AddScoped<IUserService, UserService>();
 
-        serviceCollection.AddScoped<IRestaurantRepository, RestaurantRepository>();
-        serviceCollection.AddScoped<IRestaurantService, RestaurantService>();
+        _serviceCollection.AddScoped<IRestaurantRepository, RestaurantRepository>();
+        _serviceCollection.AddScoped<IRestaurantService, RestaurantService>();
 
 
         // For Jwt
@@ -90,11 +89,54 @@ public class UnitTestFixtureBase
             // Required only when token lifetime less than 5 minutes
             ClockSkew = TimeSpan.Zero
         };
-        serviceCollection.AddSingleton(tokenValidationParameters);
-        serviceCollection.Configure<JwtConfig>(jwtConfig => jwtConfig.Secret = jwtSecret);
-        serviceCollection.AddScoped<IJwtService, JwtService>();
+        _serviceCollection.AddSingleton(tokenValidationParameters);
+        _serviceCollection.Configure<JwtConfig>(jwtConfig => jwtConfig.Secret = jwtSecret);
+        _serviceCollection.AddScoped<IJwtService, JwtService>();
 
-        _serviceProvider = serviceCollection.BuildServiceProvider();
+        _serviceProvider = _serviceCollection.BuildServiceProvider();
+    }
+
+    public void InitFixture(Action<FixtureConfiguration>? configureOptions = null)
+    {
+        var fixtureConfiguration = new FixtureConfiguration();
+        configureOptions?.Invoke(fixtureConfiguration);
+
+        PrepareDependencies(fixtureConfiguration);
+        ReplaceDependencies(fixtureConfiguration);
+    }
+
+    private void ReplaceDependencies(FixtureConfiguration fixtureConfiguration)
+    {
+        if (fixtureConfiguration.RefreshTokenRepository != null)
+        {
+            _serviceCollection.Remove(
+                _serviceCollection.First(descriptor => descriptor.ServiceType == typeof(IRefreshTokenRepository)));
+            _serviceCollection.TryAddScoped<IRefreshTokenRepository>(_ => fixtureConfiguration.RefreshTokenRepository!);
+        }
+
+        if (fixtureConfiguration.JwtSecurityTokenHandler != null)
+        {
+            _serviceCollection.Remove(
+                _serviceCollection.First(descriptor => descriptor.ServiceType == typeof(JwtSecurityTokenHandler)));
+            _serviceCollection.TryAddScoped<JwtSecurityTokenHandler>(_ =>
+                fixtureConfiguration.JwtSecurityTokenHandler!);
+        }
+
+        if (fixtureConfiguration.UserRepository != null)
+        {
+            _serviceCollection.Remove(
+                _serviceCollection.First(descriptor => descriptor.ServiceType == typeof(IUserRepository)));
+            _serviceCollection.TryAddScoped<IUserRepository>(_ => fixtureConfiguration.UserRepository!);
+        }
+
+        if (fixtureConfiguration.UserManager != null)
+        {
+            _serviceCollection.Remove(
+                _serviceCollection.First(descriptor => descriptor.ServiceType == typeof(UserManager<User>)));
+            _serviceCollection.TryAddScoped<UserManager<User>>(_ => fixtureConfiguration.UserManager!);
+        }
+
+        _serviceProvider = _serviceCollection.BuildServiceProvider();
     }
 
     public T GetImplementationFromService<T>()

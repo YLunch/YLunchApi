@@ -3,35 +3,21 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
 using Moq;
 using Xunit;
-using YLunchApi.Application.UserAggregate;
 using YLunchApi.Domain.Exceptions;
 using YLunchApi.Domain.UserAggregate.Dto;
 using YLunchApi.Domain.UserAggregate.Models;
 using YLunchApi.Domain.UserAggregate.Services;
 using YLunchApi.Infrastructure.Database;
-using YLunchApi.Infrastructure.Database.Repositories;
 using YLunchApi.TestsShared.Mocks;
-using YLunchApi.UnitTests.Core;
+using YLunchApi.UnitTests.Configuration;
 using YLunchApi.UnitTests.Core.Mocks;
 
 namespace YLunchApi.UnitTests.Application.UserAggregate;
 
-public class UserServiceTest
+public class UserServiceTest : UnitTestFixture
 {
-    private readonly ApplicationDbContext _context;
-    private readonly Mock<RoleManager<IdentityRole>> _roleManagerMock;
-    private readonly Mock<UserManager<User>> _userManagerMock;
-    private IUserService _userService;
-
-    public UserServiceTest()
+    public UserServiceTest(UnitTestFixtureBase fixture) : base(fixture)
     {
-        _context = ContextBuilder.BuildContext();
-
-        _roleManagerMock = ManagerMocker.GetRoleManagerMock(_context);
-        _userManagerMock = ManagerMocker.GetUserManagerMock(_context);
-
-        var userRepository = new UserRepository(_context, _userManagerMock.Object, _roleManagerMock.Object);
-        _userService = new UserService(userRepository);
     }
 
     [Fact]
@@ -39,9 +25,11 @@ public class UserServiceTest
     {
         // Arrange
         var userCreateDto = UserMocks.RestaurantAdminCreateDto;
+        Fixture.InitFixture();
+        var userService = Fixture.GetImplementationFromService<IUserService>();
 
         // Act
-        var actual = await _userService.Create(userCreateDto, Roles.RestaurantAdmin);
+        var actual = await userService.Create(userCreateDto, Roles.RestaurantAdmin);
 
         // Assert
         actual = Assert.IsType<UserReadDto>(actual);
@@ -54,9 +42,11 @@ public class UserServiceTest
     {
         // Arrange
         var userCreateDto = UserMocks.CustomerCreateDto;
+        Fixture.InitFixture();
+        var userService = Fixture.GetImplementationFromService<IUserService>();
 
         // Act
-        var actual = await _userService.Create(userCreateDto, Roles.Customer);
+        var actual = await userService.Create(userCreateDto, Roles.Customer);
 
         // Assert
         actual = Assert.IsType<UserReadDto>(actual);
@@ -69,10 +59,12 @@ public class UserServiceTest
     {
         // Arrange
         var userCreateDto = UserMocks.CustomerCreateDto;
-        await _userService.Create(userCreateDto, Roles.Customer);
+        Fixture.InitFixture();
+        var userService = Fixture.GetImplementationFromService<IUserService>();
+        await userService.Create(userCreateDto, Roles.Customer);
 
         // Act
-        async Task Act() => await _userService.Create(userCreateDto, Roles.Customer);
+        async Task Act() => await userService.Create(userCreateDto, Roles.Customer);
 
         // Assert
         await Assert.ThrowsAsync<EntityAlreadyExistsException>(Act);
@@ -85,11 +77,12 @@ public class UserServiceTest
         var userRepositoryMock = new Mock<IUserRepository>();
         userRepositoryMock.Setup(x => x.GetByEmail(It.IsAny<string>()))
                           .ReturnsAsync(() => null);
-        _userService = new UserService(userRepositoryMock.Object);
+        Fixture.InitFixture(configuration => configuration.UserRepository = userRepositoryMock.Object);
+        var userService = Fixture.GetImplementationFromService<IUserService>();
         var userCreateDto = UserMocks.CustomerCreateDto;
 
         // Act
-        async Task Act() => await _userService.Create(userCreateDto, Roles.Customer);
+        async Task Act() => await userService.Create(userCreateDto, Roles.Customer);
 
         // Assert
         await Assert.ThrowsAsync<EntityNotFoundException>(Act);
@@ -100,9 +93,11 @@ public class UserServiceTest
     {
         // Arrange
         var userCreateDto = UserMocks.CustomerCreateDto;
+        Fixture.InitFixture();
+        var userService = Fixture.GetImplementationFromService<IUserService>();
 
         // Act
-        async Task Act() => await _userService.Create(userCreateDto, "UnknownRole");
+        async Task Act() => await userService.Create(userCreateDto, "UnknownRole");
 
         // Assert
         await Assert.ThrowsAsync<EntityNotFoundException>(Act);
@@ -112,19 +107,20 @@ public class UserServiceTest
     public async Task Create_Should_Throw_UserRegistrationException()
     {
         // Arrange
-        _userManagerMock.Setup(x => x.CreateAsync(
-                            It.IsAny<User>(),
-                            It.IsAny<string>()))
-                        .ReturnsAsync(IdentityResult.Failed());
-
-        var userRepository = new UserRepository(_context, _userManagerMock.Object, _roleManagerMock.Object);
-
-        _userService = new UserService(userRepository);
+        Fixture.InitFixture();
+        var context = Fixture.GetImplementationFromService<ApplicationDbContext>();
+        var userManagerMock = ManagerMocker.GetUserManagerMock(context);
+        userManagerMock.Setup(x => x.CreateAsync(
+                           It.IsAny<User>(),
+                           It.IsAny<string>()))
+                       .ReturnsAsync(IdentityResult.Failed());
+        Fixture.InitFixture(configuration => configuration.UserManager = userManagerMock.Object);
+        var userService = Fixture.GetImplementationFromService<IUserService>();
 
         var userCreateDto = UserMocks.CustomerCreateDto;
 
         // Act
-        async Task Act() => await _userService.Create(userCreateDto, Roles.Customer);
+        async Task Act() => await userService.Create(userCreateDto, Roles.Customer);
 
         // Assert
         await Assert.ThrowsAsync<UserRegistrationException>(Act);
