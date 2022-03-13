@@ -12,7 +12,7 @@ using YLunchApi.Authentication.Services;
 using YLunchApi.AuthenticationShared.Repositories;
 using YLunchApi.Infrastructure.Database;
 using YLunchApi.TestsShared.Mocks;
-using YLunchApi.UnitTests.Configuration;
+using YLunchApi.UnitTests.Core.Configuration;
 
 namespace YLunchApi.UnitTests.Application.Authentication;
 

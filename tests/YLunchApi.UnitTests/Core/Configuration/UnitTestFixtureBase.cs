@@ -21,10 +21,9 @@ using YLunchApi.Domain.UserAggregate.Services;
 using YLunchApi.Infrastructure.Database;
 using YLunchApi.Infrastructure.Database.Repositories;
 using YLunchApi.Main.Controllers;
-using YLunchApi.UnitTests.Core;
 using YLunchApi.UnitTests.Core.Mocks;
 
-namespace YLunchApi.UnitTests.Configuration;
+namespace YLunchApi.UnitTests.Core.Configuration;
 
 public class UnitTestFixtureBase
 {

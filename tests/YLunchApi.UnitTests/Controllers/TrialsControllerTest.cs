@@ -6,7 +6,7 @@ using YLunchApi.Domain.CommonAggregate.Dto;
 using YLunchApi.Domain.UserAggregate.Models;
 using YLunchApi.Main.Controllers;
 using YLunchApi.TestsShared.Mocks;
-using YLunchApi.UnitTests.Configuration;
+using YLunchApi.UnitTests.Core.Configuration;
 
 namespace YLunchApi.UnitTests.Controllers;
 

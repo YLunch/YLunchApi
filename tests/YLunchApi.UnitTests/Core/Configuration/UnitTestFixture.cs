@@ -1,7 +1,7 @@
 using System;
 using Xunit;
 
-namespace YLunchApi.UnitTests.Configuration;
+namespace YLunchApi.UnitTests.Core.Configuration;
 
 public class UnitTestFixture : IClassFixture<UnitTestFixtureBase>
 {

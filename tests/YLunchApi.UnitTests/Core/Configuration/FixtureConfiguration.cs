@@ -4,7 +4,7 @@ using YLunchApi.Authentication.Repositories;
 using YLunchApi.Domain.UserAggregate.Models;
 using YLunchApi.Domain.UserAggregate.Services;
 
-namespace YLunchApi.UnitTests.Configuration;
+namespace YLunchApi.UnitTests.Core.Configuration;
 
 public class FixtureConfiguration
 {

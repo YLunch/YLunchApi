@@ -14,7 +14,7 @@ using YLunchApi.Helpers.Extensions;
 using YLunchApi.Main.Controllers;
 using YLunchApi.TestsShared;
 using YLunchApi.TestsShared.Mocks;
-using YLunchApi.UnitTests.Configuration;
+using YLunchApi.UnitTests.Core.Configuration;
 
 namespace YLunchApi.UnitTests.Controllers;
 

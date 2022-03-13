@@ -9,7 +9,7 @@ using YLunchApi.Domain.UserAggregate.Models;
 using YLunchApi.Domain.UserAggregate.Services;
 using YLunchApi.Infrastructure.Database;
 using YLunchApi.TestsShared.Mocks;
-using YLunchApi.UnitTests.Configuration;
+using YLunchApi.UnitTests.Core.Configuration;
 using YLunchApi.UnitTests.Core.Mocks;
 
 namespace YLunchApi.UnitTests.Application.UserAggregate;
