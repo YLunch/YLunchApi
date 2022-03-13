@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using YLunchApi.Domain.UserAggregate.Models;
 using YLunchApi.Infrastructure.Database;
+using YLunchApi.UnitTests.Core.Utils;
 
 namespace YLunchApi.UnitTests.Core.Mocks;
 

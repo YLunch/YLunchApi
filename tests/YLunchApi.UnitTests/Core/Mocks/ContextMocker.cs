@@ -2,9 +2,9 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using YLunchApi.Infrastructure.Database;
 
-namespace YLunchApi.UnitTests.Core;
+namespace YLunchApi.UnitTests.Core.Mocks;
 
-public static class ContextBuilder
+public static class ContextMocker
 {
     public static ApplicationDbContext BuildContext(string? fixtureConfigurationDatabaseId = null)
     {

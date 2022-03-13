@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -40,22 +41,19 @@ public class UnitTestFixtureBase
         _serviceCollection.AddScoped<RestaurantsController>();
         _serviceCollection.AddScoped<AuthenticationController>();
 
+        var context = ContextMocker.BuildContext(DatabaseId);
 
-        var context = ContextBuilder.BuildContext(DatabaseId);
+        _serviceCollection.AddDbContext<ApplicationDbContext>(options =>
+            options.UseInMemoryDatabase($"YLunchDatabaseForUnitTests-{DatabaseId}"));
 
-        _serviceCollection.TryAddScoped<ApplicationDbContext>(_ =>
-            context);
+        _serviceCollection.TryAddScoped(_ => ManagerMocker.GetRoleManagerMock(context).Object);
 
-        _serviceCollection.TryAddScoped<RoleManager<IdentityRole>>(_ =>
-            ManagerMocker.GetRoleManagerMock(context).Object);
-
-        _serviceCollection.TryAddScoped<UserManager<User>>(_ =>
-            ManagerMocker.GetUserManagerMock(context).Object);
+        _serviceCollection.TryAddScoped(_ => ManagerMocker.GetUserManagerMock(context).Object);
 
         _serviceCollection.TryAddScoped<IHttpContextAccessor>(_ =>
             new HttpContextAccessorMock(fixtureConfiguration.AccessToken));
 
-        _serviceCollection.TryAddScoped<JwtSecurityTokenHandler>(_ => new JwtSecurityTokenHandler());
+        _serviceCollection.TryAddScoped(_ => new JwtSecurityTokenHandler());
         _serviceCollection.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
         _serviceCollection.AddScoped<IUserRepository, UserRepository>();
