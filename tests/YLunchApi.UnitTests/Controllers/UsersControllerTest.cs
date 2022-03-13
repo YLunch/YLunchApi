@@ -2,15 +2,11 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
-using YLunchApi.Application.UserAggregate;
 using YLunchApi.Domain.CommonAggregate.Dto;
 using YLunchApi.Domain.UserAggregate.Dto;
-using YLunchApi.Infrastructure.Database.Repositories;
 using YLunchApi.Main.Controllers;
 using YLunchApi.TestsShared.Mocks;
 using YLunchApi.UnitTests.Configuration;
-using YLunchApi.UnitTests.Core;
-using YLunchApi.UnitTests.Core.Mockers;
 
 namespace YLunchApi.UnitTests.Controllers;
 
@@ -20,7 +16,8 @@ public class UsersControllerTest : UnitTestFixture
 
     public UsersControllerTest(UnitTestFixtureBase fixtureBase) : base(fixtureBase)
     {
-        _usersController = AnonymousUserFixture.GetImplementationFromService<UsersController>();
+        Fixture.InitFixture();
+        _usersController = Fixture.GetImplementationFromService<UsersController>();
     }
 
     [Fact]

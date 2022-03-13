@@ -1,97 +1,37 @@
 using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using NSubstitute;
 using Xunit;
-using YLunchApi.Application.UserAggregate;
 using YLunchApi.Authentication.Exceptions;
 using YLunchApi.Authentication.Models;
 using YLunchApi.Authentication.Models.Dto;
 using YLunchApi.Authentication.Repositories;
-using YLunchApi.Authentication.Services;
-using YLunchApi.AuthenticationShared.Repositories;
 using YLunchApi.Domain.CommonAggregate.Dto;
 using YLunchApi.Domain.UserAggregate.Dto;
 using YLunchApi.Domain.UserAggregate.Models;
 using YLunchApi.Domain.UserAggregate.Services;
-using YLunchApi.Infrastructure.Database.Repositories;
 using YLunchApi.Main.Controllers;
 using YLunchApi.TestsShared.Mocks;
 using YLunchApi.TestsShared.Models;
-using YLunchApi.UnitTests.Core;
-using YLunchApi.UnitTests.Core.Mockers;
+using YLunchApi.UnitTests.Configuration;
 
 namespace YLunchApi.UnitTests.Controllers;
 
-public class AuthenticationControllerTest
+public class AuthenticationControllerTest : UnitTestFixture
 {
-    private readonly IRefreshTokenRepository _refreshTokenRepository;
-    private readonly IUserRepository _userRepository;
-    private readonly IUserService _userService;
-    private readonly JwtService _jwtService;
-
-    public AuthenticationControllerTest()
+    public AuthenticationControllerTest(UnitTestFixtureBase fixture) : base(fixture)
     {
-        var context = ContextBuilder.BuildContext();
-
-        var roleManagerMock = ManagerMocker.GetRoleManagerMock(context);
-        var userManagerMock = ManagerMocker.GetUserManagerMock(context);
-
-        _userRepository = new UserRepository(context, userManagerMock.Object, roleManagerMock.Object);
-        _userService = new UserService(_userRepository);
-
-        const string jwtSecret = "JsonWebTokenSecretForTests";
-        var optionsMonitorMock = Substitute.For<IOptionsMonitor<JwtConfig>>();
-        optionsMonitorMock.CurrentValue.Returns(new JwtConfig
-        {
-            Secret = jwtSecret
-        });
-
-        var key = Encoding.ASCII.GetBytes(jwtSecret);
-
-        var tokenValidationParameter = new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(key),
-            ValidateIssuer = false,
-            ValidateAudience = false,
-            ValidateLifetime = true,
-            RequireExpirationTime = false,
-
-            // Allow to use seconds for expiration of token
-            // Required only when token lifetime less than 5 minutes
-            ClockSkew = TimeSpan.Zero
-        };
-
-        _refreshTokenRepository = new RefreshTokenRepository(context);
-
-        _jwtService = new JwtService(
-            _refreshTokenRepository,
-            optionsMonitorMock,
-            tokenValidationParameter,
-            _userRepository,
-            new JwtSecurityTokenHandler()
-        );
-    }
-
-    private AuthenticationController CreateAuthenticationController(
-        IHttpContextAccessor httpContextAccessor)
-    {
-        return new AuthenticationController(_jwtService, _userService,
-            httpContextAccessor);
     }
 
     private async Task<AuthenticatedUserInfo> Login(UserCreateDto user, string role)
     {
         // Arrange
-        await _userService.Create(user, role);
-        var userDb = await _userRepository.GetByEmail(user.Email);
+        var userService = Fixture.GetImplementationFromService<IUserService>();
+        var userRepository = Fixture.GetImplementationFromService<IUserRepository>();
+
+        await userService.Create(user, role);
+        var userDb = await userRepository.GetByEmail(user.Email);
         userDb = Assert.IsType<User>(userDb);
 
         var loginRequestDto = new LoginRequestDto
@@ -99,7 +39,7 @@ public class AuthenticationControllerTest
             Email = user.Email,
             Password = user.Password
         };
-        var controller = CreateAuthenticationController(HttpContextAccessorMocker.GetWithoutAuthorization());
+        var controller = Fixture.GetImplementationFromService<AuthenticationController>();
 
         // Act
         var response = await controller.Login(loginRequestDto);
@@ -117,7 +57,10 @@ public class AuthenticationControllerTest
     [Fact]
     public async Task Login_Should_Return_A_200Ok_Containing_Tokens()
     {
-        // Arrange, Act & Assert
+        // Arrange
+        Fixture.InitFixture();
+
+        // Act & Assert
         _ = await Login(UserMocks.RestaurantAdminCreateDto, Roles.RestaurantAdmin);
     }
 
@@ -125,6 +68,7 @@ public class AuthenticationControllerTest
     public async Task Login_Should_Return_A_401Unauthorized()
     {
         // Arrange
+        Fixture.InitFixture();
         var user = UserMocks.RestaurantAdminCreateDto;
 
         var loginRequestDto = new LoginRequestDto
@@ -132,7 +76,7 @@ public class AuthenticationControllerTest
             Email = user.Email,
             Password = user.Password
         };
-        var controller = CreateAuthenticationController(HttpContextAccessorMocker.GetWithoutAuthorization());
+        var controller = Fixture.GetImplementationFromService<AuthenticationController>();
 
         // Act
         var response = await controller.Login(loginRequestDto);
@@ -145,7 +89,9 @@ public class AuthenticationControllerTest
     public async Task RefreshTokens_Should_Return_A_200Ok_Containing_Tokens()
     {
         // Arrange
-        var controller = CreateAuthenticationController(HttpContextAccessorMocker.GetWithoutAuthorization());
+        Fixture.InitFixture();
+        var refreshTokenRepository = Fixture.GetImplementationFromService<IRefreshTokenRepository>();
+        var controller = Fixture.GetImplementationFromService<AuthenticationController>();
 
         var authenticatedUserInfo = await Login(UserMocks.RestaurantAdminCreateDto, Roles.RestaurantAdmin);
 
@@ -167,11 +113,11 @@ public class AuthenticationControllerTest
         newAuthenticatedUserInfo.UserId.Should().BeEquivalentTo(authenticatedUserInfo.UserId);
         newAuthenticatedUserInfo.Subject.Should().BeEquivalentTo(authenticatedUserInfo.UserEmail);
 
-        var oldRefreshToken = await _refreshTokenRepository.GetByToken(refreshTokensRequest.RefreshToken);
+        var oldRefreshToken = await refreshTokenRepository.GetByToken(refreshTokensRequest.RefreshToken);
         oldRefreshToken = Assert.IsType<RefreshToken>(oldRefreshToken);
         oldRefreshToken.IsUsed.Should().BeTrue();
 
-        var newRefreshToken = await _refreshTokenRepository.GetByToken(responseBody.RefreshToken);
+        var newRefreshToken = await refreshTokenRepository.GetByToken(responseBody.RefreshToken);
         newRefreshToken = Assert.IsType<RefreshToken>(newRefreshToken);
         newRefreshToken.UserId.Should().Be(newAuthenticatedUserInfo.UserId);
         newRefreshToken.JwtId.Should().Be(newAuthenticatedUserInfo.Id);
@@ -192,12 +138,13 @@ public class AuthenticationControllerTest
     {
         // Arrange
         Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Production");
+        Fixture.InitFixture();
         var refreshTokensRequest = new TokenUpdateDto
         {
             AccessToken = TokenMocks.ExpiredAccessToken,
             RefreshToken = TokenMocks.RefreshToken.Token
         };
-        var controller = CreateAuthenticationController(HttpContextAccessorMocker.GetWithoutAuthorization());
+        var controller = Fixture.GetImplementationFromService<AuthenticationController>();
 
         // Act
         var response = await controller.RefreshTokens(refreshTokensRequest);
@@ -214,12 +161,13 @@ public class AuthenticationControllerTest
     {
         // Arrange
         Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
+        Fixture.InitFixture();
         var refreshTokensRequest = new TokenUpdateDto
         {
             AccessToken = TokenMocks.ExpiredAccessToken,
             RefreshToken = TokenMocks.RefreshToken.Token
         };
-        var controller = CreateAuthenticationController(HttpContextAccessorMocker.GetWithoutAuthorization());
+        var controller = Fixture.GetImplementationFromService<AuthenticationController>();
 
         // Act
         async Task Act() => await controller.RefreshTokens(refreshTokensRequest);
@@ -229,14 +177,18 @@ public class AuthenticationControllerTest
     }
 
     [Fact]
-    public async Task GetCurrentUser_Should_Return_A_200Ok_Containing_Current_User()
+    public async Task GetCurrentUser_Should_Return_A_200Ok_Containing_Current_User_RestaurantAdmin()
     {
         // Arrange
+        var databaseId = Guid.NewGuid().ToString();
+        Fixture.InitFixture(configuration => configuration.DatabaseId = databaseId);
         var authenticatedUserInfo = await Login(UserMocks.RestaurantAdminCreateDto, Roles.RestaurantAdmin);
-
-        var controller =
-            CreateAuthenticationController(
-                HttpContextAccessorMocker.GetWithAuthorization(authenticatedUserInfo.AccessToken));
+        Fixture.InitFixture(configuration =>
+        {
+            configuration.DatabaseId = databaseId;
+            configuration.AccessToken = authenticatedUserInfo.AccessToken;
+        });
+        var controller = Fixture.GetImplementationFromService<AuthenticationController>();
 
         // Act
         var response = await controller.GetCurrentUser();
@@ -249,11 +201,34 @@ public class AuthenticationControllerTest
     }
 
     [Fact]
+    public async Task GetCurrentUser_Should_Return_A_200Ok_Containing_Current_User_Customer()
+    {
+        // Arrange
+        var databaseId = Guid.NewGuid().ToString();
+        Fixture.InitFixture(configuration => configuration.DatabaseId = databaseId);
+        var authenticatedUserInfo = await Login(UserMocks.CustomerCreateDto, Roles.Customer);
+        Fixture.InitFixture(configuration =>
+        {
+            configuration.DatabaseId = databaseId;
+            configuration.AccessToken = authenticatedUserInfo.AccessToken;
+        });
+        var controller = Fixture.GetImplementationFromService<AuthenticationController>();
+
+        // Act
+        var response = await controller.GetCurrentUser();
+
+        // Assert
+        var responseResult = Assert.IsType<OkObjectResult>(response.Result);
+        var responseBody = Assert.IsType<UserReadDto>(responseResult.Value);
+
+        responseBody.Should().BeEquivalentTo(UserMocks.CustomerUserReadDto(authenticatedUserInfo.UserId));
+    }
+
+    [Fact]
     public async Task GetCurrentUser_Should_Return_A_401Unauthorized_When_User_Not_Found()
     {
-        var controller =
-            CreateAuthenticationController(
-                HttpContextAccessorMocker.GetWithAuthorization(TokenMocks.ValidCustomerAccessToken));
+        Fixture.InitFixture(configuration => configuration.AccessToken = TokenMocks.ValidCustomerAccessToken);
+        var controller = Fixture.GetImplementationFromService<AuthenticationController>();
 
         // Act
         var response = await controller.GetCurrentUser();

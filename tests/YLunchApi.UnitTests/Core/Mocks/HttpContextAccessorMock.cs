@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Moq;
 
-namespace YLunchApi.UnitTests.Core.Mockers;
+namespace YLunchApi.UnitTests.Core.Mocks;
 
 public class HttpContextAccessorMock : IHttpContextAccessor
 {

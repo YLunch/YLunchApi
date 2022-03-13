@@ -12,7 +12,7 @@ using YLunchApi.Infrastructure.Database;
 using YLunchApi.Infrastructure.Database.Repositories;
 using YLunchApi.TestsShared.Mocks;
 using YLunchApi.UnitTests.Core;
-using YLunchApi.UnitTests.Core.Mockers;
+using YLunchApi.UnitTests.Core.Mocks;
 
 namespace YLunchApi.UnitTests.Application.UserAggregate;
 

@@ -6,19 +6,15 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
-using YLunchApi.Application.RestaurantAggregate;
 using YLunchApi.Authentication.Models;
 using YLunchApi.Domain.CommonAggregate.Dto;
 using YLunchApi.Domain.Core.Utils;
 using YLunchApi.Domain.RestaurantAggregate.Dto;
 using YLunchApi.Helpers.Extensions;
-using YLunchApi.Infrastructure.Database.Repositories;
 using YLunchApi.Main.Controllers;
 using YLunchApi.TestsShared;
 using YLunchApi.TestsShared.Mocks;
 using YLunchApi.UnitTests.Configuration;
-using YLunchApi.UnitTests.Core;
-using YLunchApi.UnitTests.Core.Mockers;
 
 namespace YLunchApi.UnitTests.Controllers;
 
@@ -29,8 +25,11 @@ public class RestaurantsControllerTest : UnitTestFixture
 
     public RestaurantsControllerTest(UnitTestFixtureBase fixture) : base(fixture)
     {
+        Fixture.InitFixture(configuration =>
+            configuration.AccessToken = TokenMocks.ValidRestaurantAdminAccessToken);
+
         _restaurantAdminInfo = new ApplicationSecurityToken(TokenMocks.ValidRestaurantAdminAccessToken);
-        _restaurantsController = AuthenticatedRestaurantAdminFixture.GetImplementationFromService<RestaurantsController>();
+        _restaurantsController = Fixture.GetImplementationFromService<RestaurantsController>();
     }
 
     #region CreateRestaurantTests
@@ -477,7 +476,7 @@ public class RestaurantsControllerTest : UnitTestFixture
             {
                 DayOfWeek = utcNow.AddDays(-1).DayOfWeek,
                 OffsetInMinutes = 1380, // 23H00
-                DurationInMinutes = utcNow.MinutesFromMidnight() + 60
+                DurationInMinutes = utcNow.MinutesFromMidnight() + 60 + 60
             }
         };
         restaurantCreateDto.AddressExtraInformation = "extra information";
@@ -668,7 +667,7 @@ public class RestaurantsControllerTest : UnitTestFixture
             {
                 DayOfWeek = utcNow.AddDays(-1).DayOfWeek,
                 OffsetInMinutes = 1380, // 23H00
-                DurationInMinutes = utcNow.MinutesFromMidnight() + 60
+                DurationInMinutes = utcNow.MinutesFromMidnight() + 60 + 60
             }
         };
         restaurantCreateDto.AddressExtraInformation = "extra information";

@@ -20,7 +20,8 @@ public class ApplicationControllerBaseTest : UnitTestFixture
     public void UserInfo_Should_Be_Unset_When_Http_Context_Is_Null()
     {
         // Arrange
-        var controller = AnonymousUserFixture.GetImplementationFromService<TrialsController>();
+        Fixture.InitFixture();
+        var controller = Fixture.GetImplementationFromService<TrialsController>();
 
         // Act
         var response = controller.GetAuthenticatedTry();
@@ -37,7 +38,7 @@ public class ApplicationControllerBaseTest : UnitTestFixture
     public void UserInfo_Should_Be_Unset_When_Authorization_Header_Value_Is_EmptyString()
     {
         // Arrange
-        Fixture.InitFixture(configureOptions => configureOptions.AccessToken = "");
+        Fixture.InitFixture(configuration => configuration.AccessToken = "");
         var controller = Fixture.GetImplementationFromService<TrialsController>();
 
         // Act
@@ -56,7 +57,7 @@ public class ApplicationControllerBaseTest : UnitTestFixture
     {
         // Arrange
         const string accessToken = TokenMocks.ValidCustomerAccessToken;
-        Fixture.InitFixture(configureOptions => configureOptions.AccessToken = accessToken);
+        Fixture.InitFixture(configuration => configuration.AccessToken = accessToken);
         var controller = Fixture.GetImplementationFromService<TrialsController>();
 
         // Act
@@ -77,7 +78,7 @@ public class ApplicationControllerBaseTest : UnitTestFixture
     {
         // Arrange
         const string accessToken = TokenMocks.ValidRestaurantAdminAccessToken;
-        Fixture.InitFixture(configureOptions => configureOptions.AccessToken = accessToken);
+        Fixture.InitFixture(configuration => configuration.AccessToken = accessToken);
         var controller = Fixture.GetImplementationFromService<TrialsController>();
 
         // Act

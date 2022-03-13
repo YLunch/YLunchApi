@@ -6,10 +6,11 @@ namespace YLunchApi.UnitTests.Core;
 
 public static class ContextBuilder
 {
-    public static ApplicationDbContext BuildContext()
+    public static ApplicationDbContext BuildContext(string? fixtureConfigurationDatabaseId = null)
     {
+        var databaseId = fixtureConfigurationDatabaseId ?? Guid.NewGuid().ToString();
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                      .UseInMemoryDatabase($"YLunchDatabaseForUnitTests-{Guid.NewGuid()}")
+                      .UseInMemoryDatabase($"YLunchDatabaseForUnitTests-{databaseId}")
                       .Options;
         return new ApplicationDbContext(options);
     }

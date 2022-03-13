@@ -20,7 +20,8 @@ public class TrialsControllerTest : UnitTestFixture
     public void GetAnonymousTry_Should_Return_A_200Ok()
     {
         // Arrange
-        var controller = AnonymousUserFixture.GetImplementationFromService<TrialsController>();
+        Fixture.InitFixture();
+        var controller = Fixture.GetImplementationFromService<TrialsController>();
 
         // Act
         var response = controller.GetAnonymousTry();
@@ -36,7 +37,8 @@ public class TrialsControllerTest : UnitTestFixture
     public void GetAuthenticatedTry_Should_Return_A_200Ok()
     {
         // Arrange
-        var controller = AuthenticatedCustomerFixture.GetImplementationFromService<TrialsController>();
+        Fixture.InitFixture(configuration => configuration.AccessToken = TokenMocks.ValidCustomerAccessToken);
+        var controller = Fixture.GetImplementationFromService<TrialsController>();
 
         // Act
         var response = controller.GetAuthenticatedTry();
@@ -54,7 +56,8 @@ public class TrialsControllerTest : UnitTestFixture
     public void GetAuthenticatedRestaurantAdminTry_Should_Return_A_200Ok()
     {
         // Arrange
-        var controller = AuthenticatedRestaurantAdminFixture.GetImplementationFromService<TrialsController>();
+        Fixture.InitFixture(configuration => configuration.AccessToken = TokenMocks.ValidRestaurantAdminAccessToken);
+        var controller = Fixture.GetImplementationFromService<TrialsController>();
 
         // Act
         var response = controller.GetAuthenticatedRestaurantAdminTry();
@@ -72,7 +75,8 @@ public class TrialsControllerTest : UnitTestFixture
     public void GetAuthenticatedCustomerTry_Should_Return_A_200Ok()
     {
         // Arrange
-        var controller = AuthenticatedCustomerFixture.GetImplementationFromService<TrialsController>();
+        Fixture.InitFixture(configuration => configuration.AccessToken = TokenMocks.ValidCustomerAccessToken);
+        var controller = Fixture.GetImplementationFromService<TrialsController>();
 
         // Act
         var response = controller.GetAuthenticatedCustomerTry();
