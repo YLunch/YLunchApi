@@ -28,6 +28,7 @@ namespace YLunchApi.UnitTests.Configuration;
 public class UnitTestFixtureBase
 {
     private ServiceProvider _serviceProvider = null!;
+    public string DatabaseId { get; set; } = null!;
 
     public void InitFixture(Action<FixtureConfiguration>? configureOptions = null)
     {
@@ -42,7 +43,7 @@ public class UnitTestFixtureBase
         serviceCollection.AddScoped<AuthenticationController>();
 
 
-        var context = ContextBuilder.BuildContext(fixtureConfiguration.DatabaseId);
+        var context = ContextBuilder.BuildContext(DatabaseId);
 
         serviceCollection.TryAddScoped<ApplicationDbContext>(_ =>
             context);

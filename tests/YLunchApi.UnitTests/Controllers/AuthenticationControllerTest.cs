@@ -27,6 +27,7 @@ public class AuthenticationControllerTest : UnitTestFixture
     private async Task<AuthenticatedUserInfo> Login(UserCreateDto user, string role)
     {
         // Arrange
+        Fixture.InitFixture();
         var userService = Fixture.GetImplementationFromService<IUserService>();
         var userRepository = Fixture.GetImplementationFromService<IUserRepository>();
 
@@ -180,14 +181,8 @@ public class AuthenticationControllerTest : UnitTestFixture
     public async Task GetCurrentUser_Should_Return_A_200Ok_Containing_Current_User_RestaurantAdmin()
     {
         // Arrange
-        var databaseId = Guid.NewGuid().ToString();
-        Fixture.InitFixture(configuration => configuration.DatabaseId = databaseId);
         var authenticatedUserInfo = await Login(UserMocks.RestaurantAdminCreateDto, Roles.RestaurantAdmin);
-        Fixture.InitFixture(configuration =>
-        {
-            configuration.DatabaseId = databaseId;
-            configuration.AccessToken = authenticatedUserInfo.AccessToken;
-        });
+        Fixture.InitFixture(configuration => configuration.AccessToken = authenticatedUserInfo.AccessToken);
         var controller = Fixture.GetImplementationFromService<AuthenticationController>();
 
         // Act
@@ -204,14 +199,8 @@ public class AuthenticationControllerTest : UnitTestFixture
     public async Task GetCurrentUser_Should_Return_A_200Ok_Containing_Current_User_Customer()
     {
         // Arrange
-        var databaseId = Guid.NewGuid().ToString();
-        Fixture.InitFixture(configuration => configuration.DatabaseId = databaseId);
         var authenticatedUserInfo = await Login(UserMocks.CustomerCreateDto, Roles.Customer);
-        Fixture.InitFixture(configuration =>
-        {
-            configuration.DatabaseId = databaseId;
-            configuration.AccessToken = authenticatedUserInfo.AccessToken;
-        });
+        Fixture.InitFixture(configuration => configuration.AccessToken = authenticatedUserInfo.AccessToken);
         var controller = Fixture.GetImplementationFromService<AuthenticationController>();
 
         // Act
