@@ -41,14 +41,12 @@ public class UnitTestFixtureBase
         _serviceCollection.AddScoped<RestaurantsController>();
         _serviceCollection.AddScoped<AuthenticationController>();
 
-        var context = ContextMocker.BuildContext(DatabaseId);
-
         _serviceCollection.AddDbContext<ApplicationDbContext>(options =>
             options.UseInMemoryDatabase($"YLunchDatabaseForUnitTests-{DatabaseId}"));
 
-        _serviceCollection.TryAddScoped(_ => ManagerMocker.GetRoleManagerMock(context).Object);
+        _serviceCollection.AddScoped<RoleManager<IdentityRole>, RoleManagerMock>();
 
-        _serviceCollection.TryAddScoped(_ => ManagerMocker.GetUserManagerMock(context).Object);
+        _serviceCollection.AddScoped<UserManager<User>, UserManagerMock>();
 
         _serviceCollection.TryAddScoped<IHttpContextAccessor>(_ =>
             new HttpContextAccessorMock(fixtureConfiguration.AccessToken));
@@ -61,7 +59,6 @@ public class UnitTestFixtureBase
 
         _serviceCollection.AddScoped<IRestaurantRepository, RestaurantRepository>();
         _serviceCollection.AddScoped<IRestaurantService, RestaurantService>();
-
 
         // For Jwt
         const string jwtSecret = "JsonWebTokenSecretForTests";

@@ -165,7 +165,7 @@ public class RestaurantsControllerTest : UnitTestFixture
         {
             new()
             {
-                DayOfWeek = DateTime.UtcNow.DayOfWeek,
+                DayOfWeek = dateTimeBeforeUtcNow.DayOfWeek,
                 OffsetInMinutes = dateTimeBeforeUtcNow.MinutesFromMidnight(),
                 DurationInMinutes = 2 * 60
             }

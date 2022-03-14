@@ -109,7 +109,7 @@ public class UserServiceTest : UnitTestFixture
         // Arrange
         Fixture.InitFixture();
         var context = Fixture.GetImplementationFromService<ApplicationDbContext>();
-        var userManagerMock = ManagerMocker.GetUserManagerMock(context);
+        var userManagerMock = new Mock<UserManagerMock>(context);
         userManagerMock.Setup(x => x.CreateAsync(
                            It.IsAny<User>(),
                            It.IsAny<string>()))
