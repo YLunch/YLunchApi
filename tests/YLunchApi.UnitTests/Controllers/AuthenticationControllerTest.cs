@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
@@ -82,8 +83,9 @@ public class AuthenticationControllerTest : UnitTestFixture
         // Act
         var response = await controller.Login(loginRequestDto);
         var responseResult = Assert.IsType<UnauthorizedObjectResult>(response.Result);
-        var responseBody = Assert.IsType<MessageDto>(responseResult.Value);
-        responseBody.Should().BeEquivalentTo(new MessageDto("Please login with valid credentials."));
+        var responseBody = Assert.IsType<ErrorDto>(responseResult.Value);
+        responseBody.Should()
+                    .BeEquivalentTo(new ErrorDto(HttpStatusCode.Unauthorized, "Please login with valid credentials."));
     }
 
     [Fact]
@@ -152,9 +154,10 @@ public class AuthenticationControllerTest : UnitTestFixture
 
         // Assert
         var responseResult = Assert.IsType<UnauthorizedObjectResult>(response.Result);
-        var responseBody = Assert.IsType<MessageDto>(responseResult.Value);
+        var responseBody = Assert.IsType<ErrorDto>(responseResult.Value);
         responseBody.Should()
-                    .BeEquivalentTo(new MessageDto("Invalid tokens, please login to generate new valid tokens."));
+                    .BeEquivalentTo(new ErrorDto(HttpStatusCode.Unauthorized,
+                        "Invalid tokens, please login to generate new valid tokens."));
     }
 
     [Fact]
@@ -224,8 +227,9 @@ public class AuthenticationControllerTest : UnitTestFixture
 
         // Assert
         var responseResult = Assert.IsType<UnauthorizedObjectResult>(response.Result);
-        var responseBody = Assert.IsType<MessageDto>(responseResult.Value);
+        var responseBody = Assert.IsType<ErrorDto>(responseResult.Value);
         responseBody.Should()
-                    .BeEquivalentTo(new MessageDto("Invalid tokens, please login to generate new valid tokens."));
+                    .BeEquivalentTo(new ErrorDto(HttpStatusCode.Unauthorized,
+                        "Invalid tokens, please login to generate new valid tokens."));
     }
 }

@@ -1,3 +1,4 @@
+using System.Net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using YLunchApi.Authentication.Models.Dto;
@@ -35,7 +36,7 @@ public class AuthenticationController : ApplicationControllerBase
         }
         catch
         {
-            return Unauthorized(new MessageDto("Please login with valid credentials."));
+            return Unauthorized(new ErrorDto(HttpStatusCode.Unauthorized, "Please login with valid credentials."));
         }
     }
 
@@ -51,7 +52,8 @@ public class AuthenticationController : ApplicationControllerBase
         {
             if (EnvironmentUtils.IsDevelopment) throw;
 
-            return Unauthorized(new MessageDto("Invalid tokens, please login to generate new valid tokens."));
+            return Unauthorized(new ErrorDto(HttpStatusCode.Unauthorized,
+                "Invalid tokens, please login to generate new valid tokens."));
         }
     }
 
@@ -65,7 +67,8 @@ public class AuthenticationController : ApplicationControllerBase
         }
         catch (EntityNotFoundException)
         {
-            return Unauthorized(new MessageDto("Invalid tokens, please login to generate new valid tokens."));
+            return Unauthorized(new ErrorDto(HttpStatusCode.Unauthorized,
+                "Invalid tokens, please login to generate new valid tokens."));
         }
     }
 }

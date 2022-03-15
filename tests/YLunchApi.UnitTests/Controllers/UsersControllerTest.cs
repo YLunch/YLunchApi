@@ -1,3 +1,4 @@
+using System.Net;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
@@ -55,8 +56,8 @@ public class UsersControllerTest : UnitTestFixture
 
         // Assert
         var responseResult = Assert.IsType<ConflictObjectResult>(response.Result);
-        var responseBody = Assert.IsType<MessageDto>(responseResult.Value);
+        var responseBody = Assert.IsType<ErrorDto>(responseResult.Value);
 
-        responseBody.Should().BeEquivalentTo(new MessageDto("User already exists"));
+        responseBody.Should().BeEquivalentTo(new ErrorDto(HttpStatusCode.Conflict, "User already exists"));
     }
 }

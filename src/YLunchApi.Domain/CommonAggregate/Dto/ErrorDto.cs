@@ -4,21 +4,32 @@ namespace YLunchApi.Domain.CommonAggregate.Dto;
 
 public class ErrorDto
 {
-    public string Title { get; set; }
-    public int Status { get; set; }
-    public List<string> Errors { get; set; }
+    public string Title { get; set; } = null!;
+    public int StatusCode { get; set; }
+    public Errors Errors { get; set; } = null!;
 
-    public ErrorDto(HttpStatusCode status, List<string> errors)
+    public ErrorDto()
     {
-        Title = status.ToString();
-        Status = (int) status;
-        Errors = errors;
     }
 
     public ErrorDto(HttpStatusCode status, string error)
     {
         Title = status.ToString();
-        Status = (int) status;
-        Errors = new List<string> { error };
+        StatusCode = (int)status;
+        Errors = new Errors(error);
+    }
+}
+
+public class Errors
+{
+    public List<string> Reasons { get; set; } = null!;
+
+    public Errors()
+    {
+    }
+
+    public Errors(string error)
+    {
+        Reasons = new List<string> { error };
     }
 }

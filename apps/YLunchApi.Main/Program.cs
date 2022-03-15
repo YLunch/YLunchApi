@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -12,6 +13,7 @@ using YLunchApi.Authentication.Models;
 using YLunchApi.Authentication.Repositories;
 using YLunchApi.Authentication.Services;
 using YLunchApi.AuthenticationShared.Repositories;
+using YLunchApi.Domain.CommonAggregate.Dto;
 using YLunchApi.Domain.RestaurantAggregate.Services;
 using YLunchApi.Domain.UserAggregate.Models;
 using YLunchApi.Domain.UserAggregate.Services;
@@ -72,14 +74,26 @@ builder.Services.AddAuthentication(options =>
            options.TokenValidationParameters = tokenValidationParameters;
            options.Events = new JwtBearerEvents
            {
+               OnForbidden = context =>
+               {
+                   context.Response.OnStarting(async () =>
+                   {
+                       context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                       context.Response.ContentType = "application/json";
+                       await context.Response.WriteAsJsonAsync(new ErrorDto(HttpStatusCode.Forbidden,
+                           "User has not granted roles."));
+                   });
+
+                   return Task.CompletedTask;
+               },
                OnChallenge = context =>
                {
                    context.Response.OnStarting(async () =>
                    {
                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                        context.Response.ContentType = "application/json";
-                       await context.Response.WriteAsJsonAsync(new
-                           { Message = "Please login and use provided tokens" });
+                       await context.Response.WriteAsJsonAsync(new ErrorDto(HttpStatusCode.Unauthorized,
+                           "Please login and use provided tokens."));
                    });
 
                    return Task.CompletedTask;
@@ -150,7 +164,8 @@ else
         {
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
             context.Response.ContentType = "application/json";
-            await context.Response.WriteAsJsonAsync(new { Message = "Something went wrong, try again later." });
+            await context.Response.WriteAsJsonAsync(new ErrorDto(HttpStatusCode.BadRequest,
+                "Something went wrong, try again later."));
         });
     });
 }

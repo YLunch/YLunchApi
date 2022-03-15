@@ -129,8 +129,9 @@ public class AuthenticationControllerITest : ControllerITestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
-        var content = await ResponseUtils.DeserializeContentAsync<MessageDto>(response);
-        content.Should().BeEquivalentTo(new MessageDto("Invalid tokens, please login to generate new valid tokens."));
+        var content = await ResponseUtils.DeserializeContentAsync<ErrorDto>(response);
+        content.Should().BeEquivalentTo(new ErrorDto(HttpStatusCode.Unauthorized,
+            "Invalid tokens, please login to generate new valid tokens."));
     }
 
     #endregion
@@ -160,7 +161,6 @@ public class AuthenticationControllerITest : ControllerITestBase
         var response = await Client.GetAsync("authentication/current-user");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         await AssertResponseUtils.AssertUnauthorizedResponse(response);
     }
 
@@ -174,7 +174,6 @@ public class AuthenticationControllerITest : ControllerITestBase
         var response = await Client.GetAsync("authentication/current-user");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         await AssertResponseUtils.AssertUnauthorizedResponse(response);
     }
 

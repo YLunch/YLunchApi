@@ -53,9 +53,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageDto'
+                $ref: '#/components/schemas/ErrorDto'
               example:
-                message: Something went wrong, please try again later.
+                title: "BadRequest"
+                statusCode: 400
+                errors:
+                  reasons: ["Something went wrong, please try again later."]
   /trials/authenticated:
     get:
       tags:
@@ -83,18 +86,24 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageDto'
+                $ref: '#/components/schemas/ErrorDto'
               example:
-                message: Something went wrong, please try again later.
+                title: "BadRequest"
+                statusCode: 400
+                errors:
+                  reasons: ["Something went wrong, please try again later."]
         '401':
           description: |
             Unauthorized:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageDto'
+                $ref: '#/components/schemas/ErrorDto'
               example:
-                message: Please login and use provided tokens.
+                title: "Unauthorized"
+                statusCode: 401
+                errors:
+                  reasons: ["Please login and use provided tokens."]
   /trials/authenticated-customer:
     get:
       tags:
@@ -122,22 +131,36 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageDto'
+                $ref: '#/components/schemas/ErrorDto'
               example:
-                message: Something went wrong, please try again later.
+                title: "BadRequest"
+                statusCode: 400
+                errors:
+                  reasons: ["Something went wrong, please try again later."]
         '401':
           description: |
             Unauthorized:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageDto'
+                $ref: '#/components/schemas/ErrorDto'
               example:
-                message: Please login and use provided tokens.
+                title: "Unauthorized"
+                statusCode: 401
+                errors:
+                  reasons: ["Please login and use provided tokens."]
         '403':
           description: |
             Forbidden:
-            - User has not granted roles
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "Forbidden"
+                statusCode: 403
+                errors:
+                  reasons: ["User has not granted roles."]
   /trials/authenticated-restaurant-admin:
     get:
       tags:
@@ -165,22 +188,36 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageDto'
+                $ref: '#/components/schemas/ErrorDto'
               example:
-                message: Something went wrong, please try again later.
+                title: "BadRequest"
+                statusCode: 400
+                errors:
+                  reasons: ["Something went wrong, please try again later."]
         '401':
           description: |
             Unauthorized:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageDto'
+                $ref: '#/components/schemas/ErrorDto'
               example:
-                message: Please login and use provided tokens.
+                title: "Unauthorized"
+                statusCode: 401
+                errors:
+                  reasons: ["Please login and use provided tokens."]
         '403':
           description: |
             Forbidden:
-            - User has not granted roles
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "Forbidden"
+                statusCode: 403
+                errors:
+                  reasons: ["User has not granted roles."]
   /authentication/login:
     post:
       tags:
@@ -222,26 +259,30 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageDto'
               examples:
-                Other:
-                  value:
-                    message: Something went wrong, please try again later.
                 ValidationError:
                   value:
-                    type: "https://tools.ietf.org/html/rfc7231#section-6.5.1"
                     title: "One or more validation errors occurred."
-                    status: 400
-                    traceId: "00-9393a6db2a571eaf5be54665fe54611b-9b403c28dba47801-00"
+                    statusCode: 400
                     errors:
                       Email: [ "The Email field is required." ]
+                Other:
+                  value:
+                    title: "BadRequest"
+                    statusCode: 400
+                    errors:
+                      reasons: ["Something went wrong, please try again later."]
         '401':
           description: |
             Unauthorized:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageDto'
+                $ref: '#/components/schemas/ErrorDto'
               example:
-                message: Please login and use provided tokens.
+                title: "Unauthorized"
+                statusCode: 401
+                errors:
+                  reasons: ["Please login and use provided tokens."]
   /authentication/refresh-tokens:
     post:
       tags:
@@ -274,26 +315,30 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageDto'
               examples:
-                Other:
-                  value:
-                    message: Something went wrong, please try again later.
                 ValidationError:
                   value:
-                    type: "https://tools.ietf.org/html/rfc7231#section-6.5.1"
                     title: "One or more validation errors occurred."
-                    status: 400
-                    traceId: "00-9393a6db2a571eaf5be54665fe54611b-9b403c28dba47801-00"
+                    statusCode: 400
                     errors:
                       AccessToken: [ "The AccessToken field is required." ]
+                Other:
+                  value:
+                    title: "BadRequest"
+                    statusCode: 400
+                    errors:
+                      reasons: ["Something went wrong, please try again later."]
         '401':
           description: |
             Unauthorized:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageDto'
+                $ref: '#/components/schemas/ErrorDto'
               example:
-                message: Please login and use provided tokens.
+                title: "Unauthorized"
+                statusCode: 401
+                errors:
+                  reasons: ["Invalid tokens, please login to generate new valid tokens."]
   /authentication/current-user:
     get:
       tags:
@@ -319,18 +364,24 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageDto'
+                $ref: '#/components/schemas/ErrorDto'
               example:
-                message: Something went wrong, please try again later.
+                title: "BadRequest"
+                statusCode: 400
+                errors:
+                  reasons: ["Something went wrong, please try again later."]
         '401':
           description: |
             Unauthorized:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageDto'
+                $ref: '#/components/schemas/ErrorDto'
               example:
-                message: Please login and use provided tokens.
+                title: "Unauthorized"
+                statusCode: 401
+                errors:
+                  reasons: ["Please login and use provided tokens."]
   /restaurant-admins:
     post:
       tags:
@@ -360,26 +411,30 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageDto'
               examples:
-                Other:
-                  value:
-                    message: Something went wrong, please try again later.
                 ValidationError:
                   value:
-                    type: "https://tools.ietf.org/html/rfc7231#section-6.5.1"
                     title: "One or more validation errors occurred."
-                    status: 400
-                    traceId: "00-9393a6db2a571eaf5be54665fe54611b-9b403c28dba47801-00"
+                    statusCode: 400
                     errors:
                       Name: [ "The Name field is required." ]
+                Other:
+                  value:
+                    title: "BadRequest"
+                    statusCode: 400
+                    errors:
+                      reasons: ["Something went wrong, please try again later."]
         '409':
           description: |
             Conflict:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageDto'
+                $ref: '#/components/schemas/ErrorDto'
               example:
-                message: User already exists.
+                title: "Conflict"
+                statusCode: 409
+                errors:
+                  reasons: ["User already exists."]
   /customers:
     post:
       tags:
@@ -409,26 +464,30 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageDto'
               examples:
-                Other:
-                  value:
-                    message: Something went wrong, please try again later.
                 ValidationError:
                   value:
-                    type: "https://tools.ietf.org/html/rfc7231#section-6.5.1"
                     title: "One or more validation errors occurred."
-                    status: 400
-                    traceId: "00-9393a6db2a571eaf5be54665fe54611b-9b403c28dba47801-00"
+                    statusCode: 400
                     errors:
                       Name: [ "The Name field is required." ]
+                Other:
+                  value:
+                    title: "BadRequest"
+                    statusCode: 400
+                    errors:
+                      reasons: ["Something went wrong, please try again later."]
         '409':
           description: |
             Conflict:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageDto'
+                $ref: '#/components/schemas/ErrorDto'
               example:
-                message: User already exists.
+                title: "Conflict"
+                statusCode: 409
+                errors:
+                  reasons: ["User already exists."]
   /restaurants:
     post:
       tags:
@@ -460,26 +519,30 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageDto'
               examples:
-                Other:
-                  value:
-                    message: Something went wrong, please try again later.
                 ValidationError:
                   value:
-                    type: "https://tools.ietf.org/html/rfc7231#section-6.5.1"
                     title: "One or more validation errors occurred."
-                    status: 400
-                    traceId: "00-9393a6db2a571eaf5be54665fe54611b-9b403c28dba47801-00"
+                    statusCode: 400
                     errors:
                       Name: [ "The Name field is required." ]
+                Other:
+                  value:
+                    title: "BadRequest"
+                    statusCode: 400
+                    errors:
+                      reasons: ["Something went wrong, please try again later."]
         '409':
           description: |
             Conflict:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageDto'
+                $ref: '#/components/schemas/ErrorDto'
               example:
-                message: Restaurant already exists.
+                title: "Conflict"
+                statusCode: 409
+                errors:
+                  reasons: ["Restaurant already exists."]
   /restaurants/{restaurantId}:
     description: |
       - Authorization header: **yes**
@@ -512,18 +575,24 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageDto'
+                $ref: '#/components/schemas/ErrorDto'
               example:
-                message: Something went wrong, please try again later.
+                title: "BadRequest"
+                statusCode: 400
+                errors:
+                  reasons: ["Something went wrong, please try again later."]
         '401':
           description: |
             Unauthorized:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageDto'
+                $ref: '#/components/schemas/ErrorDto'
               example:
-                message: Please login and use provided tokens.
+                title: "Unauthorized"
+                statusCode: 401
+                errors:
+                  reasons: ["Please login and use provided tokens."]
         '404':
           description: |
             Not found:
@@ -540,6 +609,21 @@ components:
         message:
           type: string
           description: The message.
+    ErrorDto:
+      properties:
+        title:
+          type: string
+          description: The title.
+        statusCode:
+          type: number
+          description: The status code.
+        errors:
+          properties:
+            reasons:
+              type: array
+              items:
+                type: string
+                description: The reason.
     LoginRequestDto:
       type: object
       properties:

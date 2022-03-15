@@ -1,3 +1,4 @@
+using System.Net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using YLunchApi.Domain.CommonAggregate.Dto;
@@ -32,7 +33,7 @@ public class RestaurantsController : ApplicationControllerBase
         }
         catch (EntityAlreadyExistsException)
         {
-            return Conflict(new MessageDto("Restaurant already exists"));
+            return Conflict(new ErrorDto(HttpStatusCode.Conflict, "Restaurant already exists"));
         }
     }
 
@@ -46,7 +47,7 @@ public class RestaurantsController : ApplicationControllerBase
         }
         catch (EntityNotFoundException)
         {
-            return NotFound(new MessageDto($"Restaurant {restaurantId} not found"));
+            return NotFound(new ErrorDto(HttpStatusCode.NotFound, $"Restaurant {restaurantId} not found"));
         }
     }
 }

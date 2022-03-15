@@ -162,7 +162,7 @@ public class TrialsControllerITest : ControllerITestBase
         var response = await Client.GetAsync("trials/authenticated-restaurant-admin");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        await AssertResponseUtils.AssertForbiddenResponse(response);
     }
 
     #endregion
@@ -197,7 +197,7 @@ public class TrialsControllerITest : ControllerITestBase
         var response = await Client.GetAsync("trials/authenticated-customer");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        await AssertResponseUtils.AssertForbiddenResponse(response);
     }
 
     #endregion
