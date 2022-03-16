@@ -1,8 +1,9 @@
-﻿using YLunchApi.Domain.RestaurantAggregate.Models.Enums;
+﻿using YLunchApi.Domain.CommonAggregate.Dto;
+using YLunchApi.Domain.RestaurantAggregate.Models.Enums;
 
-namespace YLunchApi.Domain.ProductsAggregate.Dto;
+namespace YLunchApi.Domain.RestaurantAggregate.Dto;
 
-public class ProductReadDto
+public class ProductReadDto : EntityReadDto
 {
     public string RestaurantId { get; set; } = null!;
 
@@ -15,7 +16,8 @@ public class ProductReadDto
     public DateTime? ExpirationDateTime { get; set; }
 
     public ProductType ProductType { get; set; }
-
+    public ICollection<AllergenReadDto> Allergens { get; set; } = null!;
+    public ICollection<ProductTagReadDto> ProductTags { get; set; } = null!;
     public string? Image { get; set; }
     public int? Quantity { get; set; }
 }

@@ -1,6 +1,6 @@
-﻿using YLunchApi.Domain.ProductsAggregate.Dto;
+﻿using YLunchApi.Domain.RestaurantAggregate.Dto;
 
-namespace YLunchApi.Domain.ProductsAggregate.Services;
+namespace YLunchApi.Domain.RestaurantAggregate.Services;
 
 public interface IProductService
 { 

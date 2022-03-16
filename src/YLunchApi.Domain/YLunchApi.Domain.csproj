@@ -14,8 +14,4 @@
       <ProjectReference Include="..\YLunchApi.Helpers\YLunchApi.Helpers.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="ProductsAggregate\Models" />
-    </ItemGroup>
-
 </Project>

@@ -1,0 +1,1336 @@
+{
+	"info": {
+		"_postman_id": "cc4f2239-8682-4c33-b17a-c49fe0f33d50",
+		"name": "YLunchApi",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Trials",
+			"item": [
+				{
+					"name": "Get anonymous try",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/trials/anonymous",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"trials",
+								"anonymous"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get authenticated try as restaurantAdmin",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{restaurantAdminAccessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/trials/authenticated",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"trials",
+								"authenticated"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get authenticated try as customer",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{customerAccessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/trials/authenticated",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"trials",
+								"authenticated"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get authenticated try for restaurantAdmin only",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{restaurantAdminAccessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/trials/authenticated-restaurant-admin",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"trials",
+								"authenticated-restaurant-admin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get authenticated try for customer only",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{customerAccessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/trials/authenticated-customer",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"trials",
+								"authenticated-customer"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login restaurant admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"restaurantAdminAccessToken\", jsonData.accessToken);",
+									"postman.setEnvironmentVariable(\"restaurantAdminRefreshToken\", jsonData.refreshToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{restaurantAdminEmail}}\",\n    \"password\": \"{{password}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/authentication/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"authentication",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"customerAccessToken\", jsonData.accessToken);",
+									"postman.setEnvironmentVariable(\"customerRefreshToken\", jsonData.refreshToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{customerEmail}}\",\n    \"password\": \"{{password}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/authentication/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"authentication",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh tokens as restaurantAdmin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"restaurantAccessToken\", jsonData.accessToken);",
+									"postman.setEnvironmentVariable(\"restaurantAdminRefreshToken\", jsonData.refreshToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"accessToken\": \"{{restaurantAdminAccessToken}}\",\n    \"refreshToken\": \"{{restaurantAdminRefreshToken}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/authentication/refresh-tokens",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"authentication",
+								"refresh-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh tokens as customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"customerAccessToken\", jsonData.accessToken);",
+									"postman.setEnvironmentVariable(\"customerRefreshToken\", jsonData.refreshToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"accessToken\": \"{{customerAccessToken}}\",\n    \"refreshToken\": \"{{customerRefreshToken}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/authentication/refresh-tokens",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"authentication",
+								"refresh-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get current user as restaurantAdmin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"restaurantAdminId\", jsonData.id);",
+									"postman.setEnvironmentVariable(\"restaurantAdminEmail\", jsonData.email);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{restaurantAdminAccessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/authentication/current-user",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"authentication",
+								"current-user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get current user as customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"customerId\", jsonData.id);",
+									"postman.setEnvironmentVariable(\"customerEmail\", jsonData.email);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{customerAccessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/authentication/current-user",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"authentication",
+								"current-user"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Restaurants",
+			"item": [
+				{
+					"name": "Create",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"restaurantId\", jsonData.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{restaurantAdminAccessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"my.restaurant@restaurant.com\",\n    \"phoneNumber\": \"0612345678\",\n    \"name\": \"My restaurant 22\",\n    \"isOpen\": true,\n    \"isPublic\": true,\n    \"city\": \"Valbonne\",\n    \"country\": \"France\",\n    \"streetName\": \"Place Sophie Lafitte\",\n    \"zipCode\": \"06560\",\n    \"streetNumber\": \"1\",\n    \"closingDates\": [\n        {\n            \"closingDateTime\": \"2021-12-31T00:00:00.000000\"\n        },\n        {\n            \"closingDateTime\": \"2021-12-25T00:00:00.000000\"\n        },\n        {\n            \"closingDateTime\": \"2021-12-26T00:00:00.000000\"\n        }\n    ],\n    \"placeOpeningTimes\": [\n        {\n            \"dayOfWeek\": 0,\n            \"OffsetInMinutes\": 600,\n            \"DurationInMinutes\": 120\n        },\n        {\n            \"dayOfWeek\": 1,\n            \"OffsetInMinutes\": 600,\n            \"DurationInMinutes\": 90\n        },\n        {\n            \"dayOfWeek\": 2,\n            \"OffsetInMinutes\": 660,\n            \"DurationInMinutes\": 120\n        },\n        {\n            \"dayOfWeek\": 2,\n            \"OffsetInMinutes\": 1140,\n            \"DurationInMinutes\": 180\n        }\n    ],\n    \"orderOpeningTimes\": [\n        {\n            \"dayOfWeek\": 0,\n            \"OffsetInMinutes\": 600,\n            \"DurationInMinutes\": 120\n        },\n        {\n            \"dayOfWeek\": 1,\n            \"OffsetInMinutes\": 600,\n            \"DurationInMinutes\": 120\n        },\n        {\n            \"dayOfWeek\": 2,\n            \"OffsetInMinutes\": 600,\n            \"DurationInMinutes\": 60\n        },\n        {\n            \"dayOfWeek\": 2,\n            \"OffsetInMinutes\": 1140,\n            \"DurationInMinutes\": 60\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/restaurants",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"restaurants"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get restaurant by id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/restaurants/{{restaurantId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"restaurants",
+								"{{restaurantId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Patch",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{restaurantOwner2Token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"{{restaurantId2}}\",\n    \"name\": \"restaurant\",\n    \"phoneNumber\": \"0612345678\",\n    \"email\": \"restaurant@restaurant2.com\",\n    \"zipCode\": \"06400\",\n    \"country\": \"France\",\n    \"city\": \"Cannes\",\n    \"streetNumber\": \"1A\",\n    \"streetName\": \"boulevard Toto\",\n    \"isOpen\": true,\n    \"isPublic\": true,\n    \"base64Image\": \"image\",\n    \"categories\": [\n        {\n            \"name\": \"turc\"\n        },\n        {\n            \"name\": \"italien\"\n        },\n        {\n            \"name\": \"français\"\n        },\n        {\n            \"name\": \"thaïlandais\"\n        }\n    ],\n    \"closingDates\": [\n        {\n            \"closingDateTime\": \"2022-07-13T16:52:02.004825\"\n        },\n        {\n            \"closingDateTime\": \"2023-05-13T16:52:02.004825\"\n        }\n    ],\n    \"weekOpeningTimes\": [\n        {\n            \"dayOfWeek\": 0,\n            \"openingTimes\": [\n                {\n                    \"StartTimeInMinutes\": \"10:00\",\n                    \"EndTimeInMinutes\": \"14:00\"\n                }\n            ]\n        },\n        {\n            \"dayOfWeek\": 1,\n            \"openingTimes\": [\n                {\n                    \"StartTimeInMinutes\": \"10:30\",\n                    \"EndTimeInMinutes\": \"15:00\"\n                }\n            ]\n        },\n        {\n            \"dayOfWeek\": 2,\n            \"openingTimes\": [\n                {\n                    \"StartTimeInMinutes\": \"10:00\",\n                    \"EndTimeInMinutes\": \"14:00\",\n                    \"StartOrderTimeInMinutes\": \"11:00\"\n                },\n                {\n                    \"StartTimeInMinutes\": \"18:00\",\n                    \"EndTimeInMinutes\": \"23:00\"\n                }\n            ]\n        },\n        {\n            \"dayOfWeek\": 3,\n            \"openingTimes\": [\n                {\n                    \"StartTimeInMinutes\": \"10:15\",\n                    \"EndTimeInMinutes\": \"13:30\",\n                    \"StartOrderTimeInMinutes\": \"11:00\",\n                    \"EndOrderTimeInMinutes\": \"13:00\"\n                }\n            ]\n        },\n        {\n            \"dayOfWeek\": 4,\n            \"openingTimes\": [\n                {\n                    \"StartTimeInMinutes\": \"9:15\",\n                    \"EndTimeInMinutes\": \"13:30\",\n                    \"StartOrderTimeInMinutes\": \"11:00\",\n                    \"EndOrderTimeInMinutes\": \"13:00\"\n                }\n            ]\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/restaurants/{{restaurantId2}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"restaurants",
+								"{{restaurantId2}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get my restaurant",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{restaurantOwner2Token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/restaurants/mine",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"restaurants",
+								"mine"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all restaurants",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{superAdminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/restaurants",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"restaurants"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get restaurants for customers",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/restaurants",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"restaurants"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete restaurant",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{restaurantAdminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/restaurants/{{restaurantId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"restaurants",
+								"{{restaurantId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all customer products",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/restaurants/{{restaurantId2}}/restaurant-products",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"restaurants",
+								"{{restaurantId2}}",
+								"restaurant-products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get customer product",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{customerToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/restaurants/{{restaurantId2}}/restaurant-products/{{restaurant2ProductId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"restaurants",
+								"{{restaurantId2}}",
+								"restaurant-products",
+								"{{restaurant2ProductId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "RestaurantProducts",
+			"item": [
+				{
+					"name": "Create restaurant product",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{restaurantOwner2Token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"marguerite\",\n  \"description\": \"tomate, fromage\",\n  \"price\": 2.05,\n  \"productFamily\": 1,\n  \"isActive\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/restaurant-products",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"restaurant-products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update restaurant product",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{restaurantAdminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"{{restaurant2ProductId}}\",\n    \"name\": \"reine\",\n    \"description\": \"tomate, fromage, poulet\",\n    \"price\": 4.4,\n    \"quantity\": null,\n    \"isActive\": true,\n    \"creationDateTime\": \"2021-06-17T17:21:09.435246\",\n    \"expirationDateTime\": null,\n    \"restaurantId\": \"ae3cb4a7-3a21-4980-87ab-0745244e1577\",\n    \"productFamily\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/restaurant-products/{{restaurant2ProductId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"restaurant-products",
+								"{{restaurant2ProductId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all restaurant products",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{restaurantOwner2Token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"blabla\",\n    \"name\": \"marguerite\",\n    \"description\": \"fromage, tomate\",\n    \"price\": 3.85,\n    \"productFamily\": 8\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/restaurant-products",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"restaurant-products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get restaurant product",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{restaurantOwner2Token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/restaurant-products/{{restaurant2ProductId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"restaurant-products",
+								"{{restaurant2ProductId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete restaurant product",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{restaurantAdminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"blabla\",\n    \"name\": \"marguerite\",\n    \"description\": \"fromage, tomate\",\n    \"price\": 3.85,\n    \"productFamily\": 8\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/restaurant-products/{{restaurantProductId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"restaurant-products",
+								"{{restaurantProductId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer"
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Orders",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{customerToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"customerComment\": \"i am the customer\",\n    \"restaurantComment\": \"i am the restaurant\",\n    \"ProductsId\": [\n        \"2439f332-43ac-44c1-8205-8e8fc15407bc\"\n    ],\n    \"RestaurantId\": \"5a76fd3b-9751-4239-af72-1d9b0b1eced6\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/orders",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add status to multiple orders",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{restaurantOwner2Token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"ordersId\": [\n    \"0e9f1519-1033-4252-82eb-4f27d2a47a89\"\n  ],\n  \"state\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/orders/statuses",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"orders",
+								"statuses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get idling orders",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{restaurantOwner2Token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/orders?status=idling",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"orders"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "idling"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get today's orders",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{restaurantOwner2Token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/orders?afterDateTime=2021-11-28",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"orders"
+							],
+							"query": [
+								{
+									"key": "afterDateTime",
+									"value": "2021-11-28"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all orders",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{superAdminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/orders",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"orders"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Create RestaurantAdmin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"restaurantAdminId\", jsonData.id);",
+									"postman.setEnvironmentVariable(\"restaurantAdminEmail\", jsonData.email);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{restaurantAdminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@restaurant.com\",\n    \"password\": \"{{password}}\",\n    \"firstname\": \"Jean-Marc\",\n    \"lastname\": \"Dupont Henri\",\n    \"phoneNumber\": \"0612345678\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/restaurant-admins",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"restaurant-admins"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"customerId\", jsonData.id);",
+									"postman.setEnvironmentVariable(\"customerEmail\", jsonData.email);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"anne-marie.martin@ynov.com\",\n    \"password\": \"{{password}}\",\n    \"firstname\": \"Anne-Marie\",\n    \"lastname\": \"Martin-Jacques\",\n    \"phoneNumber\": \"0687654321\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/customers",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"customers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{superAdminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete user by username",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{superAdminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/customer2@ynov.com",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"customer2@ynov.com"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Customers",
+			"item": [
+				{
+					"name": "Get by id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{restaurantAdminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/customers/{{customerId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"customers",
+								"{{customerId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
