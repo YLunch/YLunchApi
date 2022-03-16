@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace YLunchApi.UnitTests.Core;
+namespace YLunchApi.UnitTests.Core.Utils;
 
 public static class HashUtils
 {

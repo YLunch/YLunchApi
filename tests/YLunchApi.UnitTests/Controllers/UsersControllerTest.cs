@@ -1,32 +1,24 @@
+using System.Net;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
-using YLunchApi.Application.UserAggregate;
+using YLunchApi.Domain.CommonAggregate.Dto;
 using YLunchApi.Domain.UserAggregate.Dto;
-using YLunchApi.Infrastructure.Database.Repositories;
 using YLunchApi.Main.Controllers;
 using YLunchApi.TestsShared.Mocks;
-using YLunchApi.UnitTests.Core;
-using YLunchApi.UnitTests.Core.Mockers;
+using YLunchApi.UnitTests.Core.Configuration;
 
 namespace YLunchApi.UnitTests.Controllers;
 
-public class UsersControllerTest
+public class UsersControllerTest : UnitTestFixture
 {
     private readonly UsersController _usersController;
 
-    public UsersControllerTest()
+    public UsersControllerTest(UnitTestFixtureBase fixtureBase) : base(fixtureBase)
     {
-        var context = ContextBuilder.BuildContext();
-
-        var roleManagerMock = ManagerMocker.GetRoleManagerMock(context);
-        var userManagerMock = ManagerMocker.GetUserManagerMock(context);
-
-        var userRepository = new UserRepository(context, userManagerMock.Object, roleManagerMock.Object);
-        var userService = new UserService(userRepository);
-
-        _usersController = new UsersController(userService, HttpContextAccessorMocker.GetWithoutAuthorization());
+        Fixture.InitFixture();
+        _usersController = Fixture.GetImplementationFromService<UsersController>();
     }
 
     [Fact]
@@ -64,8 +56,8 @@ public class UsersControllerTest
 
         // Assert
         var responseResult = Assert.IsType<ConflictObjectResult>(response.Result);
-        var responseBody = Assert.IsType<string>(responseResult.Value);
+        var responseBody = Assert.IsType<ErrorDto>(responseResult.Value);
 
-        responseBody.Should().Be("User already exists");
+        responseBody.Should().BeEquivalentTo(new ErrorDto(HttpStatusCode.Conflict, "User already exists"));
     }
 }

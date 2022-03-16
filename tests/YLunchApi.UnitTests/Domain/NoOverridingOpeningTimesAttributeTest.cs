@@ -9,12 +9,7 @@ namespace YLunchApi.UnitTests.Domain;
 
 public class NoOverridingOpeningTimesAttributeTest
 {
-    private readonly NoOverridingOpeningTimesAttribute _attribute;
-
-    public NoOverridingOpeningTimesAttributeTest()
-    {
-        _attribute = new NoOverridingOpeningTimesAttribute();
-    }
+    private readonly NoOverridingOpeningTimesAttribute _attribute = new();
 
     [Fact]
     public void Null_Should_Be_Invalid()

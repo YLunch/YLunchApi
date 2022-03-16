@@ -39,16 +39,26 @@ paths:
       responses:
         '200':
           description: |
-            Success:
+            Success
             - The anonymous trial Json object
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnonymousTryDto'
+                $ref: '#/components/schemas/MessageDto'
+              example:
+                message: YLunchApi is running, you are anonymous.
         '400':
           description: |
-            Bad request:
-            - Something went wrong, please try again later
+            Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "BadRequest"
+                statusCode: 400
+                errors:
+                  reasons: ["Something went wrong, please try again later."]
   /trials/authenticated:
     get:
       tags:
@@ -62,20 +72,38 @@ paths:
       responses:
         '200':
           description: |
-            Success:
+            Success
             - The authenticated trial Json object
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthenticatedTryDto'
+                $ref: '#/components/schemas/MessageDto'
+              example:
+                message: 'YLunchApi is running, you are authenticated as {CurrentUserEmail} with Id: {CurrentUserId} and Roles: {CurrentUserRoles}.'
         '400':
           description: |
-            Bad request:
-            - Something went wrong, please try again later
+            Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "BadRequest"
+                statusCode: 400
+                errors:
+                  reasons: ["Something went wrong, please try again later."]
         '401':
           description: |
-            Unauthorized:
-            - Please login and use provided tokens
+            Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "Unauthorized"
+                statusCode: 401
+                errors:
+                  reasons: ["Please login and use provided tokens."]
   /trials/authenticated-customer:
     get:
       tags:
@@ -89,24 +117,50 @@ paths:
       responses:
         '200':
           description: |
-            Success:
+            Success
             - The authenticated trial Json object
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthenticatedTryDto'
+                $ref: '#/components/schemas/MessageDto'
+              example:
+                message: 'YLunchApi is running, you are authenticated as {CurrentUserEmail} with Id: {CurrentUserId} and Roles: {CurrentUserRoles}.'
         '400':
           description: |
-            Bad request:
-            - Something went wrong, please try again later
+            Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "BadRequest"
+                statusCode: 400
+                errors:
+                  reasons: ["Something went wrong, please try again later."]
         '401':
           description: |
-            Unauthorized:
-            - Please login and use provided tokens
+            Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "Unauthorized"
+                statusCode: 401
+                errors:
+                  reasons: ["Please login and use provided tokens."]
         '403':
           description: |
-            Forbidden:
-            - User has not granted roles
+            Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "Forbidden"
+                statusCode: 403
+                errors:
+                  reasons: ["User has not granted roles."]
   /trials/authenticated-restaurant-admin:
     get:
       tags:
@@ -120,24 +174,50 @@ paths:
       responses:
         '200':
           description: |
-            Success:
+            Success
             - The authenticated trial Json object
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthenticatedTryDto'
+                $ref: '#/components/schemas/MessageDto'
+              example:
+                message: 'YLunchApi is running, you are authenticated as {CurrentUserEmail} with Id: {CurrentUserId} and Roles: {CurrentUserRoles}.'
         '400':
           description: |
-            Bad request:
-            - Something went wrong, please try again later
+            Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "BadRequest"
+                statusCode: 400
+                errors:
+                  reasons: ["Something went wrong, please try again later."]
         '401':
           description: |
-            Unauthorized:
-            - Please login and use provided tokens
+            Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "Unauthorized"
+                statusCode: 401
+                errors:
+                  reasons: ["Please login and use provided tokens."]
         '403':
           description: |
-            Forbidden:
-            - User has not granted roles
+            Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "Forbidden"
+                statusCode: 403
+                errors:
+                  reasons: ["User has not granted roles."]
   /authentication/login:
     post:
       tags:
@@ -165,7 +245,7 @@ paths:
       responses:
         '200':
           description: |
-            Success:
+            Success
             - The access and refresh tokens
           content:
             application/json:
@@ -173,12 +253,36 @@ paths:
                 $ref: '#/components/schemas/TokenReadDto'
         '400':
           description: |
-            Bad request:
-            - Something went wrong, please try again later
+            Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+              examples:
+                ValidationError:
+                  value:
+                    title: "One or more validation errors occurred."
+                    statusCode: 400
+                    errors:
+                      Email: [ "The Email field is required." ]
+                Other:
+                  value:
+                    title: "BadRequest"
+                    statusCode: 400
+                    errors:
+                      reasons: ["Something went wrong, please try again later."]
         '401':
           description: |
-            Unauthorized:
-            - Please login and use provided tokens
+            Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "Unauthorized"
+                statusCode: 401
+                errors:
+                  reasons: ["Please login and use provided tokens."]
   /authentication/refresh-tokens:
     post:
       tags:
@@ -197,7 +301,7 @@ paths:
       responses:
         '200':
           description: |
-            Success:
+            Success
             - The new access and refresh tokens
           content:
             application/json:
@@ -205,13 +309,36 @@ paths:
                 $ref: '#/components/schemas/TokenReadDto'
         '400':
           description: |
-            Bad request:
-            - Something went wrong, please try again later
-            - invalid input, object invalid
+            Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+              examples:
+                ValidationError:
+                  value:
+                    title: "One or more validation errors occurred."
+                    statusCode: 400
+                    errors:
+                      AccessToken: [ "The AccessToken field is required." ]
+                Other:
+                  value:
+                    title: "BadRequest"
+                    statusCode: 400
+                    errors:
+                      reasons: ["Something went wrong, please try again later."]
         '401':
           description: |
-            Unauthorized:
-            - Please login and use provided tokens
+            Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "Unauthorized"
+                statusCode: 401
+                errors:
+                  reasons: ["Invalid tokens, please login to generate new valid tokens."]
   /authentication/current-user:
     get:
       tags:
@@ -225,7 +352,7 @@ paths:
       responses:
         '200':
           description: |
-            Success:
+            Success
             - The current user Json object
           content:
             application/json:
@@ -233,12 +360,28 @@ paths:
                 $ref: '#/components/schemas/UserReadDto'
         '400':
           description: |
-            Bad request:
-            - Something went wrong, please try again later
+            Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "BadRequest"
+                statusCode: 400
+                errors:
+                  reasons: ["Something went wrong, please try again later."]
         '401':
           description: |
-            Unauthorized:
-            - Please login and use provided tokens
+            Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "Unauthorized"
+                statusCode: 401
+                errors:
+                  reasons: ["Please login and use provided tokens."]
   /restaurant-admins:
     post:
       tags:
@@ -261,9 +404,37 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserReadDto'
         '400':
-          description: invalid input, object invalid
+          description: |
+            Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+              examples:
+                ValidationError:
+                  value:
+                    title: "One or more validation errors occurred."
+                    statusCode: 400
+                    errors:
+                      Name: [ "The Name field is required." ]
+                Other:
+                  value:
+                    title: "BadRequest"
+                    statusCode: 400
+                    errors:
+                      reasons: ["Something went wrong, please try again later."]
         '409':
-          description: User already exists
+          description: |
+            Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "Conflict"
+                statusCode: 409
+                errors:
+                  reasons: ["User already exists."]
   /customers:
     post:
       tags:
@@ -286,9 +457,37 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserReadDto'
         '400':
-          description: invalid input, object invalid
+          description: |
+            Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+              examples:
+                ValidationError:
+                  value:
+                    title: "One or more validation errors occurred."
+                    statusCode: 400
+                    errors:
+                      Name: [ "The Name field is required." ]
+                Other:
+                  value:
+                    title: "BadRequest"
+                    statusCode: 400
+                    errors:
+                      reasons: ["Something went wrong, please try again later."]
         '409':
-          description: User already exists
+          description: |
+            Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "Conflict"
+                statusCode: 409
+                errors:
+                  reasons: ["User already exists."]
   /restaurants:
     post:
       tags:
@@ -313,9 +512,37 @@ paths:
               schema:
                 $ref: '#/components/schemas/RestaurantReadDto'
         '400':
-          description: invalid input, object invalid
+          description: |
+            Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+              examples:
+                ValidationError:
+                  value:
+                    title: "One or more validation errors occurred."
+                    statusCode: 400
+                    errors:
+                      Name: [ "The Name field is required." ]
+                Other:
+                  value:
+                    title: "BadRequest"
+                    statusCode: 400
+                    errors:
+                      reasons: ["Something went wrong, please try again later."]
         '409':
-          description: Restaurant already exists
+          description: |
+            Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "Conflict"
+                statusCode: 409
+                errors:
+                  reasons: ["Restaurant already exists."]
   /restaurants/{restaurantId}:
     description: |
       - Authorization header: **yes**
@@ -336,7 +563,7 @@ paths:
       responses:
         '200':
           description: |
-            Success:
+            Success
             - The restaurant
           content:
             application/json:
@@ -344,29 +571,59 @@ paths:
                 $ref: '#/components/schemas/RestaurantReadDto'
         '400':
           description: |
-            Bad request:
-            - Something went wrong, please try again later
+            Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "BadRequest"
+                statusCode: 400
+                errors:
+                  reasons: ["Something went wrong, please try again later."]
         '401':
           description: |
-            Unauthorized:
-            - Please login and use provided tokens
+            Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "Unauthorized"
+                statusCode: 401
+                errors:
+                  reasons: ["Please login and use provided tokens."]
         '404':
           description: |
             Not found:
-            - Restaurant not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+              example:
+                message: Restaurant not found.
 components:
   schemas:
-    AnonymousTryDto:
+    MessageDto:
       properties:
         message:
           type: string
-          description: YLunchApi is running, you are anonymous
-    AuthenticatedTryDto:
+          description: The message.
+    ErrorDto:
       properties:
-        message:
+        title:
           type: string
-          description: |
-            YLunchApi is running, you are authenticated as {CurrentUserEmail} with Id: {CurrentUserId} and Roles: {CurrentUserRoles}
+          description: The title.
+        statusCode:
+          type: number
+          description: The status code.
+        errors:
+          properties:
+            reasons:
+              type: array
+              items:
+                type: string
+                description: The reason.
     LoginRequestDto:
       type: object
       properties:
@@ -502,15 +759,15 @@ components:
       properties:
         dayOfWeek:
           type: number
-          description: 'The day to apply this opening time. Starting from Sunday: 0 to Saturday: 6, for example 4 is thursday'
+          description: 'The day to apply this opening time. Starting from Sunday: 0 to Saturday: 6, for example 4 is thursday.'
           example: 4
         OffsetInMinutes:
           type: number
-          description: 'Number of minutes past from 00:00 for example 10:00 is 600, which means the restaurant is open since 10:00'
+          description: 'Number of minutes past from 00:00 for example 10:00 is 600, which means the restaurant is open since 10:00.'
           example: 600
         DurationInMinutes:
           type: number
-          description: 'Number of minutes the restaurant is open since the offset, for example 120 minutes, which means the restaurant is open during 2h since 10:00'
+          description: 'Number of minutes the restaurant is open since the offset, for example 120 minutes, which means the restaurant is open during 2h since 10:00.'
           example: 120
       required:
         - dayOfWeek
@@ -527,15 +784,15 @@ components:
           example: a00000e0-aaa0-000a-0000-00e00aa00e00
         dayOfWeek:
           type: number
-          description: 'The day to apply this opening time. Starting from Sunday: 0 to Saturday: 6, for example 4 is thursday'
+          description: 'The day to apply this opening time. Starting from Sunday: 0 to Saturday: 6, for example 4 is thursday.'
           example: 4
         OffsetInMinutes:
           type: number
-          description: 'Number of minutes past from 00:00 for example 10:00 is 600, which means the restaurant is open since 10:00'
+          description: 'Number of minutes past from 00:00 for example 10:00 is 600, which means the restaurant is open since 10:00.'
           example: 600
         DurationInMinutes:
           type: number
-          description: 'Number of minutes the restaurant is open since the offset, for example 120 minutes, which means the restaurant is open during 2h since 10:00'
+          description: 'Number of minutes the restaurant is open since the offset, for example 120 minutes, which means the restaurant is open during 2h since 10:00.'
           example: 120
     RestaurantCreateDto:
       type: object
@@ -560,7 +817,7 @@ components:
           example: true
         isPublic:
           type: boolean
-          description: 'True if the restaurant wants to be visible for customers, actual visibility value is `isPublished` (refer to that field in `RestaurantReadDto`for details)'
+          description: 'True if the restaurant wants to be visible for customers, actual visibility value is `isPublished` (refer to that field in `RestaurantReadDto`for details).'
           example: true
         zipCode:
           type: string
@@ -637,7 +894,7 @@ components:
           example: true
         isPublic:
           type: boolean
-          description: 'True if the restaurant wants to be visible for customers, actual display value is `isPublished` (refer to that field for details)'
+          description: 'True if the restaurant wants to be visible for customers, actual display value is `isPublished` (refer to that field for details).'
           example: true
         zipCode:
           type: string
@@ -683,13 +940,13 @@ components:
           example: true
         isCurrentlyOpenToOrder:
           type: boolean
-          description: 'True if the restaurant accepts orders'
+          description: 'True if the restaurant accepts orders.'
         isCurrentlyOpenInPlace:
           type: boolean
-          description: 'True if the restaurant is open to eat in place'
+          description: 'True if the restaurant is open to eat in place.'
   securitySchemes:
     Bearer:
       type: http
       description: |
-        JWT Authorization header using the Bearer scheme. Example: 'Authorization: Bearer {token}',
+        JWT Authorization header using the Bearer scheme. Example: 'Authorization: Bearer {token}'.
       scheme: bearer

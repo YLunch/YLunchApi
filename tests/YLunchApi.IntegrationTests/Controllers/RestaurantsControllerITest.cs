@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Mapster;
 using Xunit;
+using YLunchApi.Domain.CommonAggregate.Dto;
 using YLunchApi.Domain.Core.Utils;
 using YLunchApi.Domain.RestaurantAggregate.Dto;
 using YLunchApi.Helpers.Extensions;
@@ -416,10 +417,7 @@ public class RestaurantsControllerITest : ControllerITestBase
         var response = await Client.PostAsJsonAsync("restaurants", body);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
-        var responseBody = await ResponseUtils.DeserializeContentAsync(response);
-
-        responseBody.Should().Contain("Please login and use provided tokens");
+        await AssertResponseUtils.AssertUnauthorizedResponse(response);
     }
 
     [Fact]
@@ -468,10 +466,7 @@ public class RestaurantsControllerITest : ControllerITestBase
         var response = await Client.PostAsJsonAsync("restaurants", body);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
-        var responseBody = await ResponseUtils.DeserializeContentAsync(response);
-
-        responseBody.Should().Be("");
+        await AssertResponseUtils.AssertForbiddenResponse(response);
     }
 
     #endregion
