@@ -57,6 +57,6 @@ public class RestaurantRepository : IRestaurantRepository
 
     public async Task<ICollection<Restaurant>> GetRestaurants()
     {
-        return await _context.Restaurants.ToListAsync();
+        return await _context.Restaurants.OrderBy(restaurant =>restaurant.CreationDateTime ).ToListAsync();
     }
 }

@@ -2,6 +2,8 @@ using Mapster;
 using YLunchApi.Domain.RestaurantAggregate.Dto;
 using YLunchApi.Domain.RestaurantAggregate.Models;
 using YLunchApi.Domain.RestaurantAggregate.Services;
+using System.Linq;
+using System.Collections.Generic; 
 
 namespace YLunchApi.Application.RestaurantAggregate;
 
@@ -42,3 +44,5 @@ public class RestaurantService : IRestaurantService
         return restaurants.Select(x => x.Adapt<RestaurantReadDto>()).ToList();
     }
 }
+
+
