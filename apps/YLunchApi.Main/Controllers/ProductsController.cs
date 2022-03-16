@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using YLunchApi.Domain.Exceptions;
 using YLunchApi.Domain.ProductsAggregate.Dto;
+using YLunchApi.Domain.ProductsAggregate.Services;
 using YLunchApi.Domain.UserAggregate.Models;
 
 namespace YLunchApi.Main.Controllers;

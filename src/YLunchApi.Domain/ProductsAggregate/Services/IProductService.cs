@@ -1,6 +1,8 @@
-﻿namespace YLunchApi.Domain.ProductsAggregate.Services;
+﻿using YLunchApi.Domain.ProductsAggregate.Dto;
 
-public class IProducrsService
-{
-    
+namespace YLunchApi.Domain.ProductsAggregate.Services;
+
+public interface IProductService
+{ 
+    Task<ProductReadDto> Create(ProductCreateDto productCreateDto, string restaurantId);
 }
