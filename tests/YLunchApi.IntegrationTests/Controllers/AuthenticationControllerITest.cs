@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
 using YLunchApi.Authentication.Models.Dto;
+using YLunchApi.Domain.CommonAggregate.Dto;
 using YLunchApi.Domain.UserAggregate.Dto;
 using YLunchApi.IntegrationTests.Core.Extensions;
 using YLunchApi.IntegrationTests.Core.Utils;
@@ -128,8 +129,9 @@ public class AuthenticationControllerITest : ControllerITestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
-        var content = await ResponseUtils.DeserializeContentAsync(response);
-        content.Should().Be("Invalid tokens, please login to generate new valid tokens");
+        var content = await ResponseUtils.DeserializeContentAsync<ErrorDto>(response);
+        content.Should().BeEquivalentTo(new ErrorDto(HttpStatusCode.Unauthorized,
+            "Invalid tokens, please login to generate new valid tokens."));
     }
 
     #endregion
@@ -159,7 +161,6 @@ public class AuthenticationControllerITest : ControllerITestBase
         var response = await Client.GetAsync("authentication/current-user");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         await AssertResponseUtils.AssertUnauthorizedResponse(response);
     }
 
@@ -173,7 +174,6 @@ public class AuthenticationControllerITest : ControllerITestBase
         var response = await Client.GetAsync("authentication/current-user");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         await AssertResponseUtils.AssertUnauthorizedResponse(response);
     }
 
