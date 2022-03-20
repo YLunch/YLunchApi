@@ -44,55 +44,56 @@ public class RestaurantRepository : IRestaurantRepository
 
     public async Task<Restaurant> GetById(string id)
     {
-        var restaurant = await _context.Restaurants
-                                       .Include(x => x.ClosingDates)
-                                       .Include(x => x.PlaceOpeningTimes)
-                                       .Include(x => x.OrderOpeningTimes)
-                                       .FirstOrDefaultAsync(x => x.Id == id);
+        var restaurant = await RestaurantsQueryBase
+            .FirstOrDefaultAsync(x => x.Id == id);
         if (restaurant == null) throw new EntityNotFoundException($"Restaurant {id} not found");
-        restaurant.ClosingDates = restaurant.ClosingDates.OrderBy(x => x.ClosingDateTime).ToList();
-        restaurant.PlaceOpeningTimes = OpeningTimeUtils.AscendingOrder(restaurant.PlaceOpeningTimes);
-        restaurant.OrderOpeningTimes = OpeningTimeUtils.AscendingOrder(restaurant.OrderOpeningTimes);
-        return restaurant;
+        return ReorderRestaurantFields(restaurant);
     }
 
     public async Task<ICollection<Restaurant>> GetRestaurants(RestaurantFilter restaurantFilter)
     {
-        var query = _context.Restaurants
-                            .Include(x => x.ClosingDates.OrderBy(y => y.ClosingDateTime))
-                            .Include(x => x.PlaceOpeningTimes.OrderBy(y =>
-                                ((int)y.DayOfWeek == 0 ? 7 : (int)y.DayOfWeek) * 1440 + y.OffsetInMinutes))
-                            .Include(x => x.OrderOpeningTimes.OrderBy(y =>
-                                ((int)y.DayOfWeek == 0 ? 7 : (int)y.DayOfWeek) * 1440 + y.OffsetInMinutes))
-                            .OrderBy(restaurant => restaurant.CreationDateTime)
-                            .Skip((restaurantFilter.Page - 1) * restaurantFilter.Size)
-                            .Take(restaurantFilter.Size);
-        query = restaurantFilter.IsPublished switch
+        var query = RestaurantsQueryBase
+                    .Skip((restaurantFilter.Page - 1) * restaurantFilter.Size)
+                    .Take(restaurantFilter.Size);
+        query = IsPublishedRestaurantsQuery(query, restaurantFilter.IsPublished);
+        query = IsCurrentlyOpenToOrderRestaurantsQuery(query, restaurantFilter.IsCurrentlyOpenToOrder);
+        return (await query.ToListAsync()).Select(ReorderRestaurantFields).ToList();
+    }
+
+    private IOrderedQueryable<Restaurant> RestaurantsQueryBase =>
+        _context.Restaurants
+                .Include(x => x.ClosingDates.OrderBy(y => y.ClosingDateTime))
+                .Include(x => x.PlaceOpeningTimes.OrderBy(y => (int)y.DayOfWeek * 24 * 60 + y.OffsetInMinutes))
+                .Include(x => x.OrderOpeningTimes.OrderBy(y => (int)y.DayOfWeek * 24 * 60 + y.OffsetInMinutes))
+                .OrderBy(restaurant => restaurant.CreationDateTime);
+
+    private static IQueryable<Restaurant> IsPublishedRestaurantsQuery(IQueryable<Restaurant> query, bool? isPublished) =>
+        isPublished switch
         {
             true => query.Where(x => x.IsPublished),
             false => query.Where(x => !x.IsPublished),
             null => query
         };
-        query = restaurantFilter.IsCurrentlyOpenToOrder switch
+
+    private static IQueryable<Restaurant> IsCurrentlyOpenToOrderRestaurantsQuery(IQueryable<Restaurant> query, bool? isCurrentlyOpenToOrderRestaurants) =>
+        isCurrentlyOpenToOrderRestaurants switch
         {
             true => query.Where(x => x.OrderOpeningTimes.Any(y =>
-                ((int)y.DayOfWeek == 0 ? 7 : (int)y.DayOfWeek) * 1440 + y.OffsetInMinutes <=
-                ((int)DateTime.UtcNow.DayOfWeek == 0 ? 7 : (int)DateTime.UtcNow.DayOfWeek) * 1440 +
-                DateTime.UtcNow.Hour * 60 + DateTime.UtcNow.Minute &&
-                ((int)DateTime.UtcNow.DayOfWeek == 0 ? 7 : (int)DateTime.UtcNow.DayOfWeek) * 1440 +
-                DateTime.UtcNow.Hour * 60 + DateTime.UtcNow.Minute <=
-                ((int)y.DayOfWeek == 0 ? 7 : (int)y.DayOfWeek) * 1440 + y.OffsetInMinutes + y.DurationInMinutes)),
+                (int)y.DayOfWeek * 24 * 60 + y.OffsetInMinutes <= (int)DateTime.UtcNow.DayOfWeek * 1440 + DateTime.UtcNow.Hour * 60 + DateTime.UtcNow.Minute &&
+                (int)DateTime.UtcNow.DayOfWeek * 1440 + DateTime.UtcNow.Hour * 60 + DateTime.UtcNow.Minute <= (int)y.DayOfWeek * 24 * 60 + y.OffsetInMinutes + y.DurationInMinutes)),
 
             false => query.Where(x => !x.OrderOpeningTimes.Any(y =>
-                ((int)y.DayOfWeek == 0 ? 7 : (int)y.DayOfWeek) * 1440 + y.OffsetInMinutes <=
-                ((int)DateTime.UtcNow.DayOfWeek == 0 ? 7 : (int)DateTime.UtcNow.DayOfWeek) * 1440 +
-                DateTime.UtcNow.Hour * 60 + DateTime.UtcNow.Minute &&
-                ((int)DateTime.UtcNow.DayOfWeek == 0 ? 7 : (int)DateTime.UtcNow.DayOfWeek) * 1440 +
-                DateTime.UtcNow.Hour * 60 + DateTime.UtcNow.Minute <=
-                ((int)y.DayOfWeek == 0 ? 7 : (int)y.DayOfWeek) * 1440 + y.OffsetInMinutes + y.DurationInMinutes)),
+                (int)y.DayOfWeek * 24 * 60 + y.OffsetInMinutes <= (int)DateTime.UtcNow.DayOfWeek * 1440 + DateTime.UtcNow.Hour * 60 + DateTime.UtcNow.Minute &&
+                (int)DateTime.UtcNow.DayOfWeek * 1440 + DateTime.UtcNow.Hour * 60 + DateTime.UtcNow.Minute <= (int)y.DayOfWeek * 24 * 60 + y.OffsetInMinutes + y.DurationInMinutes)),
 
             null => query
         };
-        return await query.ToListAsync();
+
+    private static Restaurant ReorderRestaurantFields(Restaurant restaurant)
+    {
+        restaurant.ClosingDates = restaurant.ClosingDates.OrderBy(x=>x.ClosingDateTime).ToList();
+        restaurant.PlaceOpeningTimes = OpeningTimeUtils.AscendingOrder(restaurant.PlaceOpeningTimes);
+        restaurant.OrderOpeningTimes = OpeningTimeUtils.AscendingOrder(restaurant.OrderOpeningTimes);
+        return restaurant;
     }
 }

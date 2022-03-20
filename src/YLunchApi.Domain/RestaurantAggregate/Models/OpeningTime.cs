@@ -12,6 +12,8 @@ public abstract class OpeningTime : Entity
     public int OffsetInMinutes { get; set; }
     public int DurationInMinutes { get; set; }
 
+
+
     public bool Contains(DateTime dateTime)
     {
         var dateTimeMinutesFromFirstDayOfWeek =
