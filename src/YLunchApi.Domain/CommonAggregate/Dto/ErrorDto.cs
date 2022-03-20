@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 
 namespace YLunchApi.Domain.CommonAggregate.Dto;
@@ -8,6 +9,7 @@ public class ErrorDto
     public int StatusCode { get; set; }
     public Errors Errors { get; set; } = null!;
 
+    [ExcludeFromCodeCoverage]
     public ErrorDto()
     {
     }
@@ -24,6 +26,7 @@ public class Errors
 {
     public List<string> Reasons { get; set; } = null!;
 
+    [ExcludeFromCodeCoverage]
     public Errors()
     {
     }

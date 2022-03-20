@@ -3,7 +3,8 @@ using YLunchApi.Domain.RestaurantAggregate.Dto;
 using YLunchApi.Domain.RestaurantAggregate.Models;
 using YLunchApi.Domain.RestaurantAggregate.Services;
 using System.Linq;
-using System.Collections.Generic; 
+using System.Collections.Generic;
+using YLunchApi.Domain.RestaurantAggregate.Filters;
 
 namespace YLunchApi.Application.RestaurantAggregate;
 
@@ -38,9 +39,9 @@ public class RestaurantService : IRestaurantService
         return restaurant.Adapt<RestaurantReadDto>();
     }
 
-    public async Task<ICollection<RestaurantReadDto>> GetRestaurants()
+    public async Task<ICollection<RestaurantReadDto>> GetRestaurants(RestaurantFilter restaurantFilter)
     {
-        var restaurants = await _restaurantRepository.GetRestaurants();
+        var restaurants = await _restaurantRepository.GetRestaurants(restaurantFilter);
         return restaurants.Select(x => x.Adapt<RestaurantReadDto>()).ToList();
     }
 }
