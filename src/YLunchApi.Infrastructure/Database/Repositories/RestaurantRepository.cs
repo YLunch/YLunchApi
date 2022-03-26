@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using YLunchApi.Domain.CommonAggregate.Services;
 using YLunchApi.Domain.Core.Utils;
 using YLunchApi.Domain.Exceptions;
 using YLunchApi.Domain.RestaurantAggregate.Filters;
@@ -10,10 +11,12 @@ namespace YLunchApi.Infrastructure.Database.Repositories;
 public class RestaurantRepository : IRestaurantRepository
 {
     private readonly ApplicationDbContext _context;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
-    public RestaurantRepository(ApplicationDbContext context)
+    public RestaurantRepository(ApplicationDbContext context, IDateTimeProvider dateTimeProvider)
     {
         _context = context;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public async Task Create(Restaurant restaurant)
@@ -47,7 +50,7 @@ public class RestaurantRepository : IRestaurantRepository
         var restaurant = await RestaurantsQueryBase
             .FirstOrDefaultAsync(x => x.Id == id);
         if (restaurant == null) throw new EntityNotFoundException($"Restaurant {id} not found");
-        return ReorderRestaurantFields(restaurant);
+        return ReformatRestaurant(restaurant);
     }
 
     public async Task<ICollection<Restaurant>> GetRestaurants(RestaurantFilter restaurantFilter)
@@ -57,7 +60,7 @@ public class RestaurantRepository : IRestaurantRepository
                     .Take(restaurantFilter.Size);
         query = IsPublishedRestaurantsQuery(query, restaurantFilter.IsPublished);
         query = IsCurrentlyOpenToOrderRestaurantsQuery(query, restaurantFilter.IsCurrentlyOpenToOrder);
-        return (await query.ToListAsync()).Select(ReorderRestaurantFields).ToList();
+        return (await query.ToListAsync()).Select(ReformatRestaurant).ToList();
     }
 
     private IOrderedQueryable<Restaurant> RestaurantsQueryBase =>
@@ -75,23 +78,26 @@ public class RestaurantRepository : IRestaurantRepository
             null => query
         };
 
-    private static IQueryable<Restaurant> IsCurrentlyOpenToOrderRestaurantsQuery(IQueryable<Restaurant> query, bool? isCurrentlyOpenToOrderRestaurants) =>
-        isCurrentlyOpenToOrderRestaurants switch
+    private IQueryable<Restaurant> IsCurrentlyOpenToOrderRestaurantsQuery(IQueryable<Restaurant> query, bool? isCurrentlyOpenToOrderRestaurants)
+    {
+        var utcNow = _dateTimeProvider.UtcNow;
+        return isCurrentlyOpenToOrderRestaurants switch
         {
             true => query.Where(x => x.OrderOpeningTimes.Any(y =>
-                (int)y.DayOfWeek * 24 * 60 + y.OffsetInMinutes <= (int)DateTime.UtcNow.DayOfWeek * 1440 + DateTime.UtcNow.Hour * 60 + DateTime.UtcNow.Minute &&
-                (int)DateTime.UtcNow.DayOfWeek * 1440 + DateTime.UtcNow.Hour * 60 + DateTime.UtcNow.Minute <= (int)y.DayOfWeek * 24 * 60 + y.OffsetInMinutes + y.DurationInMinutes)),
+                (int)y.DayOfWeek * 24 * 60 + y.OffsetInMinutes <= (int)utcNow.DayOfWeek * 1440 + utcNow.Hour * 60 + utcNow.Minute &&
+                (int)utcNow.DayOfWeek * 1440 + utcNow.Hour * 60 + utcNow.Minute <= (int)y.DayOfWeek * 24 * 60 + y.OffsetInMinutes + y.DurationInMinutes)),
 
             false => query.Where(x => !x.OrderOpeningTimes.Any(y =>
-                (int)y.DayOfWeek * 24 * 60 + y.OffsetInMinutes <= (int)DateTime.UtcNow.DayOfWeek * 1440 + DateTime.UtcNow.Hour * 60 + DateTime.UtcNow.Minute &&
-                (int)DateTime.UtcNow.DayOfWeek * 1440 + DateTime.UtcNow.Hour * 60 + DateTime.UtcNow.Minute <= (int)y.DayOfWeek * 24 * 60 + y.OffsetInMinutes + y.DurationInMinutes)),
+                (int)y.DayOfWeek * 24 * 60 + y.OffsetInMinutes <= (int)utcNow.DayOfWeek * 1440 + utcNow.Hour * 60 + utcNow.Minute &&
+                (int)utcNow.DayOfWeek * 1440 + utcNow.Hour * 60 + utcNow.Minute <= (int)y.DayOfWeek * 24 * 60 + y.OffsetInMinutes + y.DurationInMinutes)),
 
             null => query
         };
+    }
 
-    private static Restaurant ReorderRestaurantFields(Restaurant restaurant)
+    private static Restaurant ReformatRestaurant(Restaurant restaurant)
     {
-        restaurant.ClosingDates = restaurant.ClosingDates.OrderBy(x=>x.ClosingDateTime).ToList();
+        restaurant.ClosingDates = restaurant.ClosingDates.OrderBy(x => x.ClosingDateTime).ToList();
         restaurant.PlaceOpeningTimes = OpeningTimeUtils.AscendingOrder(restaurant.PlaceOpeningTimes);
         restaurant.OrderOpeningTimes = OpeningTimeUtils.AscendingOrder(restaurant.OrderOpeningTimes);
         return restaurant;

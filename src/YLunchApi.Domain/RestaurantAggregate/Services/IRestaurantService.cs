@@ -8,5 +8,4 @@ public interface IRestaurantService
     Task<RestaurantReadDto> Create(RestaurantCreateDto restaurantCreateDto, string restaurantAdminId);
     Task<RestaurantReadDto> GetById(string restaurantId);
     Task<ICollection<RestaurantReadDto>> GetRestaurants(RestaurantFilter restaurantFilter);
-    
 }

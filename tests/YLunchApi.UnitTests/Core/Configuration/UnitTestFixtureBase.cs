@@ -16,6 +16,7 @@ using YLunchApi.Authentication.Models;
 using YLunchApi.Authentication.Repositories;
 using YLunchApi.Authentication.Services;
 using YLunchApi.AuthenticationShared.Repositories;
+using YLunchApi.Domain.CommonAggregate.Services;
 using YLunchApi.Domain.RestaurantAggregate.Services;
 using YLunchApi.Domain.UserAggregate.Models;
 using YLunchApi.Domain.UserAggregate.Services;
@@ -60,6 +61,8 @@ public class UnitTestFixtureBase
         _serviceCollection.AddScoped<IRestaurantRepository, RestaurantRepository>();
         _serviceCollection.AddScoped<IRestaurantService, RestaurantService>();
 
+        _serviceCollection.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+
         // For Jwt
         const string jwtSecret = "JsonWebTokenSecretForTests";
         var optionsMonitorMock = Substitute.For<IOptionsMonitor<JwtConfig>>();
@@ -101,11 +104,11 @@ public class UnitTestFixtureBase
 
     private void ReplaceDependencies(FixtureConfiguration fixtureConfiguration)
     {
-        if (fixtureConfiguration.RefreshTokenRepository != null)
+        if (fixtureConfiguration.UserManager != null)
         {
             _serviceCollection.Remove(
-                _serviceCollection.First(descriptor => descriptor.ServiceType == typeof(IRefreshTokenRepository)));
-            _serviceCollection.TryAddScoped<IRefreshTokenRepository>(_ => fixtureConfiguration.RefreshTokenRepository!);
+                _serviceCollection.First(descriptor => descriptor.ServiceType == typeof(UserManager<User>)));
+            _serviceCollection.TryAddScoped<UserManager<User>>(_ => fixtureConfiguration.UserManager!);
         }
 
         if (fixtureConfiguration.JwtSecurityTokenHandler != null)
@@ -116,6 +119,13 @@ public class UnitTestFixtureBase
                 fixtureConfiguration.JwtSecurityTokenHandler!);
         }
 
+        if (fixtureConfiguration.RefreshTokenRepository != null)
+        {
+            _serviceCollection.Remove(
+                _serviceCollection.First(descriptor => descriptor.ServiceType == typeof(IRefreshTokenRepository)));
+            _serviceCollection.TryAddScoped<IRefreshTokenRepository>(_ => fixtureConfiguration.RefreshTokenRepository!);
+        }
+
         if (fixtureConfiguration.UserRepository != null)
         {
             _serviceCollection.Remove(
@@ -123,12 +133,13 @@ public class UnitTestFixtureBase
             _serviceCollection.TryAddScoped<IUserRepository>(_ => fixtureConfiguration.UserRepository!);
         }
 
-        if (fixtureConfiguration.UserManager != null)
+        if (fixtureConfiguration.DateTimeProvider != null)
         {
             _serviceCollection.Remove(
-                _serviceCollection.First(descriptor => descriptor.ServiceType == typeof(UserManager<User>)));
-            _serviceCollection.TryAddScoped<UserManager<User>>(_ => fixtureConfiguration.UserManager!);
+                _serviceCollection.First(descriptor => descriptor.ServiceType == typeof(IDateTimeProvider)));
+            _serviceCollection.TryAddScoped<IDateTimeProvider>(_ => fixtureConfiguration.DateTimeProvider!);
         }
+
 
         _serviceProvider = _serviceCollection.BuildServiceProvider();
     }

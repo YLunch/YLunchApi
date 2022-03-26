@@ -8,7 +8,6 @@ using YLunchApi.Domain.RestaurantAggregate.Filters;
 using YLunchApi.Domain.RestaurantAggregate.Services;
 using YLunchApi.Domain.UserAggregate.Models;
 
-
 namespace YLunchApi.Main.Controllers;
 
 [ApiController]
@@ -52,8 +51,8 @@ public class RestaurantsController : ApplicationControllerBase
             return NotFound(new ErrorDto(HttpStatusCode.NotFound, $"Restaurant {restaurantId} not found"));
         }
     }
-    
-    
+
+
     //get All restaurants
     [HttpGet]
     public async Task<ActionResult<ICollection<RestaurantReadDto>>> GetRestaurants([FromQuery] RestaurantFilter? restaurantFilter = null)
@@ -61,8 +60,6 @@ public class RestaurantsController : ApplicationControllerBase
         var filter = restaurantFilter ?? new RestaurantFilter();
         var restaurantReadDto = await _restaurantService.GetRestaurants(filter);
         return Ok(restaurantReadDto);
-       
     }
     //Fin
-   
 }

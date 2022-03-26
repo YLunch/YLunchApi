@@ -8,6 +8,7 @@ using YLunchApi.Authentication.Models;
 using YLunchApi.Authentication.Models.Dto;
 using YLunchApi.Authentication.Repositories;
 using YLunchApi.Authentication.Utils;
+using YLunchApi.Domain.CommonAggregate.Services;
 using YLunchApi.Domain.UserAggregate.Models;
 using YLunchApi.Domain.UserAggregate.Services;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
@@ -21,18 +22,21 @@ public class JwtService : IJwtService
     private readonly TokenValidationParameters _tokenValidationParameters;
     private readonly IUserRepository _userRepository;
     private readonly JwtSecurityTokenHandler _jwtSecurityTokenHandler;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
     public JwtService(IRefreshTokenRepository refreshTokenRepository,
                       IOptionsMonitor<JwtConfig> jwtConfig,
                       TokenValidationParameters tokenValidationParameters,
                       IUserRepository userRepository,
-                      JwtSecurityTokenHandler jwtSecurityTokenHandler)
+                      JwtSecurityTokenHandler jwtSecurityTokenHandler,
+                      IDateTimeProvider dateTimeProvider)
     {
         _refreshTokenRepository = refreshTokenRepository;
         _tokenValidationParameters = tokenValidationParameters;
         _userRepository = userRepository;
         _jwtConfig = jwtConfig.CurrentValue;
         _jwtSecurityTokenHandler = jwtSecurityTokenHandler;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public async Task<TokenReadDto> GenerateJwtToken(AuthenticatedUser authenticatedUser)
@@ -72,7 +76,7 @@ public class JwtService : IJwtService
         if (storedToken == null) throw new RefreshTokenNotFoundException();
 
         // Validation 4 - refresh token is not expired
-        if (storedToken.ExpirationDateTime < DateTime.UtcNow) throw new RefreshTokenExpiredException();
+        if (storedToken.ExpirationDateTime < _dateTimeProvider.UtcNow) throw new RefreshTokenExpiredException();
 
         // Validation 5 - refresh token not used
         if (storedToken.IsUsed) throw new RefreshTokenAlreadyUsedException();
@@ -113,7 +117,7 @@ public class JwtService : IJwtService
         {
             Subject = new ClaimsIdentity(authClaims),
             // Todo reduce delay when prod deliver
-            Expires = DateTime.UtcNow.AddMinutes(30),
+            Expires = _dateTimeProvider.UtcNow.AddMinutes(30),
             SigningCredentials =
                 new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
@@ -135,8 +139,8 @@ public class JwtService : IJwtService
             IsUsed = false,
             IsRevoked = false,
             UserId = userId,
-            CreationDateTime = DateTime.UtcNow,
-            ExpirationDateTime = DateTime.UtcNow.AddMonths(1),
+            CreationDateTime = _dateTimeProvider.UtcNow,
+            ExpirationDateTime = _dateTimeProvider.UtcNow.AddMonths(1),
             Token = RandomUtils.GetRandomKey() + Guid.NewGuid()
         };
 

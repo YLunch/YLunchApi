@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Mapster;
 using Xunit;
-using YLunchApi.Domain.CommonAggregate.Dto;
 using YLunchApi.Domain.Core.Utils;
 using YLunchApi.Domain.RestaurantAggregate.Dto;
 using YLunchApi.Helpers.Extensions;
@@ -29,16 +28,16 @@ public class RestaurantsControllerITest : ControllerITestBase
         var utcNow = DateTime.UtcNow;
         var body = new
         {
-            RestaurantMocks.RestaurantCreateDto.Name,
-            RestaurantMocks.RestaurantCreateDto.Email,
-            RestaurantMocks.RestaurantCreateDto.PhoneNumber,
-            RestaurantMocks.RestaurantCreateDto.Country,
-            RestaurantMocks.RestaurantCreateDto.City,
-            RestaurantMocks.RestaurantCreateDto.ZipCode,
-            RestaurantMocks.RestaurantCreateDto.StreetName,
-            RestaurantMocks.RestaurantCreateDto.StreetNumber,
-            RestaurantMocks.RestaurantCreateDto.IsOpen,
-            RestaurantMocks.RestaurantCreateDto.IsPublic,
+            RestaurantMocks.SimpleRestaurantCreateDto.Name,
+            RestaurantMocks.SimpleRestaurantCreateDto.Email,
+            RestaurantMocks.SimpleRestaurantCreateDto.PhoneNumber,
+            RestaurantMocks.SimpleRestaurantCreateDto.Country,
+            RestaurantMocks.SimpleRestaurantCreateDto.City,
+            RestaurantMocks.SimpleRestaurantCreateDto.ZipCode,
+            RestaurantMocks.SimpleRestaurantCreateDto.StreetName,
+            RestaurantMocks.SimpleRestaurantCreateDto.StreetNumber,
+            RestaurantMocks.SimpleRestaurantCreateDto.IsOpen,
+            RestaurantMocks.SimpleRestaurantCreateDto.IsPublic,
             ClosingDates = new List<dynamic>
             {
                 new { ClosingDateTime = DateTime.Parse("2021-12-31") },
@@ -92,16 +91,16 @@ public class RestaurantsControllerITest : ControllerITestBase
         var utcNow = DateTime.UtcNow;
         var body = new
         {
-            RestaurantMocks.RestaurantCreateDto.Name,
-            RestaurantMocks.RestaurantCreateDto.Email,
-            RestaurantMocks.RestaurantCreateDto.PhoneNumber,
-            RestaurantMocks.RestaurantCreateDto.Country,
-            RestaurantMocks.RestaurantCreateDto.City,
-            RestaurantMocks.RestaurantCreateDto.ZipCode,
-            RestaurantMocks.RestaurantCreateDto.StreetName,
-            RestaurantMocks.RestaurantCreateDto.StreetNumber,
-            RestaurantMocks.RestaurantCreateDto.IsOpen,
-            RestaurantMocks.RestaurantCreateDto.IsPublic,
+            RestaurantMocks.SimpleRestaurantCreateDto.Name,
+            RestaurantMocks.SimpleRestaurantCreateDto.Email,
+            RestaurantMocks.SimpleRestaurantCreateDto.PhoneNumber,
+            RestaurantMocks.SimpleRestaurantCreateDto.Country,
+            RestaurantMocks.SimpleRestaurantCreateDto.City,
+            RestaurantMocks.SimpleRestaurantCreateDto.ZipCode,
+            RestaurantMocks.SimpleRestaurantCreateDto.StreetName,
+            RestaurantMocks.SimpleRestaurantCreateDto.StreetNumber,
+            RestaurantMocks.SimpleRestaurantCreateDto.IsOpen,
+            RestaurantMocks.SimpleRestaurantCreateDto.IsPublic,
             ClosingDates = new List<dynamic>
             {
                 new { ClosingDateTime = DateTime.Parse("2021-12-31") },
@@ -244,16 +243,16 @@ public class RestaurantsControllerITest : ControllerITestBase
         Client.SetAuthorizationHeader(authenticatedUserInfo.AccessToken);
         var body = new
         {
-            RestaurantMocks.RestaurantCreateDto.Name,
+            RestaurantMocks.SimpleRestaurantCreateDto.Name,
             Email = "bad email",
             PhoneNumber = "bad phone",
-            RestaurantMocks.RestaurantCreateDto.Country,
-            RestaurantMocks.RestaurantCreateDto.City,
+            RestaurantMocks.SimpleRestaurantCreateDto.Country,
+            RestaurantMocks.SimpleRestaurantCreateDto.City,
             ZipCode = "bad zipcode",
-            RestaurantMocks.RestaurantCreateDto.StreetName,
-            RestaurantMocks.RestaurantCreateDto.StreetNumber,
-            RestaurantMocks.RestaurantCreateDto.IsOpen,
-            RestaurantMocks.RestaurantCreateDto.IsPublic,
+            RestaurantMocks.SimpleRestaurantCreateDto.StreetName,
+            RestaurantMocks.SimpleRestaurantCreateDto.StreetNumber,
+            RestaurantMocks.SimpleRestaurantCreateDto.IsOpen,
+            RestaurantMocks.SimpleRestaurantCreateDto.IsPublic,
             ClosingDates = new List<dynamic>
             {
                 new { }
@@ -315,16 +314,16 @@ public class RestaurantsControllerITest : ControllerITestBase
         Client.SetAuthorizationHeader(authenticatedUserInfo.AccessToken);
         var body = new
         {
-            RestaurantMocks.RestaurantCreateDto.Name,
-            RestaurantMocks.RestaurantCreateDto.Email,
-            RestaurantMocks.RestaurantCreateDto.PhoneNumber,
-            RestaurantMocks.RestaurantCreateDto.Country,
-            RestaurantMocks.RestaurantCreateDto.City,
-            RestaurantMocks.RestaurantCreateDto.ZipCode,
-            RestaurantMocks.RestaurantCreateDto.StreetName,
-            RestaurantMocks.RestaurantCreateDto.StreetNumber,
-            RestaurantMocks.RestaurantCreateDto.IsOpen,
-            RestaurantMocks.RestaurantCreateDto.IsPublic,
+            RestaurantMocks.SimpleRestaurantCreateDto.Name,
+            RestaurantMocks.SimpleRestaurantCreateDto.Email,
+            RestaurantMocks.SimpleRestaurantCreateDto.PhoneNumber,
+            RestaurantMocks.SimpleRestaurantCreateDto.Country,
+            RestaurantMocks.SimpleRestaurantCreateDto.City,
+            RestaurantMocks.SimpleRestaurantCreateDto.ZipCode,
+            RestaurantMocks.SimpleRestaurantCreateDto.StreetName,
+            RestaurantMocks.SimpleRestaurantCreateDto.StreetNumber,
+            RestaurantMocks.SimpleRestaurantCreateDto.IsOpen,
+            RestaurantMocks.SimpleRestaurantCreateDto.IsPublic,
             PlaceOpeningTimes = new List<dynamic>
             {
                 new
@@ -379,16 +378,16 @@ public class RestaurantsControllerITest : ControllerITestBase
         // Arrange
         var body = new
         {
-            RestaurantMocks.RestaurantCreateDto.Name,
-            RestaurantMocks.RestaurantCreateDto.Email,
-            RestaurantMocks.RestaurantCreateDto.PhoneNumber,
-            RestaurantMocks.RestaurantCreateDto.Country,
-            RestaurantMocks.RestaurantCreateDto.City,
-            RestaurantMocks.RestaurantCreateDto.ZipCode,
-            RestaurantMocks.RestaurantCreateDto.StreetName,
-            RestaurantMocks.RestaurantCreateDto.StreetNumber,
-            RestaurantMocks.RestaurantCreateDto.IsOpen,
-            RestaurantMocks.RestaurantCreateDto.IsPublic,
+            RestaurantMocks.SimpleRestaurantCreateDto.Name,
+            RestaurantMocks.SimpleRestaurantCreateDto.Email,
+            RestaurantMocks.SimpleRestaurantCreateDto.PhoneNumber,
+            RestaurantMocks.SimpleRestaurantCreateDto.Country,
+            RestaurantMocks.SimpleRestaurantCreateDto.City,
+            RestaurantMocks.SimpleRestaurantCreateDto.ZipCode,
+            RestaurantMocks.SimpleRestaurantCreateDto.StreetName,
+            RestaurantMocks.SimpleRestaurantCreateDto.StreetNumber,
+            RestaurantMocks.SimpleRestaurantCreateDto.IsOpen,
+            RestaurantMocks.SimpleRestaurantCreateDto.IsPublic,
             ClosingDates = new List<ClosingDateCreateDto>
             {
                 new() { ClosingDateTime = DateTime.Parse("2021-12-25") }
@@ -428,16 +427,16 @@ public class RestaurantsControllerITest : ControllerITestBase
         Client.SetAuthorizationHeader(authenticatedUserInfo.AccessToken);
         var body = new
         {
-            RestaurantMocks.RestaurantCreateDto.Name,
-            RestaurantMocks.RestaurantCreateDto.Email,
-            RestaurantMocks.RestaurantCreateDto.PhoneNumber,
-            RestaurantMocks.RestaurantCreateDto.Country,
-            RestaurantMocks.RestaurantCreateDto.City,
-            RestaurantMocks.RestaurantCreateDto.ZipCode,
-            RestaurantMocks.RestaurantCreateDto.StreetName,
-            RestaurantMocks.RestaurantCreateDto.StreetNumber,
-            RestaurantMocks.RestaurantCreateDto.IsOpen,
-            RestaurantMocks.RestaurantCreateDto.IsPublic,
+            RestaurantMocks.SimpleRestaurantCreateDto.Name,
+            RestaurantMocks.SimpleRestaurantCreateDto.Email,
+            RestaurantMocks.SimpleRestaurantCreateDto.PhoneNumber,
+            RestaurantMocks.SimpleRestaurantCreateDto.Country,
+            RestaurantMocks.SimpleRestaurantCreateDto.City,
+            RestaurantMocks.SimpleRestaurantCreateDto.ZipCode,
+            RestaurantMocks.SimpleRestaurantCreateDto.StreetName,
+            RestaurantMocks.SimpleRestaurantCreateDto.StreetNumber,
+            RestaurantMocks.SimpleRestaurantCreateDto.IsOpen,
+            RestaurantMocks.SimpleRestaurantCreateDto.IsPublic,
             ClosingDates = new List<ClosingDateCreateDto>
             {
                 new() { ClosingDateTime = DateTime.Parse("2021-12-25") }
