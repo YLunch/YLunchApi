@@ -10,7 +10,6 @@ using Mapster;
 using Xunit;
 using YLunchApi.Domain.Core.Utils;
 using YLunchApi.Domain.RestaurantAggregate.Dto;
-using YLunchApi.Helpers.Extensions;
 using YLunchApi.IntegrationTests.Core.Extensions;
 using YLunchApi.IntegrationTests.Core.Utils;
 using YLunchApi.TestsShared;
@@ -48,14 +47,14 @@ public class RestaurantsControllerITest : ControllerITestBase
                 new
                 {
                     utcNow.AddDays(-1).DayOfWeek,
-                    OffsetInMinutes = utcNow.MinutesFromMidnight(),
-                    DurationInMinutes = 2 * 60
+                    OffsetInMinutes = 0 * 60,
+                    DurationInMinutes = 23 * 60 + 59
                 },
                 new
                 {
                     utcNow.DayOfWeek,
-                    OffsetInMinutes = utcNow.MinutesFromMidnight(),
-                    DurationInMinutes = 2 * 60
+                    OffsetInMinutes = 0 * 60,
+                    DurationInMinutes = 23 * 60 + 59
                 }
             },
             OrderOpeningTimes = new List<dynamic>
@@ -63,14 +62,14 @@ public class RestaurantsControllerITest : ControllerITestBase
                 new
                 {
                     utcNow.AddDays(-1).DayOfWeek,
-                    OffsetInMinutes = utcNow.MinutesFromMidnight(),
-                    DurationInMinutes = 2 * 60
+                    OffsetInMinutes = 0 * 60,
+                    DurationInMinutes = 23 * 60 + 59
                 },
                 new
                 {
                     utcNow.DayOfWeek,
-                    OffsetInMinutes = utcNow.MinutesFromMidnight(),
-                    DurationInMinutes = 2 * 60
+                    OffsetInMinutes = 0 * 60,
+                    DurationInMinutes = 23 * 60 + 59
                 }
             }
         };
@@ -111,14 +110,14 @@ public class RestaurantsControllerITest : ControllerITestBase
                 new
                 {
                     utcNow.AddDays(-1).DayOfWeek,
-                    OffsetInMinutes = utcNow.MinutesFromMidnight(),
-                    DurationInMinutes = 2 * 60
+                    OffsetInMinutes = 0 * 60,
+                    DurationInMinutes = 23 * 60 + 59
                 },
                 new
                 {
                     utcNow.DayOfWeek,
-                    OffsetInMinutes = utcNow.MinutesFromMidnight(),
-                    DurationInMinutes = 2 * 60
+                    OffsetInMinutes = 0 * 60,
+                    DurationInMinutes = 23 * 60 + 59
                 }
             },
             OrderOpeningTimes = new List<dynamic>
@@ -126,14 +125,14 @@ public class RestaurantsControllerITest : ControllerITestBase
                 new
                 {
                     utcNow.AddDays(-1).DayOfWeek,
-                    OffsetInMinutes = utcNow.MinutesFromMidnight(),
-                    DurationInMinutes = 2 * 60
+                    OffsetInMinutes = 0 * 60,
+                    DurationInMinutes = 23 * 60 + 59
                 },
                 new
                 {
                     utcNow.DayOfWeek,
-                    OffsetInMinutes = utcNow.MinutesFromMidnight(),
-                    DurationInMinutes = 2 * 60
+                    OffsetInMinutes = 0 * 60,
+                    DurationInMinutes = 23 * 60 + 59
                 }
             }
         };

@@ -1,6 +1,5 @@
 using YLunchApi.Domain.CommonAggregate.Models;
 using YLunchApi.Domain.Core.Utils;
-using YLunchApi.Helpers.Extensions;
 
 namespace YLunchApi.Domain.RestaurantAggregate.Models;
 
@@ -17,7 +16,7 @@ public abstract class OpeningTime : Entity
     {
         var dateTimeMinutesFromFirstDayOfWeek =
             (dateTime.DayOfWeek < DayOfWeek ? 7 : 0 + (int)dateTime.DayOfWeek) * 24 * 60 +
-            dateTime.MinutesFromMidnight();
+            dateTime.Hour * 60 + dateTime.Minute;
 
 
         return dateTimeMinutesFromFirstDayOfWeek >= OpeningTimeUtils.StartMinutesFromFirstDayOfWeek(this) &&
