@@ -8,10 +8,8 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Mapster;
 using Xunit;
-using YLunchApi.Domain.CommonAggregate.Dto;
 using YLunchApi.Domain.Core.Utils;
 using YLunchApi.Domain.RestaurantAggregate.Dto;
-using YLunchApi.Helpers.Extensions;
 using YLunchApi.IntegrationTests.Core.Extensions;
 using YLunchApi.IntegrationTests.Core.Utils;
 using YLunchApi.TestsShared;
@@ -22,23 +20,25 @@ namespace YLunchApi.IntegrationTests.Controllers;
 [Collection("Sequential")]
 public class RestaurantsControllerITest : ControllerITestBase
 {
-    private async Task<RestaurantReadDto> CreateRestaurant()
+    #region Utils
+
+    private async Task<RestaurantReadDto> CreateFullRestaurant(string? name = null)
     {
         var authenticatedUserInfo = await Authenticate(UserMocks.RestaurantAdminCreateDto);
         Client.SetAuthorizationHeader(authenticatedUserInfo.AccessToken);
         var utcNow = DateTime.UtcNow;
         var body = new
         {
-            RestaurantMocks.RestaurantCreateDto.Name,
-            RestaurantMocks.RestaurantCreateDto.Email,
-            RestaurantMocks.RestaurantCreateDto.PhoneNumber,
-            RestaurantMocks.RestaurantCreateDto.Country,
-            RestaurantMocks.RestaurantCreateDto.City,
-            RestaurantMocks.RestaurantCreateDto.ZipCode,
-            RestaurantMocks.RestaurantCreateDto.StreetName,
-            RestaurantMocks.RestaurantCreateDto.StreetNumber,
-            RestaurantMocks.RestaurantCreateDto.IsOpen,
-            RestaurantMocks.RestaurantCreateDto.IsPublic,
+            Name = name ?? RestaurantMocks.SimpleRestaurantCreateDto.Name,
+            RestaurantMocks.SimpleRestaurantCreateDto.Email,
+            RestaurantMocks.SimpleRestaurantCreateDto.PhoneNumber,
+            RestaurantMocks.SimpleRestaurantCreateDto.Country,
+            RestaurantMocks.SimpleRestaurantCreateDto.City,
+            RestaurantMocks.SimpleRestaurantCreateDto.ZipCode,
+            RestaurantMocks.SimpleRestaurantCreateDto.StreetName,
+            RestaurantMocks.SimpleRestaurantCreateDto.StreetNumber,
+            RestaurantMocks.SimpleRestaurantCreateDto.IsOpen,
+            RestaurantMocks.SimpleRestaurantCreateDto.IsPublic,
             ClosingDates = new List<dynamic>
             {
                 new { ClosingDateTime = DateTime.Parse("2021-12-31") },
@@ -49,14 +49,14 @@ public class RestaurantsControllerITest : ControllerITestBase
                 new
                 {
                     utcNow.AddDays(-1).DayOfWeek,
-                    OffsetInMinutes = utcNow.MinutesFromMidnight(),
-                    DurationInMinutes = 2 * 60
+                    OffsetInMinutes = 0 * 60,
+                    DurationInMinutes = 23 * 60 + 59
                 },
                 new
                 {
                     utcNow.DayOfWeek,
-                    OffsetInMinutes = utcNow.MinutesFromMidnight(),
-                    DurationInMinutes = 2 * 60
+                    OffsetInMinutes = 0 * 60,
+                    DurationInMinutes = 23 * 60 + 59
                 }
             },
             OrderOpeningTimes = new List<dynamic>
@@ -64,14 +64,14 @@ public class RestaurantsControllerITest : ControllerITestBase
                 new
                 {
                     utcNow.AddDays(-1).DayOfWeek,
-                    OffsetInMinutes = utcNow.MinutesFromMidnight(),
-                    DurationInMinutes = 2 * 60
+                    OffsetInMinutes = 0 * 60,
+                    DurationInMinutes = 23 * 60 + 59
                 },
                 new
                 {
                     utcNow.DayOfWeek,
-                    OffsetInMinutes = utcNow.MinutesFromMidnight(),
-                    DurationInMinutes = 2 * 60
+                    OffsetInMinutes = 0 * 60,
+                    DurationInMinutes = 23 * 60 + 59
                 }
             }
         };
@@ -80,6 +80,17 @@ public class RestaurantsControllerITest : ControllerITestBase
         restaurantCreationResponse.StatusCode.Should().Be(HttpStatusCode.Created);
         return await ResponseUtils.DeserializeContentAsync<RestaurantReadDto>(restaurantCreationResponse);
     }
+
+    private async Task<RestaurantReadDto> CreateSimpleRestaurant(RestaurantCreateDto restaurantCreateDto)
+    {
+        var authenticatedUserInfo = await Authenticate(UserMocks.RestaurantAdminCreateDto);
+        Client.SetAuthorizationHeader(authenticatedUserInfo.AccessToken);
+        var restaurantCreationResponse = await Client.PostAsJsonAsync("restaurants", restaurantCreateDto);
+        restaurantCreationResponse.StatusCode.Should().Be(HttpStatusCode.Created);
+        return await ResponseUtils.DeserializeContentAsync<RestaurantReadDto>(restaurantCreationResponse);
+    }
+
+    #endregion
 
     #region CreateRestaurant_Tests
 
@@ -92,16 +103,16 @@ public class RestaurantsControllerITest : ControllerITestBase
         var utcNow = DateTime.UtcNow;
         var body = new
         {
-            RestaurantMocks.RestaurantCreateDto.Name,
-            RestaurantMocks.RestaurantCreateDto.Email,
-            RestaurantMocks.RestaurantCreateDto.PhoneNumber,
-            RestaurantMocks.RestaurantCreateDto.Country,
-            RestaurantMocks.RestaurantCreateDto.City,
-            RestaurantMocks.RestaurantCreateDto.ZipCode,
-            RestaurantMocks.RestaurantCreateDto.StreetName,
-            RestaurantMocks.RestaurantCreateDto.StreetNumber,
-            RestaurantMocks.RestaurantCreateDto.IsOpen,
-            RestaurantMocks.RestaurantCreateDto.IsPublic,
+            RestaurantMocks.SimpleRestaurantCreateDto.Name,
+            RestaurantMocks.SimpleRestaurantCreateDto.Email,
+            RestaurantMocks.SimpleRestaurantCreateDto.PhoneNumber,
+            RestaurantMocks.SimpleRestaurantCreateDto.Country,
+            RestaurantMocks.SimpleRestaurantCreateDto.City,
+            RestaurantMocks.SimpleRestaurantCreateDto.ZipCode,
+            RestaurantMocks.SimpleRestaurantCreateDto.StreetName,
+            RestaurantMocks.SimpleRestaurantCreateDto.StreetNumber,
+            RestaurantMocks.SimpleRestaurantCreateDto.IsOpen,
+            RestaurantMocks.SimpleRestaurantCreateDto.IsPublic,
             ClosingDates = new List<dynamic>
             {
                 new { ClosingDateTime = DateTime.Parse("2021-12-31") },
@@ -112,14 +123,14 @@ public class RestaurantsControllerITest : ControllerITestBase
                 new
                 {
                     utcNow.AddDays(-1).DayOfWeek,
-                    OffsetInMinutes = utcNow.MinutesFromMidnight(),
-                    DurationInMinutes = 2 * 60
+                    OffsetInMinutes = 0 * 60,
+                    DurationInMinutes = 23 * 60 + 59
                 },
                 new
                 {
                     utcNow.DayOfWeek,
-                    OffsetInMinutes = utcNow.MinutesFromMidnight(),
-                    DurationInMinutes = 2 * 60
+                    OffsetInMinutes = 0 * 60,
+                    DurationInMinutes = 23 * 60 + 59
                 }
             },
             OrderOpeningTimes = new List<dynamic>
@@ -127,14 +138,14 @@ public class RestaurantsControllerITest : ControllerITestBase
                 new
                 {
                     utcNow.AddDays(-1).DayOfWeek,
-                    OffsetInMinutes = utcNow.MinutesFromMidnight(),
-                    DurationInMinutes = 2 * 60
+                    OffsetInMinutes = 0 * 60,
+                    DurationInMinutes = 23 * 60 + 59
                 },
                 new
                 {
                     utcNow.DayOfWeek,
-                    OffsetInMinutes = utcNow.MinutesFromMidnight(),
-                    DurationInMinutes = 2 * 60
+                    OffsetInMinutes = 0 * 60,
+                    DurationInMinutes = 23 * 60 + 59
                 }
             }
         };
@@ -244,16 +255,16 @@ public class RestaurantsControllerITest : ControllerITestBase
         Client.SetAuthorizationHeader(authenticatedUserInfo.AccessToken);
         var body = new
         {
-            RestaurantMocks.RestaurantCreateDto.Name,
+            RestaurantMocks.SimpleRestaurantCreateDto.Name,
             Email = "bad email",
             PhoneNumber = "bad phone",
-            RestaurantMocks.RestaurantCreateDto.Country,
-            RestaurantMocks.RestaurantCreateDto.City,
+            RestaurantMocks.SimpleRestaurantCreateDto.Country,
+            RestaurantMocks.SimpleRestaurantCreateDto.City,
             ZipCode = "bad zipcode",
-            RestaurantMocks.RestaurantCreateDto.StreetName,
-            RestaurantMocks.RestaurantCreateDto.StreetNumber,
-            RestaurantMocks.RestaurantCreateDto.IsOpen,
-            RestaurantMocks.RestaurantCreateDto.IsPublic,
+            RestaurantMocks.SimpleRestaurantCreateDto.StreetName,
+            RestaurantMocks.SimpleRestaurantCreateDto.StreetNumber,
+            RestaurantMocks.SimpleRestaurantCreateDto.IsOpen,
+            RestaurantMocks.SimpleRestaurantCreateDto.IsPublic,
             ClosingDates = new List<dynamic>
             {
                 new { }
@@ -315,16 +326,16 @@ public class RestaurantsControllerITest : ControllerITestBase
         Client.SetAuthorizationHeader(authenticatedUserInfo.AccessToken);
         var body = new
         {
-            RestaurantMocks.RestaurantCreateDto.Name,
-            RestaurantMocks.RestaurantCreateDto.Email,
-            RestaurantMocks.RestaurantCreateDto.PhoneNumber,
-            RestaurantMocks.RestaurantCreateDto.Country,
-            RestaurantMocks.RestaurantCreateDto.City,
-            RestaurantMocks.RestaurantCreateDto.ZipCode,
-            RestaurantMocks.RestaurantCreateDto.StreetName,
-            RestaurantMocks.RestaurantCreateDto.StreetNumber,
-            RestaurantMocks.RestaurantCreateDto.IsOpen,
-            RestaurantMocks.RestaurantCreateDto.IsPublic,
+            RestaurantMocks.SimpleRestaurantCreateDto.Name,
+            RestaurantMocks.SimpleRestaurantCreateDto.Email,
+            RestaurantMocks.SimpleRestaurantCreateDto.PhoneNumber,
+            RestaurantMocks.SimpleRestaurantCreateDto.Country,
+            RestaurantMocks.SimpleRestaurantCreateDto.City,
+            RestaurantMocks.SimpleRestaurantCreateDto.ZipCode,
+            RestaurantMocks.SimpleRestaurantCreateDto.StreetName,
+            RestaurantMocks.SimpleRestaurantCreateDto.StreetNumber,
+            RestaurantMocks.SimpleRestaurantCreateDto.IsOpen,
+            RestaurantMocks.SimpleRestaurantCreateDto.IsPublic,
             PlaceOpeningTimes = new List<dynamic>
             {
                 new
@@ -379,16 +390,16 @@ public class RestaurantsControllerITest : ControllerITestBase
         // Arrange
         var body = new
         {
-            RestaurantMocks.RestaurantCreateDto.Name,
-            RestaurantMocks.RestaurantCreateDto.Email,
-            RestaurantMocks.RestaurantCreateDto.PhoneNumber,
-            RestaurantMocks.RestaurantCreateDto.Country,
-            RestaurantMocks.RestaurantCreateDto.City,
-            RestaurantMocks.RestaurantCreateDto.ZipCode,
-            RestaurantMocks.RestaurantCreateDto.StreetName,
-            RestaurantMocks.RestaurantCreateDto.StreetNumber,
-            RestaurantMocks.RestaurantCreateDto.IsOpen,
-            RestaurantMocks.RestaurantCreateDto.IsPublic,
+            RestaurantMocks.SimpleRestaurantCreateDto.Name,
+            RestaurantMocks.SimpleRestaurantCreateDto.Email,
+            RestaurantMocks.SimpleRestaurantCreateDto.PhoneNumber,
+            RestaurantMocks.SimpleRestaurantCreateDto.Country,
+            RestaurantMocks.SimpleRestaurantCreateDto.City,
+            RestaurantMocks.SimpleRestaurantCreateDto.ZipCode,
+            RestaurantMocks.SimpleRestaurantCreateDto.StreetName,
+            RestaurantMocks.SimpleRestaurantCreateDto.StreetNumber,
+            RestaurantMocks.SimpleRestaurantCreateDto.IsOpen,
+            RestaurantMocks.SimpleRestaurantCreateDto.IsPublic,
             ClosingDates = new List<ClosingDateCreateDto>
             {
                 new() { ClosingDateTime = DateTime.Parse("2021-12-25") }
@@ -428,16 +439,16 @@ public class RestaurantsControllerITest : ControllerITestBase
         Client.SetAuthorizationHeader(authenticatedUserInfo.AccessToken);
         var body = new
         {
-            RestaurantMocks.RestaurantCreateDto.Name,
-            RestaurantMocks.RestaurantCreateDto.Email,
-            RestaurantMocks.RestaurantCreateDto.PhoneNumber,
-            RestaurantMocks.RestaurantCreateDto.Country,
-            RestaurantMocks.RestaurantCreateDto.City,
-            RestaurantMocks.RestaurantCreateDto.ZipCode,
-            RestaurantMocks.RestaurantCreateDto.StreetName,
-            RestaurantMocks.RestaurantCreateDto.StreetNumber,
-            RestaurantMocks.RestaurantCreateDto.IsOpen,
-            RestaurantMocks.RestaurantCreateDto.IsPublic,
+            RestaurantMocks.SimpleRestaurantCreateDto.Name,
+            RestaurantMocks.SimpleRestaurantCreateDto.Email,
+            RestaurantMocks.SimpleRestaurantCreateDto.PhoneNumber,
+            RestaurantMocks.SimpleRestaurantCreateDto.Country,
+            RestaurantMocks.SimpleRestaurantCreateDto.City,
+            RestaurantMocks.SimpleRestaurantCreateDto.ZipCode,
+            RestaurantMocks.SimpleRestaurantCreateDto.StreetName,
+            RestaurantMocks.SimpleRestaurantCreateDto.StreetNumber,
+            RestaurantMocks.SimpleRestaurantCreateDto.IsOpen,
+            RestaurantMocks.SimpleRestaurantCreateDto.IsPublic,
             ClosingDates = new List<ClosingDateCreateDto>
             {
                 new() { ClosingDateTime = DateTime.Parse("2021-12-25") }
@@ -477,7 +488,7 @@ public class RestaurantsControllerITest : ControllerITestBase
     public async Task GetRestaurantById_Should_Return_A_200Ok()
     {
         // Arrange
-        var restaurant = await CreateRestaurant();
+        var restaurant = await CreateFullRestaurant();
 
         // Act
         var response = await Client.GetAsync($"restaurants/{restaurant.Id}");
@@ -523,6 +534,514 @@ public class RestaurantsControllerITest : ControllerITestBase
         responseBody.IsCurrentlyOpenToOrder.Should().Be(true);
 
         responseBody.IsPublished.Should().Be(true);
+    }
+
+    #endregion
+
+    #region GetRestaurants_Tests
+
+    [Fact]
+    public async Task GetRestaurants_Should_Return_A_200Ok_Containing_Restaurants()
+    {
+        // Arrange
+        var restaurantCreateDto1 = RestaurantMocks.SimpleRestaurantCreateDto;
+        restaurantCreateDto1.Name = "restaurant1";
+        var restaurant1 = await CreateSimpleRestaurant(restaurantCreateDto1);
+
+        var restaurant2 = await CreateFullRestaurant("restaurant2");
+
+        var restaurantCreateDto3 = RestaurantMocks.SimpleRestaurantCreateDto;
+        restaurantCreateDto3.Name = "restaurant3";
+        var restaurant3 = await CreateSimpleRestaurant(restaurantCreateDto3);
+
+        var restaurant4 = await CreateFullRestaurant("restaurant4");
+
+        var restaurantCreateDto5 = RestaurantMocks.SimpleRestaurantCreateDto;
+        restaurantCreateDto5.Name = "restaurant5";
+        var restaurant5 = await CreateSimpleRestaurant(restaurantCreateDto5);
+
+        var restaurant6 = await CreateFullRestaurant("restaurant6");
+
+        var restaurant7 = await CreateFullRestaurant("restaurant7");
+
+        var expectedRestaurants = new List<RestaurantReadDto>
+        {
+            restaurant1,
+            restaurant2,
+            restaurant3,
+            restaurant4,
+            restaurant5,
+            restaurant6,
+            restaurant7
+        };
+
+        // Act
+        var response = await Client.GetAsync("restaurants");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var responseBody = await ResponseUtils.DeserializeContentAsync<List<RestaurantReadDto>>(response);
+        responseBody.Count.Should().Be(expectedRestaurants.Count);
+
+        for (var i = 0; i < responseBody.Count; i++)
+        {
+            var actualRestaurant = responseBody[i];
+            var expectedRestaurant = expectedRestaurants[i];
+
+            actualRestaurant.Id.Should().Be(expectedRestaurant.Id);
+            actualRestaurant.AdminId.Should().Be(expectedRestaurant.AdminId);
+            actualRestaurant.Email.Should().Be(expectedRestaurant.Email);
+            actualRestaurant.PhoneNumber.Should().Be(expectedRestaurant.PhoneNumber);
+            actualRestaurant.CreationDateTime.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
+            actualRestaurant.Name.Should().Be(expectedRestaurant.Name);
+            actualRestaurant.City.Should().Be(expectedRestaurant.City);
+            actualRestaurant.Country.Should().Be(expectedRestaurant.Country);
+            actualRestaurant.ZipCode.Should().Be(expectedRestaurant.ZipCode);
+            actualRestaurant.StreetName.Should().Be(expectedRestaurant.StreetName);
+            actualRestaurant.StreetNumber.Should().Be(expectedRestaurant.StreetNumber);
+            actualRestaurant.AddressExtraInformation.Should().Be(expectedRestaurant.AddressExtraInformation);
+            actualRestaurant.IsOpen.Should().Be(expectedRestaurant.IsOpen);
+            actualRestaurant.IsPublic.Should().Be(expectedRestaurant.IsPublic);
+            actualRestaurant.Base64Logo.Should().Be(expectedRestaurant.Base64Logo);
+            actualRestaurant.Base64Image.Should().Be(expectedRestaurant.Base64Image);
+            actualRestaurant.PlaceOpeningTimes.Should().BeEquivalentTo(expectedRestaurant.PlaceOpeningTimes);
+            actualRestaurant.PlaceOpeningTimes
+                            .Aggregate(true, (acc, x) => acc && x.RestaurantId == expectedRestaurant.Id)
+                            .Should()
+                            .BeTrue();
+            actualRestaurant.PlaceOpeningTimes
+                            .Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
+                            .Should().BeTrue();
+            actualRestaurant.IsCurrentlyOpenInPlace.Should().Be(expectedRestaurant.IsCurrentlyOpenInPlace);
+            actualRestaurant.OrderOpeningTimes.Should().BeEquivalentTo(expectedRestaurant.OrderOpeningTimes);
+            actualRestaurant.OrderOpeningTimes
+                            .Aggregate(true, (acc, x) => acc && x.RestaurantId == expectedRestaurant.Id)
+                            .Should()
+                            .BeTrue();
+            actualRestaurant.OrderOpeningTimes
+                            .Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
+                            .Should().BeTrue();
+            actualRestaurant.IsCurrentlyOpenToOrder.Should().Be(expectedRestaurant.IsCurrentlyOpenToOrder);
+            actualRestaurant.IsPublished.Should().Be(expectedRestaurant.IsPublished);
+            actualRestaurant.LastUpdateDateTime.Should().BeNull();
+            actualRestaurant.EmailConfirmationDateTime.Should().BeNull();
+            actualRestaurant.IsEmailConfirmed.Should().Be(false);
+        }
+    }
+
+    [Fact]
+    public async Task GetRestaurants_Should_Return_A_200Ok_Containing_Paginated_Restaurants()
+    {
+        // Arrange
+        var restaurantCreateDto1 = RestaurantMocks.SimpleRestaurantCreateDto;
+        restaurantCreateDto1.Name = "restaurant1";
+        await CreateSimpleRestaurant(restaurantCreateDto1);
+
+        await CreateFullRestaurant("restaurant2");
+
+        var restaurantCreateDto3 = RestaurantMocks.SimpleRestaurantCreateDto;
+        restaurantCreateDto3.Name = "restaurant3";
+        await CreateSimpleRestaurant(restaurantCreateDto3);
+
+        var restaurant4 = await CreateFullRestaurant("restaurant4");
+
+        var restaurantCreateDto5 = RestaurantMocks.SimpleRestaurantCreateDto;
+        restaurantCreateDto5.Name = "restaurant5";
+        var restaurant5 = await CreateSimpleRestaurant(restaurantCreateDto5);
+
+        var restaurant6 = await CreateFullRestaurant("restaurant6");
+
+        await CreateFullRestaurant("restaurant7");
+
+        var expectedRestaurants = new List<RestaurantReadDto>
+        {
+            restaurant4,
+            restaurant5,
+            restaurant6
+        };
+
+        // Act
+        var response = await Client.GetAsync("restaurants?page=2&size=3");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var responseBody = await ResponseUtils.DeserializeContentAsync<List<RestaurantReadDto>>(response);
+        responseBody.Count.Should().Be(expectedRestaurants.Count);
+
+        for (var i = 0; i < responseBody.Count; i++)
+        {
+            var actualRestaurant = responseBody[i];
+            var expectedRestaurant = expectedRestaurants[i];
+
+            actualRestaurant.Id.Should().Be(expectedRestaurant.Id);
+            actualRestaurant.AdminId.Should().Be(expectedRestaurant.AdminId);
+            actualRestaurant.Email.Should().Be(expectedRestaurant.Email);
+            actualRestaurant.PhoneNumber.Should().Be(expectedRestaurant.PhoneNumber);
+            actualRestaurant.CreationDateTime.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
+            actualRestaurant.Name.Should().Be(expectedRestaurant.Name);
+            actualRestaurant.City.Should().Be(expectedRestaurant.City);
+            actualRestaurant.Country.Should().Be(expectedRestaurant.Country);
+            actualRestaurant.ZipCode.Should().Be(expectedRestaurant.ZipCode);
+            actualRestaurant.StreetName.Should().Be(expectedRestaurant.StreetName);
+            actualRestaurant.StreetNumber.Should().Be(expectedRestaurant.StreetNumber);
+            actualRestaurant.AddressExtraInformation.Should().Be(expectedRestaurant.AddressExtraInformation);
+            actualRestaurant.IsOpen.Should().Be(expectedRestaurant.IsOpen);
+            actualRestaurant.IsPublic.Should().Be(expectedRestaurant.IsPublic);
+            actualRestaurant.Base64Logo.Should().Be(expectedRestaurant.Base64Logo);
+            actualRestaurant.Base64Image.Should().Be(expectedRestaurant.Base64Image);
+            actualRestaurant.PlaceOpeningTimes.Should().BeEquivalentTo(expectedRestaurant.PlaceOpeningTimes);
+            actualRestaurant.PlaceOpeningTimes
+                            .Aggregate(true, (acc, x) => acc && x.RestaurantId == expectedRestaurant.Id)
+                            .Should()
+                            .BeTrue();
+            actualRestaurant.PlaceOpeningTimes
+                            .Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
+                            .Should().BeTrue();
+            actualRestaurant.IsCurrentlyOpenInPlace.Should().Be(expectedRestaurant.IsCurrentlyOpenInPlace);
+            actualRestaurant.OrderOpeningTimes.Should().BeEquivalentTo(expectedRestaurant.OrderOpeningTimes);
+            actualRestaurant.OrderOpeningTimes
+                            .Aggregate(true, (acc, x) => acc && x.RestaurantId == expectedRestaurant.Id)
+                            .Should()
+                            .BeTrue();
+            actualRestaurant.OrderOpeningTimes
+                            .Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
+                            .Should().BeTrue();
+            actualRestaurant.IsCurrentlyOpenToOrder.Should().Be(expectedRestaurant.IsCurrentlyOpenToOrder);
+            actualRestaurant.IsPublished.Should().Be(expectedRestaurant.IsPublished);
+            actualRestaurant.LastUpdateDateTime.Should().BeNull();
+            actualRestaurant.EmailConfirmationDateTime.Should().BeNull();
+            actualRestaurant.IsEmailConfirmed.Should().Be(false);
+        }
+    }
+
+    [Fact]
+    public async Task GetRestaurants_Should_Return_A_200Ok_Containing_Restaurants_Which_Are_CurrentlyOpenToOrder()
+    {
+        // Arrange
+        var restaurantCreateDto1 = RestaurantMocks.SimpleRestaurantCreateDto;
+        restaurantCreateDto1.Name = "restaurant1";
+        await CreateSimpleRestaurant(restaurantCreateDto1);
+
+        var restaurant2 = await CreateFullRestaurant("restaurant2");
+
+        var restaurantCreateDto3 = RestaurantMocks.SimpleRestaurantCreateDto;
+        restaurantCreateDto3.Name = "restaurant3";
+        await CreateSimpleRestaurant(restaurantCreateDto3);
+
+        var restaurant4 = await CreateFullRestaurant("restaurant4");
+
+        var restaurantCreateDto5 = RestaurantMocks.SimpleRestaurantCreateDto;
+        restaurantCreateDto5.Name = "restaurant5";
+        await CreateSimpleRestaurant(restaurantCreateDto5);
+
+        var restaurant6 = await CreateFullRestaurant("restaurant6");
+
+        var restaurant7 = await CreateFullRestaurant("restaurant7");
+
+        var expectedRestaurants = new List<RestaurantReadDto>
+        {
+            restaurant2,
+            restaurant4,
+            restaurant6,
+            restaurant7
+        };
+
+        // Act
+        var response = await Client.GetAsync("restaurants?isCurrentlyOpenToOrder=true");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var responseBody = await ResponseUtils.DeserializeContentAsync<List<RestaurantReadDto>>(response);
+        responseBody.Count.Should().Be(expectedRestaurants.Count);
+
+        for (var i = 0; i < responseBody.Count; i++)
+        {
+            var actualRestaurant = responseBody[i];
+            var expectedRestaurant = expectedRestaurants[i];
+
+            actualRestaurant.Id.Should().MatchRegex(GuidUtils.Regex);
+            actualRestaurant.AdminId.Should().Be(expectedRestaurant.AdminId);
+            actualRestaurant.Email.Should().Be(expectedRestaurant.Email);
+            actualRestaurant.PhoneNumber.Should().Be(expectedRestaurant.PhoneNumber);
+            actualRestaurant.CreationDateTime.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
+            actualRestaurant.Name.Should().Be(expectedRestaurant.Name);
+            actualRestaurant.City.Should().Be(expectedRestaurant.City);
+            actualRestaurant.Country.Should().Be(expectedRestaurant.Country);
+            actualRestaurant.ZipCode.Should().Be(expectedRestaurant.ZipCode);
+            actualRestaurant.StreetName.Should().Be(expectedRestaurant.StreetName);
+            actualRestaurant.StreetNumber.Should().Be(expectedRestaurant.StreetNumber);
+            actualRestaurant.AddressExtraInformation.Should().Be(expectedRestaurant.AddressExtraInformation);
+            actualRestaurant.IsOpen.Should().Be(expectedRestaurant.IsOpen);
+            actualRestaurant.IsPublic.Should().Be(expectedRestaurant.IsPublic);
+            actualRestaurant.Base64Logo.Should().Be(expectedRestaurant.Base64Logo);
+            actualRestaurant.Base64Image.Should().Be(expectedRestaurant.Base64Image);
+            actualRestaurant.PlaceOpeningTimes.Should().BeEquivalentTo(expectedRestaurant.PlaceOpeningTimes);
+            actualRestaurant.PlaceOpeningTimes
+                            .Aggregate(true, (acc, x) => acc && x.RestaurantId == expectedRestaurant.Id)
+                            .Should()
+                            .BeTrue();
+            actualRestaurant.PlaceOpeningTimes
+                            .Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
+                            .Should().BeTrue();
+            actualRestaurant.IsCurrentlyOpenInPlace.Should().Be(true);
+            actualRestaurant.OrderOpeningTimes.Should().BeEquivalentTo(expectedRestaurant.OrderOpeningTimes);
+            actualRestaurant.OrderOpeningTimes
+                            .Aggregate(true, (acc, x) => acc && x.RestaurantId == expectedRestaurant.Id)
+                            .Should()
+                            .BeTrue();
+            actualRestaurant.OrderOpeningTimes
+                            .Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
+                            .Should().BeTrue();
+            actualRestaurant.IsCurrentlyOpenToOrder.Should().Be(true);
+            actualRestaurant.IsPublished.Should().Be(true);
+            actualRestaurant.LastUpdateDateTime.Should().BeNull();
+            actualRestaurant.EmailConfirmationDateTime.Should().BeNull();
+            actualRestaurant.IsEmailConfirmed.Should().Be(false);
+        }
+    }
+
+    [Fact]
+    public async Task GetRestaurants_Should_Return_A_200Ok_Containing_Restaurants_Which_Are_Not_CurrentlyOpenToOrder()
+    {
+        // Arrange
+        var restaurantCreateDto1 = RestaurantMocks.SimpleRestaurantCreateDto;
+        restaurantCreateDto1.Name = "restaurant1";
+        var restaurant1 = await CreateSimpleRestaurant(restaurantCreateDto1);
+
+        await CreateFullRestaurant("restaurant2");
+
+        var restaurantCreateDto3 = RestaurantMocks.SimpleRestaurantCreateDto;
+        restaurantCreateDto3.Name = "restaurant3";
+        var restaurant3 = await CreateSimpleRestaurant(restaurantCreateDto3);
+
+        await CreateFullRestaurant("restaurant4");
+
+        var restaurantCreateDto5 = RestaurantMocks.SimpleRestaurantCreateDto;
+        restaurantCreateDto5.Name = "restaurant5";
+        var restaurant5 = await CreateSimpleRestaurant(restaurantCreateDto5);
+
+        await CreateFullRestaurant("restaurant6");
+
+        await CreateFullRestaurant("restaurant7");
+
+        var expectedRestaurants = new List<RestaurantReadDto>
+        {
+            restaurant1,
+            restaurant3,
+            restaurant5
+        };
+
+        // Act
+        var response = await Client.GetAsync("restaurants?isCurrentlyOpenToOrder=false");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var responseBody = await ResponseUtils.DeserializeContentAsync<List<RestaurantReadDto>>(response);
+        responseBody.Count.Should().Be(3);
+
+        for (var i = 0; i < responseBody.Count; i++)
+        {
+            var actualRestaurant = responseBody[i];
+            var expectedRestaurant = expectedRestaurants[i];
+
+            actualRestaurant.Id.Should().MatchRegex(GuidUtils.Regex);
+            actualRestaurant.AdminId.Should().Be(expectedRestaurant.AdminId);
+            actualRestaurant.Email.Should().Be(expectedRestaurant.Email);
+            actualRestaurant.PhoneNumber.Should().Be(expectedRestaurant.PhoneNumber);
+            actualRestaurant.CreationDateTime.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
+            actualRestaurant.Name.Should().Be(expectedRestaurant.Name);
+            actualRestaurant.City.Should().Be(expectedRestaurant.City);
+            actualRestaurant.Country.Should().Be(expectedRestaurant.Country);
+            actualRestaurant.ZipCode.Should().Be(expectedRestaurant.ZipCode);
+            actualRestaurant.StreetName.Should().Be(expectedRestaurant.StreetName);
+            actualRestaurant.StreetNumber.Should().Be(expectedRestaurant.StreetNumber);
+            actualRestaurant.AddressExtraInformation.Should().Be(expectedRestaurant.AddressExtraInformation);
+            actualRestaurant.IsOpen.Should().Be(expectedRestaurant.IsOpen);
+            actualRestaurant.IsPublic.Should().Be(expectedRestaurant.IsPublic);
+            actualRestaurant.Base64Logo.Should().Be(expectedRestaurant.Base64Logo);
+            actualRestaurant.Base64Image.Should().Be(expectedRestaurant.Base64Image);
+            actualRestaurant.OrderOpeningTimes.Should().BeEmpty();
+            actualRestaurant.IsCurrentlyOpenToOrder.Should().Be(false);
+            actualRestaurant.IsPublished.Should().Be(false);
+            actualRestaurant.LastUpdateDateTime.Should().BeNull();
+            actualRestaurant.EmailConfirmationDateTime.Should().BeNull();
+            actualRestaurant.IsEmailConfirmed.Should().Be(false);
+        }
+    }
+
+    [Fact]
+    public async Task GetRestaurants_Should_Return_A_200Ok_Containing_Published_Restaurants()
+    {
+        // Arrange
+        var restaurantCreateDto1 = RestaurantMocks.SimpleRestaurantCreateDto;
+        restaurantCreateDto1.Name = "restaurant1";
+        await CreateSimpleRestaurant(restaurantCreateDto1);
+
+        var restaurant2 = await CreateFullRestaurant("restaurant2");
+
+        var restaurantCreateDto3 = RestaurantMocks.SimpleRestaurantCreateDto;
+        restaurantCreateDto3.Name = "restaurant3";
+        await CreateSimpleRestaurant(restaurantCreateDto3);
+
+        var restaurant4 = await CreateFullRestaurant("restaurant4");
+
+        var restaurantCreateDto5 = RestaurantMocks.SimpleRestaurantCreateDto;
+        restaurantCreateDto5.Name = "restaurant5";
+        await CreateSimpleRestaurant(restaurantCreateDto5);
+
+        var restaurant6 = await CreateFullRestaurant("restaurant6");
+
+        var restaurant7 = await CreateFullRestaurant("restaurant7");
+
+        var expectedRestaurants = new List<RestaurantReadDto>
+        {
+            restaurant2,
+            restaurant4,
+            restaurant6,
+            restaurant7
+        };
+
+        // Act
+        var response = await Client.GetAsync("restaurants?isPublished=true");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var responseBody = await ResponseUtils.DeserializeContentAsync<List<RestaurantReadDto>>(response);
+        responseBody.Count.Should().Be(expectedRestaurants.Count);
+
+        for (var i = 0; i < responseBody.Count; i++)
+        {
+            var actualRestaurant = responseBody[i];
+            var expectedRestaurant = expectedRestaurants[i];
+
+            actualRestaurant.Id.Should().MatchRegex(GuidUtils.Regex);
+            actualRestaurant.AdminId.Should().Be(expectedRestaurant.AdminId);
+            actualRestaurant.Email.Should().Be(expectedRestaurant.Email);
+            actualRestaurant.PhoneNumber.Should().Be(expectedRestaurant.PhoneNumber);
+            actualRestaurant.CreationDateTime.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
+            actualRestaurant.Name.Should().Be(expectedRestaurant.Name);
+            actualRestaurant.City.Should().Be(expectedRestaurant.City);
+            actualRestaurant.Country.Should().Be(expectedRestaurant.Country);
+            actualRestaurant.ZipCode.Should().Be(expectedRestaurant.ZipCode);
+            actualRestaurant.StreetName.Should().Be(expectedRestaurant.StreetName);
+            actualRestaurant.StreetNumber.Should().Be(expectedRestaurant.StreetNumber);
+            actualRestaurant.AddressExtraInformation.Should().Be(expectedRestaurant.AddressExtraInformation);
+            actualRestaurant.IsOpen.Should().Be(expectedRestaurant.IsOpen);
+            actualRestaurant.IsPublic.Should().Be(expectedRestaurant.IsPublic);
+            actualRestaurant.Base64Logo.Should().Be(expectedRestaurant.Base64Logo);
+            actualRestaurant.Base64Image.Should().Be(expectedRestaurant.Base64Image);
+            actualRestaurant.PlaceOpeningTimes.Should().BeEquivalentTo(expectedRestaurant.PlaceOpeningTimes);
+            actualRestaurant.PlaceOpeningTimes
+                            .Aggregate(true, (acc, x) => acc && x.RestaurantId == expectedRestaurant.Id)
+                            .Should()
+                            .BeTrue();
+            actualRestaurant.PlaceOpeningTimes
+                            .Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
+                            .Should().BeTrue();
+            actualRestaurant.IsCurrentlyOpenInPlace.Should().Be(true);
+            actualRestaurant.OrderOpeningTimes.Should().BeEquivalentTo(expectedRestaurant.OrderOpeningTimes);
+            actualRestaurant.OrderOpeningTimes
+                            .Aggregate(true, (acc, x) => acc && x.RestaurantId == expectedRestaurant.Id)
+                            .Should()
+                            .BeTrue();
+            actualRestaurant.OrderOpeningTimes
+                            .Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
+                            .Should().BeTrue();
+            actualRestaurant.IsCurrentlyOpenToOrder.Should().Be(true);
+            actualRestaurant.IsPublished.Should().Be(true);
+            actualRestaurant.LastUpdateDateTime.Should().BeNull();
+            actualRestaurant.EmailConfirmationDateTime.Should().BeNull();
+            actualRestaurant.IsEmailConfirmed.Should().Be(false);
+        }
+    }
+
+    [Fact]
+    public async Task GetRestaurants_Should_Return_A_200Ok_Containing_Not_Published_Restaurants()
+    {
+        // Arrange
+        var restaurantCreateDto1 = RestaurantMocks.SimpleRestaurantCreateDto;
+        restaurantCreateDto1.Name = "restaurant1";
+        var restaurant1 = await CreateSimpleRestaurant(restaurantCreateDto1);
+
+        await CreateFullRestaurant("restaurant2");
+
+        var restaurantCreateDto3 = RestaurantMocks.SimpleRestaurantCreateDto;
+        restaurantCreateDto3.Name = "restaurant3";
+        var restaurant3 = await CreateSimpleRestaurant(restaurantCreateDto3);
+
+        await CreateFullRestaurant("restaurant4");
+
+        var restaurantCreateDto5 = RestaurantMocks.SimpleRestaurantCreateDto;
+        restaurantCreateDto5.Name = "restaurant5";
+        var restaurant5 = await CreateSimpleRestaurant(restaurantCreateDto5);
+
+        await CreateFullRestaurant("restaurant6");
+
+        await CreateFullRestaurant("restaurant7");
+
+        var expectedRestaurants = new List<RestaurantReadDto>
+        {
+            restaurant1,
+            restaurant3,
+            restaurant5
+        };
+
+        // Act
+        var response = await Client.GetAsync("restaurants?isPublished=false");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var responseBody = await ResponseUtils.DeserializeContentAsync<List<RestaurantReadDto>>(response);
+        responseBody.Count.Should().Be(3);
+
+        for (var i = 0; i < responseBody.Count; i++)
+        {
+            var actualRestaurant = responseBody[i];
+            var expectedRestaurant = expectedRestaurants[i];
+
+            actualRestaurant.Id.Should().MatchRegex(GuidUtils.Regex);
+            actualRestaurant.AdminId.Should().Be(expectedRestaurant.AdminId);
+            actualRestaurant.Email.Should().Be(expectedRestaurant.Email);
+            actualRestaurant.PhoneNumber.Should().Be(expectedRestaurant.PhoneNumber);
+            actualRestaurant.CreationDateTime.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
+            actualRestaurant.Name.Should().Be(expectedRestaurant.Name);
+            actualRestaurant.City.Should().Be(expectedRestaurant.City);
+            actualRestaurant.Country.Should().Be(expectedRestaurant.Country);
+            actualRestaurant.ZipCode.Should().Be(expectedRestaurant.ZipCode);
+            actualRestaurant.StreetName.Should().Be(expectedRestaurant.StreetName);
+            actualRestaurant.StreetNumber.Should().Be(expectedRestaurant.StreetNumber);
+            actualRestaurant.AddressExtraInformation.Should().Be(expectedRestaurant.AddressExtraInformation);
+            actualRestaurant.IsOpen.Should().Be(expectedRestaurant.IsOpen);
+            actualRestaurant.IsPublic.Should().Be(expectedRestaurant.IsPublic);
+            actualRestaurant.Base64Logo.Should().Be(expectedRestaurant.Base64Logo);
+            actualRestaurant.Base64Image.Should().Be(expectedRestaurant.Base64Image);
+            actualRestaurant.OrderOpeningTimes.Should().BeEmpty();
+            actualRestaurant.IsCurrentlyOpenToOrder.Should().Be(false);
+            actualRestaurant.IsPublished.Should().Be(false);
+            actualRestaurant.LastUpdateDateTime.Should().BeNull();
+            actualRestaurant.EmailConfirmationDateTime.Should().BeNull();
+            actualRestaurant.IsEmailConfirmed.Should().Be(false);
+        }
+    }
+
+    [Fact]
+    public async Task GetRestaurants_Should_Return_A_400BadRequest_When_Invalid_Filter()
+    {
+        // Arrange
+        var authenticatedUserInfo = await Authenticate(UserMocks.RestaurantAdminCreateDto);
+        Client.SetAuthorizationHeader(authenticatedUserInfo.AccessToken);
+
+        // Act
+        var response = await Client.GetAsync("restaurants?page=0&size=31&isPublished=25&isCurrentlyOpenToOrder=abc");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        var responseBody = await ResponseUtils.DeserializeContentAsync(response);
+
+        responseBody.Should().Contain("Page must be an integer within 1 and 100000.");
+        responseBody.Should().Contain("Size must be an integer within 1 and 30.");
+        responseBody.Should().Contain("The value '25' is not valid for IsPublished.");
+        responseBody.Should().Contain("The value 'abc' is not valid for IsCurrentlyOpenToOrder.");
     }
 
     #endregion

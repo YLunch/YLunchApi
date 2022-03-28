@@ -543,6 +543,59 @@ paths:
                 statusCode: 409
                 errors:
                   reasons: ["Restaurant already exists."]
+    get:
+      tags:
+        - restaurants
+      summary: Gets restaurants
+      operationId: getRestaurants
+      parameters:
+        - in: query
+          name: page
+          required: false
+          description: The page you want within 1 and 10 000. Default 1.
+          schema:
+            type: number
+        - in: query
+          name: size
+          required: false
+          description: The size you want within 1 and 30. Default 30.
+          schema:
+            type: number
+        - in: query
+          name: isPublished
+          required: false
+          description: To filter the restaurants that are published or not. Default null to get both.
+          schema:
+            type: boolean
+        - in: query
+          name: isCurrentlyOpenToOrder
+          required: false
+          description: To filter the restaurants that are currently open to order or not. Default null to get both.
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: |
+            Success
+            - The restaurants
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RestaurantReadDto'
+        '400':
+          description: |
+            Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "BadRequest"
+                statusCode: 400
+                errors:
+                  reasons: ["Something went wrong, please try again later."]
   /restaurants/{restaurantId}:
     description: |
       - Authorization header: **yes**
@@ -812,8 +865,8 @@ components:
           type: boolean
           description: |
             Boolean to set manually if the restaurant is open or not:
-            - `False`: the restaurant will be set as closed regardless of closing dates and opening times
-            - `True`: the restaurant will be set as open regarding closing dates and opening times
+            - `False`: the restaurant will be set as closed regardless of closing dates and opening times.
+            - `True`: the restaurant will be set as open regarding closing dates and opening times.
           example: true
         isPublic:
           type: boolean
@@ -889,8 +942,8 @@ components:
           type: boolean
           description: |
             Boolean to set manually if the restaurant is open or not:
-            - `False`: the restaurant will be set as closed regardless of closing dates and opening times
-            - `True`: the restaurant will be set as open regarding closing dates and opening times
+            - `False`: the restaurant will be set as closed regardless of closing dates and opening times.
+            - `True`: the restaurant will be set as open regarding closing dates and opening times.
           example: true
         isPublic:
           type: boolean

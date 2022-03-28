@@ -4,7 +4,7 @@ namespace YLunchApi.TestsShared.Mocks;
 
 public static class RestaurantMocks
 {
-    public static RestaurantCreateDto RestaurantCreateDto => new()
+    public static RestaurantCreateDto SimpleRestaurantCreateDto => new()
     {
         Email = "admin@restaurant.com",
         PhoneNumber = "0612345678",

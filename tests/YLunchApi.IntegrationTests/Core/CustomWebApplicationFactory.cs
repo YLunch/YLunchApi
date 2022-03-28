@@ -25,10 +25,7 @@ public class CustomWebApplicationFactory<TStartup>
 
             services.Remove(dbContextDescriptor!);
 
-            services.AddDbContext<ApplicationDbContext>(options =>
-            {
-                options.UseInMemoryDatabase("YLunchDatabaseForIntegrationTests");
-            });
+            services.AddDbContext<ApplicationDbContext>(options => { options.UseInMemoryDatabase("YLunchDatabaseForIntegrationTests"); });
 
             var sp = services.BuildServiceProvider();
 

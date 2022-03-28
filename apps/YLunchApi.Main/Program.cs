@@ -15,6 +15,7 @@ using YLunchApi.Authentication.Repositories;
 using YLunchApi.Authentication.Services;
 using YLunchApi.AuthenticationShared.Repositories;
 using YLunchApi.Domain.CommonAggregate.Dto;
+using YLunchApi.Domain.CommonAggregate.Services;
 using YLunchApi.Domain.RestaurantAggregate.Services;
 using YLunchApi.Domain.UserAggregate.Models;
 using YLunchApi.Domain.UserAggregate.Services;
@@ -37,6 +38,8 @@ builder.Services.AddScoped<IRestaurantService, RestaurantService>();
 
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
+
+builder.Services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
