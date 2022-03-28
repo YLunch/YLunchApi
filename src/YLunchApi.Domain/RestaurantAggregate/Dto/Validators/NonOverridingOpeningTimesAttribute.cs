@@ -4,7 +4,7 @@ using YLunchApi.Domain.Core.Utils;
 namespace YLunchApi.Domain.RestaurantAggregate.Dto.Validators;
 
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
-public class NoOverridingOpeningTimesAttribute : ValidationAttribute
+public class NonOverridingOpeningTimesAttribute : ValidationAttribute
 {
     public override bool IsValid(object? value)
     {

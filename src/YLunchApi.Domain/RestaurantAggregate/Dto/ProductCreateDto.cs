@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using YLunchApi.Domain.RestaurantAggregate.Dto.Validators;
 using YLunchApi.Domain.RestaurantAggregate.Models.Enums;
 
 namespace YLunchApi.Domain.RestaurantAggregate.Dto;
@@ -7,12 +8,11 @@ public class ProductCreateDto
 {
     [Required] public string Name { get; set; } = null!;
     public string? Description { get; set; }
-    [Required] public double? Price { get; set; } = null!;
-    [Required] public bool? IsActive { get; set; } = null!;
-    [Required] public ProductType? ProductType { get; set; } = null!;
+    [Required] public double? Price { get; set; }
+    [Required] public bool? IsActive { get; set; }
+    [Required] public ProductType? ProductType { get; set; }
 
-    // Todo valid ExpirationDateTime is in future if present
-    public DateTime? ExpirationDateTime { get; set; }
+    [InFutureOrNull] public DateTime? ExpirationDateTime { get; set; }
     public string? Image { get; set; }
     public int? Quantity { get; set; }
 

@@ -7,9 +7,9 @@ using YLunchApi.Domain.RestaurantAggregate.Dto.Validators;
 
 namespace YLunchApi.UnitTests.Domain;
 
-public class NoOverridingOpeningTimesAttributeTest
+public class NonOverridingOpeningTimesAttributeTest
 {
-    private readonly NoOverridingOpeningTimesAttribute _attribute = new();
+    private readonly NonOverridingOpeningTimesAttribute _attribute = new();
 
     [Fact]
     public void Null_Should_Be_Invalid()
