@@ -11,7 +11,7 @@ public static class ProductMocks
         Description = "Tomate, Fromage, Olives",
         IsActive = true,
         Quantity = 3,
-        ExpirationDateTime = DateTimeMocks.Monday_21_03_2022T10_00UTC.AddDays(1),
+        ExpirationDateTime = DateTimeMocks.Monday20220321T1000Utc.AddDays(1),
         Allergens = new List<AllergenCreateDto>
         {
             new() { Name = "gluten" },
