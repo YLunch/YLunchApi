@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Net;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using YLunchApi.Domain.CommonAggregate.Dto;
 using YLunchApi.Domain.Exceptions;
 using YLunchApi.Domain.RestaurantAggregate.Dto;
 using YLunchApi.Domain.RestaurantAggregate.Services;
@@ -21,8 +23,7 @@ public class ProductsController : ApplicationControllerBase
 
     [HttpPost("Restaurants/{restaurantId}/products")]
     [Authorize(Roles = Roles.RestaurantAdmin)]
-    public async Task<ActionResult<ProductReadDto>> CreateProduct([FromBody] ProductCreateDto productCreateDto,
-        [FromRoute] string restaurantId)
+    public async Task<ActionResult<ProductReadDto>> CreateProduct([FromRoute] string restaurantId, [FromBody] ProductCreateDto productCreateDto)
     {
         try
         {
@@ -31,7 +32,21 @@ public class ProductsController : ApplicationControllerBase
         }
         catch (EntityAlreadyExistsException)
         {
-            return Conflict("Product already exists");
+            return Conflict(new ErrorDto(HttpStatusCode.Conflict, $"Product: {productCreateDto.Name} already exists"));
+        }
+    }
+
+    [HttpGet("products/{productId}")]
+    public async Task<ActionResult<ProductReadDto>> GetProductById([FromRoute] string productId)
+    {
+        try
+        {
+            var productReadDto = await _productService.GetById(productId);
+            return Ok(productReadDto);
+        }
+        catch (EntityNotFoundException)
+        {
+            return NotFound($"Product {productId} not found");
         }
     }
 }

@@ -30,6 +30,8 @@ public class RestaurantsControllerTest : UnitTestFixture
         _restaurantAdminInfo = new ApplicationSecurityToken(TokenMocks.ValidRestaurantAdminAccessToken);
     }
 
+    #region Utils
+
     private RestaurantsController InitRestaurantsController(DateTime? customDateTime = null)
     {
         var dateTimeProviderMock = new Mock<IDateTimeProvider>();
@@ -42,13 +44,72 @@ public class RestaurantsControllerTest : UnitTestFixture
         return Fixture.GetImplementationFromService<RestaurantsController>();
     }
 
+    private async Task<RestaurantReadDto> CreateRestaurant(string restaurantName, DateTime dateTime)
+    {
+        var restaurantsController = InitRestaurantsController(dateTime);
+        var restaurantCreateDto = RestaurantMocks.SimpleRestaurantCreateDto;
+        restaurantCreateDto.Name = restaurantName;
+
+        restaurantCreateDto.ClosingDates = new List<ClosingDateCreateDto>
+        {
+            new() { ClosingDateTime = dateTime.AddDays(-1) },
+            new() { ClosingDateTime = dateTime.AddDays(1) }
+        };
+
+        restaurantCreateDto.PlaceOpeningTimes = new List<OpeningTimeCreateDto>
+        {
+            new()
+            {
+                DayOfWeek = dateTime.AddDays(-1).DayOfWeek,
+                OffsetInMinutes = dateTime.Hour * 60 + dateTime.Minute,
+                DurationInMinutes = 2 * 60
+            },
+            new()
+            {
+                DayOfWeek = dateTime.DayOfWeek,
+                OffsetInMinutes = dateTime.Hour * 60 + dateTime.Minute,
+                DurationInMinutes = 2 * 60
+            }
+        };
+
+        restaurantCreateDto.OrderOpeningTimes = new List<OpeningTimeCreateDto>
+        {
+            new()
+            {
+                DayOfWeek = dateTime.AddDays(-1).DayOfWeek,
+                OffsetInMinutes = dateTime.Hour * 60 + dateTime.Minute,
+                DurationInMinutes = 2 * 60
+            },
+            new()
+            {
+                DayOfWeek = dateTime.DayOfWeek,
+                OffsetInMinutes = dateTime.Hour * 60 + dateTime.Minute,
+                DurationInMinutes = 2 * 60
+            }
+        };
+
+        var restaurantCreationResponse = await restaurantsController.CreateRestaurant(restaurantCreateDto);
+        var restaurantCreationResponseResult = Assert.IsType<CreatedResult>(restaurantCreationResponse.Result);
+        return Assert.IsType<RestaurantReadDto>(restaurantCreationResponseResult.Value);
+    }
+
+    private async Task<RestaurantReadDto> CreateRestaurant(RestaurantCreateDto restaurantCreateDto, DateTime dateTime)
+    {
+        var restaurantsController = InitRestaurantsController(dateTime);
+        var restaurantCreationResponse = await restaurantsController.CreateRestaurant(restaurantCreateDto);
+        var restaurantCreationResponseResult = Assert.IsType<CreatedResult>(restaurantCreationResponse.Result);
+        return Assert.IsType<RestaurantReadDto>(restaurantCreationResponseResult.Value);
+    }
+
+    #endregion
+
     #region CreateRestaurantTests
 
     [Fact]
     public async Task CreateRestaurant_Should_Return_A_201Created()
     {
         // Arrange
-        var dateTime = DateTime.Parse("2022-03-21T10:00");
+        var dateTime = DateTimeMocks.Monday_21_03_2022T10_00UTC;
         var restaurantsController = InitRestaurantsController(dateTime);
 
         var restaurantCreateDto = RestaurantMocks.SimpleRestaurantCreateDto;
@@ -162,7 +223,7 @@ public class RestaurantsControllerTest : UnitTestFixture
     public async Task GetRestaurantById_Should_Return_A_200Ok()
     {
         // Arrange
-        var dateTime = DateTime.Parse("2022-03-21T10:00");
+        var dateTime = DateTimeMocks.Monday_21_03_2022T10_00UTC;
         var restaurantsController = InitRestaurantsController(dateTime);
 
         var restaurantCreateDto = RestaurantMocks.SimpleRestaurantCreateDto;
@@ -531,7 +592,7 @@ public class RestaurantsControllerTest : UnitTestFixture
         GetRestaurantById_Should_Return_A_200Ok_Having_IsCurrentlyOpenInPlace_False_Because_Of_ClosingDates()
     {
         // Arrange
-        var dateTime = DateTime.Parse("2022-03-21T10:00");
+        var dateTime = DateTimeMocks.Monday_21_03_2022T10_00UTC;
         var restaurantsController = InitRestaurantsController(dateTime);
         var restaurantCreateDto = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurantCreateDto.ClosingDates = new List<ClosingDateCreateDto>
@@ -558,7 +619,7 @@ public class RestaurantsControllerTest : UnitTestFixture
         GetRestaurantById_Should_Return_A_200Ok_Having_IsCurrentlyOpenInPlace_False_Because_Of_Day_Out_Of_OpeningTimes_In_Place()
     {
         // Arrange
-        var dateTime = DateTime.Parse("2022-03-21T10:00");
+        var dateTime = DateTimeMocks.Monday_21_03_2022T10_00UTC;
         var restaurantsController = InitRestaurantsController(dateTime);
         var restaurantCreateDto = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurantCreateDto.PlaceOpeningTimes = new List<OpeningTimeCreateDto>
@@ -590,7 +651,7 @@ public class RestaurantsControllerTest : UnitTestFixture
         GetRestaurantById_Should_Return_A_200Ok_Having_IsCurrentlyOpenInPlace_False_Because_Of_Before_OpeningTimes_In_Place()
     {
         // Arrange
-        var dateTime = DateTime.Parse("2022-03-21T10:00");
+        var dateTime = DateTimeMocks.Monday_21_03_2022T10_00UTC;
         var restaurantsController = InitRestaurantsController(dateTime);
         var restaurantCreateDto = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurantCreateDto.PlaceOpeningTimes = new List<OpeningTimeCreateDto>
@@ -622,7 +683,7 @@ public class RestaurantsControllerTest : UnitTestFixture
         GetRestaurantById_Should_Return_A_200Ok_Having_IsCurrentlyOpenInPlace_False_Because_Of_After_OpeningTimes_In_Place()
     {
         // Arrange
-        var dateTime = DateTime.Parse("2022-03-21T10:00");
+        var dateTime = DateTimeMocks.Monday_21_03_2022T10_00UTC;
         var restaurantsController = InitRestaurantsController(dateTime);
         var restaurantCreateDto = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurantCreateDto.PlaceOpeningTimes = new List<OpeningTimeCreateDto>
@@ -654,7 +715,7 @@ public class RestaurantsControllerTest : UnitTestFixture
         GetRestaurantById_Should_Return_A_200Ok_Having_IsCurrentlyOpenInPlace_False_Because_Of_IsOpen_False()
     {
         // Arrange
-        var dateTime = DateTime.Parse("2022-03-21T10:00");
+        var dateTime = DateTimeMocks.Monday_21_03_2022T10_00UTC;
         var restaurantsController = InitRestaurantsController(dateTime);
         var restaurantCreateDto = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurantCreateDto.IsOpen = false;
@@ -690,7 +751,7 @@ public class RestaurantsControllerTest : UnitTestFixture
     public async Task GetRestaurantById_Should_Return_A_200Ok_Having_IsCurrentlyOpenToOrder_True_Even_Day_After()
     {
         // Arrange
-        var dateTime = DateTime.Parse("2022-03-21T10:00");
+        var dateTime = DateTimeMocks.Monday_21_03_2022T10_00UTC;
         var restaurantsController = InitRestaurantsController(dateTime);
         var restaurantCreateDto = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurantCreateDto.OrderOpeningTimes = new List<OpeningTimeCreateDto>
@@ -725,7 +786,7 @@ public class RestaurantsControllerTest : UnitTestFixture
         GetRestaurantById_Should_Return_A_200Ok_Having_IsCurrentlyOpenToOrder_False_Because_Of_ClosingDates()
     {
         // Arrange
-        var dateTime = DateTime.Parse("2022-03-21T10:00");
+        var dateTime = DateTimeMocks.Monday_21_03_2022T10_00UTC;
         var restaurantsController = InitRestaurantsController(dateTime);
         var restaurantCreateDto = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurantCreateDto.ClosingDates = new List<ClosingDateCreateDto>
@@ -752,7 +813,7 @@ public class RestaurantsControllerTest : UnitTestFixture
         GetRestaurantById_Should_Return_A_200Ok_Having_IsCurrentlyOpenToOrder_False_Because_Of_Day_Out_Of_OpeningTimes_To_Order()
     {
         // Arrange
-        var dateTime = DateTime.Parse("2022-03-21T10:00");
+        var dateTime = DateTimeMocks.Monday_21_03_2022T10_00UTC;
         var restaurantsController = InitRestaurantsController(dateTime);
         var restaurantCreateDto = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurantCreateDto.OrderOpeningTimes = new List<OpeningTimeCreateDto>
@@ -784,7 +845,7 @@ public class RestaurantsControllerTest : UnitTestFixture
         GetRestaurantById_Should_Return_A_200Ok_Having_IsCurrentlyOpenToOrder_False_Because_Of_Before_OpeningTimes_To_Order()
     {
         // Arrange
-        var dateTime = DateTime.Parse("2022-03-21T10:00");
+        var dateTime = DateTimeMocks.Monday_21_03_2022T10_00UTC;
         var restaurantsController = InitRestaurantsController(dateTime);
         var restaurantCreateDto = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurantCreateDto.OrderOpeningTimes = new List<OpeningTimeCreateDto>
@@ -816,7 +877,7 @@ public class RestaurantsControllerTest : UnitTestFixture
         GetRestaurantById_Should_Return_A_200Ok_Having_IsCurrentlyOpenToOrder_False_Because_Of_After_OpeningTimes_To_Order()
     {
         // Arrange
-        var dateTime = DateTime.Parse("2022-03-21T10:00");
+        var dateTime = DateTimeMocks.Monday_21_03_2022T10_00UTC;
         var restaurantsController = InitRestaurantsController(dateTime);
         var restaurantCreateDto = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurantCreateDto.OrderOpeningTimes = new List<OpeningTimeCreateDto>
@@ -848,7 +909,7 @@ public class RestaurantsControllerTest : UnitTestFixture
         GetRestaurantById_Should_Return_A_200Ok_Having_IsCurrentlyOpenToOrder_False_Because_Of_IsOpen_False()
     {
         // Arrange
-        var dateTime = DateTime.Parse("2022-03-21T10:00");
+        var dateTime = DateTimeMocks.Monday_21_03_2022T10_00UTC;
         var restaurantsController = InitRestaurantsController(dateTime);
         var restaurantCreateDto = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurantCreateDto.IsOpen = false;
@@ -878,14 +939,13 @@ public class RestaurantsControllerTest : UnitTestFixture
 
     #endregion
 
-
     #region GetRestaurantsTests
 
     [Fact]
     public async Task GetRestaurants_Should_Return_A_200Ok()
     {
         // Arrange
-        var dateTime = DateTime.Parse("2022-03-21T10:00");
+        var dateTime = DateTimeMocks.Monday_21_03_2022T10_00UTC;
         var restaurantsController = InitRestaurantsController(dateTime);
         var expectedRestaurants = new List<RestaurantReadDto>
         {
@@ -951,7 +1011,7 @@ public class RestaurantsControllerTest : UnitTestFixture
     public async Task GetRestaurants_With_Pagination_Should_Return_A_200Ok_With_Correct_Restaurants()
     {
         // Arrange
-        var dateTime = DateTime.Parse("2022-03-21T10:00");
+        var dateTime = DateTimeMocks.Monday_21_03_2022T10_00UTC;
         var restaurantsController = InitRestaurantsController(dateTime);
         await CreateRestaurant("restaurant1", dateTime);
         await CreateRestaurant("restaurant2", dateTime);
@@ -1029,7 +1089,7 @@ public class RestaurantsControllerTest : UnitTestFixture
         GetRestaurants_With_Filter_IsCurrentlyOpenToOrder_True_Should_Return_A_200Ok_With_Correct_Restaurants()
     {
         // Arrange
-        var dateTime = DateTime.Parse("2022-03-21T10:00");
+        var dateTime = DateTimeMocks.Monday_21_03_2022T10_00UTC;
         var restaurantsController = InitRestaurantsController(dateTime);
 
         var restaurant1 = RestaurantMocks.SimpleRestaurantCreateDto;
@@ -1123,7 +1183,7 @@ public class RestaurantsControllerTest : UnitTestFixture
         GetRestaurants_With_Filter_IsCurrentlyOpenToOrder_False_Should_Return_A_200Ok_With_Correct_Restaurants()
     {
         // Arrange
-        var dateTime = DateTime.Parse("2022-03-21T10:00");
+        var dateTime = DateTimeMocks.Monday_21_03_2022T10_00UTC;
         var restaurantsController = InitRestaurantsController(dateTime);
 
         var restaurantCreateDto1 = RestaurantMocks.SimpleRestaurantCreateDto;
@@ -1199,7 +1259,7 @@ public class RestaurantsControllerTest : UnitTestFixture
     public async Task GetRestaurants_With_Filter_IsPublished_True_Should_Return_A_200Ok_With_Correct_Restaurants()
     {
         // Arrange
-        var dateTime = DateTime.Parse("2022-03-21T10:00");
+        var dateTime = DateTimeMocks.Monday_21_03_2022T10_00UTC;
         var restaurantsController = InitRestaurantsController(dateTime);
 
         var restaurant1 = RestaurantMocks.SimpleRestaurantCreateDto;
@@ -1296,7 +1356,7 @@ public class RestaurantsControllerTest : UnitTestFixture
     public async Task GetRestaurants_With_Filter_IsPublished_False_Should_Return_A_200Ok_With_Correct_Restaurants()
     {
         // Arrange
-        var dateTime = DateTime.Parse("2022-03-21T10:00");
+        var dateTime = DateTimeMocks.Monday_21_03_2022T10_00UTC;
         var restaurantsController = InitRestaurantsController(dateTime);
 
         var restaurantCreateDto1 = RestaurantMocks.SimpleRestaurantCreateDto;
@@ -1370,61 +1430,4 @@ public class RestaurantsControllerTest : UnitTestFixture
     }
 
     #endregion
-
-    private async Task<RestaurantReadDto> CreateRestaurant(string restaurantName, DateTime dateTime)
-    {
-        var restaurantsController = InitRestaurantsController(dateTime);
-        var restaurantCreateDto = RestaurantMocks.SimpleRestaurantCreateDto;
-        restaurantCreateDto.Name = restaurantName;
-
-        restaurantCreateDto.ClosingDates = new List<ClosingDateCreateDto>
-        {
-            new() { ClosingDateTime = dateTime.AddDays(-1) },
-            new() { ClosingDateTime = dateTime.AddDays(1) }
-        };
-
-        restaurantCreateDto.PlaceOpeningTimes = new List<OpeningTimeCreateDto>
-        {
-            new()
-            {
-                DayOfWeek = dateTime.AddDays(-1).DayOfWeek,
-                OffsetInMinutes = dateTime.Hour * 60 + dateTime.Minute,
-                DurationInMinutes = 2 * 60
-            },
-            new()
-            {
-                DayOfWeek = dateTime.DayOfWeek,
-                OffsetInMinutes = dateTime.Hour * 60 + dateTime.Minute,
-                DurationInMinutes = 2 * 60
-            }
-        };
-
-        restaurantCreateDto.OrderOpeningTimes = new List<OpeningTimeCreateDto>
-        {
-            new()
-            {
-                DayOfWeek = dateTime.AddDays(-1).DayOfWeek,
-                OffsetInMinutes = dateTime.Hour * 60 + dateTime.Minute,
-                DurationInMinutes = 2 * 60
-            },
-            new()
-            {
-                DayOfWeek = dateTime.DayOfWeek,
-                OffsetInMinutes = dateTime.Hour * 60 + dateTime.Minute,
-                DurationInMinutes = 2 * 60
-            }
-        };
-
-        var restaurantCreationResponse = await restaurantsController.CreateRestaurant(restaurantCreateDto);
-        var restaurantCreationResponseResult = Assert.IsType<CreatedResult>(restaurantCreationResponse.Result);
-        return Assert.IsType<RestaurantReadDto>(restaurantCreationResponseResult.Value);
-    }
-
-    private async Task<RestaurantReadDto> CreateRestaurant(RestaurantCreateDto restaurantCreateDto, DateTime dateTime)
-    {
-        var restaurantsController = InitRestaurantsController(dateTime);
-        var restaurantCreationResponse = await restaurantsController.CreateRestaurant(restaurantCreateDto);
-        var restaurantCreationResponseResult = Assert.IsType<CreatedResult>(restaurantCreationResponse.Result);
-        return Assert.IsType<RestaurantReadDto>(restaurantCreationResponseResult.Value);
-    }
 }

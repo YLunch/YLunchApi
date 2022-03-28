@@ -62,16 +62,13 @@ public class RestaurantService : IRestaurantService
 
     public async Task<RestaurantReadDto> Create(RestaurantCreateDto restaurantCreateDto, string restaurantAdminId)
     {
-        var restaurantId = Guid.NewGuid().ToString();
-
         var restaurant = restaurantCreateDto.Adapt<Restaurant>();
-        restaurant.Id = restaurantId;
         restaurant.AdminId = restaurantAdminId;
         restaurant.CreationDateTime = _dateTimeProvider.UtcNow;
         restaurant.IsPublished = CanPublish(restaurant);
 
         await _restaurantRepository.Create(restaurant);
-        var restaurantDb = await _restaurantRepository.GetById(restaurantId);
+        var restaurantDb = await _restaurantRepository.GetById(restaurant.Id);
         return CreateRestaurantReadDto(restaurantDb);
     }
 

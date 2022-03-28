@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
-using YLunchApi.Application.ProductAggregate;
 using YLunchApi.Application.RestaurantAggregate;
 using YLunchApi.Application.UserAggregate;
 using YLunchApi.Authentication.Models;
@@ -38,6 +37,8 @@ builder.Services.AddScoped<IRestaurantService, RestaurantService>();
 
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
+
+builder.Services.AddScoped<IAllergenRepository, AllergenRepository>();
 
 builder.Services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 

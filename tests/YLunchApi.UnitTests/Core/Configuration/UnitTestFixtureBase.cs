@@ -41,6 +41,7 @@ public class UnitTestFixtureBase
         _serviceCollection.AddScoped<UsersController>();
         _serviceCollection.AddScoped<RestaurantsController>();
         _serviceCollection.AddScoped<AuthenticationController>();
+        _serviceCollection.AddScoped<ProductsController>();
 
         _serviceCollection.AddDbContext<ApplicationDbContext>(options =>
             options.UseInMemoryDatabase($"YLunchDatabaseForUnitTests-{DatabaseId}"));
@@ -60,6 +61,11 @@ public class UnitTestFixtureBase
 
         _serviceCollection.AddScoped<IRestaurantRepository, RestaurantRepository>();
         _serviceCollection.AddScoped<IRestaurantService, RestaurantService>();
+
+        _serviceCollection.AddScoped<IProductRepository, ProductRepository>();
+        _serviceCollection.AddScoped<IProductService, ProductService>();
+
+        _serviceCollection.AddScoped<IAllergenRepository, AllergenRepository>();
 
         _serviceCollection.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
@@ -147,6 +153,6 @@ public class UnitTestFixtureBase
     public T GetImplementationFromService<T>()
     {
         var service = _serviceProvider.GetService<T>();
-        return service ?? throw new InvalidOperationException();
+        return service ?? throw new InvalidOperationException($"Service of type {typeof(T)} could not be instantiated");
     }
 }
