@@ -1,4 +1,5 @@
 using YLunchApi.Domain.RestaurantAggregate.Dto;
+using YLunchApi.Domain.RestaurantAggregate.Models.Enums;
 
 namespace YLunchApi.TestsShared.Mocks;
 
@@ -8,9 +9,10 @@ public static class ProductMocks
     {
         Name = "Margherite",
         Price = 9.80,
-        Description = "Tomate, Fromage, Olives",
+        Description = "tomate, fromage",
         IsActive = true,
         Quantity = 3,
+        ProductType = ProductType.Main,
         ExpirationDateTime = DateTimeMocks.Monday20220321T1000Utc.AddDays(1),
         Allergens = new List<AllergenCreateDto>
         {

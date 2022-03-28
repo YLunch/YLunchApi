@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
@@ -8,12 +7,9 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
-using YLunchApi.Authentication.Models;
 using YLunchApi.Domain.CommonAggregate.Dto;
 using YLunchApi.Domain.CommonAggregate.Services;
-using YLunchApi.Domain.Core.Utils;
 using YLunchApi.Domain.RestaurantAggregate.Dto;
-using YLunchApi.Domain.RestaurantAggregate.Filters;
 using YLunchApi.Main.Controllers;
 using YLunchApi.TestsShared;
 using YLunchApi.TestsShared.Mocks;
@@ -23,12 +19,10 @@ namespace YLunchApi.UnitTests.Controllers;
 
 public class ProductsControllerTest : UnitTestFixture
 {
-    private readonly ApplicationSecurityToken _restaurantAdminInfo;
-    private RestaurantReadDto _restaurant;
+    private RestaurantReadDto _restaurant = null!;
 
     public ProductsControllerTest(UnitTestFixtureBase fixture) : base(fixture)
     {
-        _restaurantAdminInfo = new ApplicationSecurityToken(TokenMocks.ValidRestaurantAdminAccessToken);
     }
 
     #region Utils
@@ -81,6 +75,7 @@ public class ProductsControllerTest : UnitTestFixture
         responseBody.Description.Should().Be(productCreateDto.Description);
         responseBody.IsActive.Should().Be(true);
         responseBody.Quantity.Should().Be(productCreateDto.Quantity);
+        responseBody.ProductType.Should().Be(productCreateDto.ProductType);
         responseBody.CreationDateTime.Should().BeCloseTo(dateTime, TimeSpan.FromSeconds(5));
         responseBody.ExpirationDateTime.Should().BeCloseTo(dateTime.AddDays(1), TimeSpan.FromSeconds(5));
         responseBody.Allergens.Should().BeEquivalentTo(productCreateDto.Allergens)
@@ -136,6 +131,7 @@ public class ProductsControllerTest : UnitTestFixture
         responseBody.Description.Should().Be(productCreateDto.Description);
         responseBody.IsActive.Should().Be(true);
         responseBody.Quantity.Should().Be(productCreateDto.Quantity);
+        responseBody.ProductType.Should().Be(productCreateDto.ProductType);
         responseBody.CreationDateTime.Should().BeCloseTo(dateTime, TimeSpan.FromSeconds(5));
         responseBody.ExpirationDateTime.Should().BeCloseTo(dateTime.AddDays(1), TimeSpan.FromSeconds(5));
         responseBody.Allergens.Should().BeEquivalentTo(productCreationResponseBody.Allergens)
