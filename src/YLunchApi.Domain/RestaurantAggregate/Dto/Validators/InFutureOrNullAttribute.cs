@@ -14,16 +14,11 @@ public class InFutureOrNullAttribute : ValidationAttribute
             return ValidationResult.Success;
         }
 
-        if ((DateTime)value > dateTimeProvider!.UtcNow)
-        {
-            return ValidationResult.Success;
-        }
-
-        return new ValidationResult(FormatErrorMessage("DateTime"));
+        return (DateTime)value > dateTimeProvider!.UtcNow ? ValidationResult.Success : new ValidationResult(FormatErrorMessage("DateTime"));
     }
 
     public override string FormatErrorMessage(string name)
     {
-        return $"{name} should be in future if present.";
+        return $"{name} must be in future if present.";
     }
 }
