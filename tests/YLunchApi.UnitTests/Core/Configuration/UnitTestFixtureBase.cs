@@ -66,6 +66,7 @@ public class UnitTestFixtureBase
         _serviceCollection.AddScoped<IProductService, ProductService>();
 
         _serviceCollection.AddScoped<IAllergenRepository, AllergenRepository>();
+        _serviceCollection.AddScoped<IProductTagRepository, ProductTagRepository>();
 
         _serviceCollection.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 

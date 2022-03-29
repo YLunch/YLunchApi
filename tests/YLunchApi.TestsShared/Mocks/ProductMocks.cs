@@ -18,6 +18,11 @@ public static class ProductMocks
         {
             new() { Name = "gluten" },
             new() { Name = "arachide" }
+        },
+        ProductTags = new List<ProductTagCreateDto>
+        {
+            new() { Name = "pizza" },
+            new() { Name = "italienne" }
         }
     };
 }

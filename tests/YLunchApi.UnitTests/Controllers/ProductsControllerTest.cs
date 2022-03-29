@@ -83,6 +83,11 @@ public class ProductsControllerTest : UnitTestFixture
                     .BeInAscendingOrder(x => x.Name);
         responseBody.Allergens.Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
                     .Should().BeTrue();
+        responseBody.ProductTags.Should().BeEquivalentTo(productCreateDto.ProductTags)
+                    .And
+                    .BeInAscendingOrder(x => x.Name);
+        responseBody.ProductTags.Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
+                    .Should().BeTrue();
     }
 
     [Fact]
@@ -135,6 +140,9 @@ public class ProductsControllerTest : UnitTestFixture
         responseBody.CreationDateTime.Should().BeCloseTo(dateTime, TimeSpan.FromSeconds(5));
         responseBody.ExpirationDateTime.Should().BeCloseTo(dateTime.AddDays(1), TimeSpan.FromSeconds(5));
         responseBody.Allergens.Should().BeEquivalentTo(productCreationResponseBody.Allergens)
+                    .And
+                    .BeInAscendingOrder(x => x.Name);
+        responseBody.ProductTags.Should().BeEquivalentTo(productCreationResponseBody.ProductTags)
                     .And
                     .BeInAscendingOrder(x => x.Name);
     }
