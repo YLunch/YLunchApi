@@ -15,6 +15,7 @@ public class ProductCreateDto
     [InFutureOrNull] public DateTime? ExpirationDateTime { get; set; }
     public string? Image { get; set; }
     [Required] public ICollection<AllergenCreateDto> Allergens { get; set; } = null!;
+
     public ICollection<ProductTagCreateDto> ProductTags { get; set; } =
         new List<ProductTagCreateDto>();
 }
