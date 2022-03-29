@@ -238,59 +238,43 @@ public class ProductsControllerITest : ControllerITestBase
 
     #endregion
 
-    // #region GetRestaurantById_Tests
-    //
-    // [Fact]
-    // public async Task GetRestaurantById_Should_Return_A_200Ok()
-    // {
-    //     // Arrange
-    //     var restaurant = await CreateFullRestaurant();
-    //
-    //     // Act
-    //     var response = await Client.GetAsync($"restaurants/{restaurant.Id}");
-    //
-    //     // Assert
-    //     response.StatusCode.Should().Be(HttpStatusCode.OK);
-    //     var responseBody = await ResponseUtils.DeserializeContentAsync<RestaurantReadDto>(response);
-    //
-    //     responseBody.Id.Should().Be(restaurant.Id);
-    //     responseBody.AdminId.Should().Be(restaurant.AdminId);
-    //     responseBody.Email.Should().Be(restaurant.Email);
-    //     responseBody.PhoneNumber.Should().Be(restaurant.PhoneNumber);
-    //     responseBody.CreationDateTime.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
-    //     responseBody.Name.Should().Be(restaurant.Name);
-    //     responseBody.City.Should().Be(restaurant.City);
-    //     responseBody.Country.Should().Be(restaurant.Country);
-    //     responseBody.StreetName.Should().Be(restaurant.StreetName);
-    //     responseBody.ZipCode.Should().Be(restaurant.ZipCode);
-    //     responseBody.StreetNumber.Should().Be(restaurant.StreetNumber);
-    //     responseBody.IsOpen.Should().Be(restaurant.IsOpen);
-    //     responseBody.IsPublic.Should().Be(restaurant.IsPublic);
-    //
-    //     responseBody.ClosingDates.Should().BeEquivalentTo(restaurant.ClosingDates)
-    //                 .And
-    //                 .BeInAscendingOrder(x => x.ClosingDateTime);
-    //
-    //     responseBody.PlaceOpeningTimes.Should().BeEquivalentTo(
-    //         OpeningTimeUtils.AscendingOrder(restaurant.PlaceOpeningTimes.Adapt<List<OpeningTimeCreateDto>>()),
-    //         options => options.WithStrictOrdering());
-    //     responseBody.PlaceOpeningTimes.Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
-    //                 .Should().BeTrue();
-    //     responseBody.PlaceOpeningTimes.Aggregate(true, (acc, x) => acc && x.RestaurantId == responseBody.Id)
-    //                 .Should().BeTrue();
-    //     responseBody.IsCurrentlyOpenInPlace.Should().Be(true);
-    //
-    //     responseBody.OrderOpeningTimes.Should().BeEquivalentTo(
-    //         OpeningTimeUtils.AscendingOrder(restaurant.OrderOpeningTimes.Adapt<List<OpeningTimeCreateDto>>()),
-    //         options => options.WithStrictOrdering());
-    //     responseBody.OrderOpeningTimes.Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
-    //                 .Should().BeTrue();
-    //     responseBody.OrderOpeningTimes.Aggregate(true, (acc, x) => acc && x.RestaurantId == responseBody.Id)
-    //                 .Should().BeTrue();
-    //     responseBody.IsCurrentlyOpenToOrder.Should().Be(true);
-    //
-    //     responseBody.IsPublished.Should().Be(true);
-    // }
-    //
-    // #endregion
+    #region GetRestaurantById_Tests
+
+    [Fact]
+    public async Task GetRestaurantById_Should_Return_A_200Ok()
+    {
+        // Arrange
+        var (dateTime, restaurant, body, product) = await CreateProduct();
+
+        // Act
+        var response = await Client.GetAsync($"products/{product.Id}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var responseBody = await ResponseUtils.DeserializeContentAsync<ProductReadDto>(response);
+
+        responseBody.Id.Should().MatchRegex(GuidUtils.Regex);
+        responseBody.RestaurantId.Should().Be(restaurant.Id);
+        responseBody.Name.Should().Be(body.Name);
+        responseBody.Price.Should().Be(body.Price);
+        responseBody.Description.Should().Be(body.Description);
+        responseBody.IsActive.Should().Be(true);
+        responseBody.Quantity.Should().Be(body.Quantity);
+        responseBody.ProductType.Should().Be(body.ProductType);
+        responseBody.Image.Should().Be(body.Image);
+        responseBody.CreationDateTime.Should().BeCloseTo(dateTime, TimeSpan.FromSeconds(5));
+        responseBody.ExpirationDateTime.Should().BeCloseTo(dateTime.AddDays(1), TimeSpan.FromSeconds(5));
+        responseBody.Allergens.Should().BeEquivalentTo(body.Allergens)
+                    .And
+                    .BeInAscendingOrder(x => x.Name);
+        responseBody.Allergens.Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
+                    .Should().BeTrue();
+        responseBody.ProductTags.Should().BeEquivalentTo(body.ProductTags)
+                    .And
+                    .BeInAscendingOrder(x => x.Name);
+        responseBody.ProductTags.Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
+                    .Should().BeTrue();
+    }
+
+    #endregion
 }
