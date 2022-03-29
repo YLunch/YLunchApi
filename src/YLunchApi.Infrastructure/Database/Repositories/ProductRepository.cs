@@ -30,6 +30,7 @@ public class ProductRepository : IProductRepository
     {
         var product = await _context.Products
                                     .Include(x => x.Allergens)
+                                    .Include(x => x.ProductTags)
                                     .FirstOrDefaultAsync(x => x.Id == productId);
         if (product == null)
         {
@@ -42,6 +43,7 @@ public class ProductRepository : IProductRepository
     private static Product FormatProduct(Product product)
     {
         product.Allergens = product.Allergens.OrderBy(x => x.Name).ToList();
+        product.ProductTags = product.ProductTags.OrderBy(x => x.Name).ToList();
         return product;
     }
 }

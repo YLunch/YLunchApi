@@ -39,6 +39,7 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
 
 builder.Services.AddScoped<IAllergenRepository, AllergenRepository>();
+builder.Services.AddScoped<IProductTagRepository, ProductTagRepository>();
 
 builder.Services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
