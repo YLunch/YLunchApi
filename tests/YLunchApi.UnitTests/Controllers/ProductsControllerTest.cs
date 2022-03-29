@@ -76,6 +76,7 @@ public class ProductsControllerTest : UnitTestFixture
         responseBody.IsActive.Should().Be(true);
         responseBody.Quantity.Should().Be(productCreateDto.Quantity);
         responseBody.ProductType.Should().Be(productCreateDto.ProductType);
+        responseBody.Image.Should().Be(productCreateDto.Image);
         responseBody.CreationDateTime.Should().BeCloseTo(dateTime, TimeSpan.FromSeconds(5));
         responseBody.ExpirationDateTime.Should().BeCloseTo(dateTime.AddDays(1), TimeSpan.FromSeconds(5));
         responseBody.Allergens.Should().BeEquivalentTo(productCreateDto.Allergens)
@@ -104,7 +105,23 @@ public class ProductsControllerTest : UnitTestFixture
         // Assert
         var responseResult = Assert.IsType<ConflictObjectResult>(response.Result);
         var responseBody = Assert.IsType<ErrorDto>(responseResult.Value);
-        responseBody.Should().BeEquivalentTo(new ErrorDto(HttpStatusCode.Conflict, $"Product: {productCreateDto.Name} already exists"));
+        responseBody.Should().BeEquivalentTo(new ErrorDto(HttpStatusCode.Conflict, $"Product: {productCreateDto.Name} already exists."));
+    }
+
+    [Fact]
+    public async Task CreateProduct_Should_Return_A_404NotFound()
+    {
+        // Arrange
+        var productsController = await InitProductsController();
+        var productCreateDto = ProductMocks.ProductCreateDto;
+
+        // Act
+        var response = await productsController.CreateProduct("NON_EXISTENT_ID", productCreateDto);
+
+        // Assert
+        var responseResult = Assert.IsType<NotFoundObjectResult>(response.Result);
+        var responseBody = Assert.IsType<ErrorDto>(responseResult.Value);
+        responseBody.Should().BeEquivalentTo(new ErrorDto(HttpStatusCode.NotFound, $"Restaurant: NON_EXISTENT_ID not found."));
     }
 
     [Fact]
@@ -114,7 +131,7 @@ public class ProductsControllerTest : UnitTestFixture
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
         var productsController = await InitProductsController(dateTime);
         var initialProductCreateDto = ProductMocks.ProductCreateDto;
-        initialProductCreateDto.Name = "First pizza";
+        initialProductCreateDto.Name = "first pizza";
 
         var initialProductCreationResponse = await productsController.CreateProduct(_restaurant.Id, initialProductCreateDto);
         var initialProductCreationResponseResult = Assert.IsType<CreatedResult>(initialProductCreationResponse.Result);
@@ -141,7 +158,7 @@ public class ProductsControllerTest : UnitTestFixture
     #region GetRestaurantByIdTests
 
     [Fact]
-    public async Task GetRestaurantById_Should_Return_A_200Ok()
+    public async Task GetProductById_Should_Return_A_200Ok()
     {
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
@@ -166,6 +183,7 @@ public class ProductsControllerTest : UnitTestFixture
         responseBody.IsActive.Should().Be(true);
         responseBody.Quantity.Should().Be(productCreateDto.Quantity);
         responseBody.ProductType.Should().Be(productCreateDto.ProductType);
+        responseBody.Image.Should().Be(productCreateDto.Image);
         responseBody.CreationDateTime.Should().BeCloseTo(dateTime, TimeSpan.FromSeconds(5));
         responseBody.ExpirationDateTime.Should().BeCloseTo(dateTime.AddDays(1), TimeSpan.FromSeconds(5));
         responseBody.Allergens.Should().BeEquivalentTo(productCreationResponseBody.Allergens)
@@ -177,7 +195,7 @@ public class ProductsControllerTest : UnitTestFixture
     }
 
     [Fact]
-    public async Task GetRestaurantById_Should_Return_A_404NotFound()
+    public async Task GetProductById_Should_Return_A_404NotFound()
     {
         // Arrange
         var productsController = await InitProductsController();
@@ -191,7 +209,7 @@ public class ProductsControllerTest : UnitTestFixture
         var responseBody = Assert.IsType<ErrorDto>(responseResult.Value);
         responseBody.Should()
                     .BeEquivalentTo(new ErrorDto(HttpStatusCode.NotFound,
-                        $"Product {notExistingProductId} not found"));
+                        $"Product {notExistingProductId} not found."));
     }
 
     #endregion

@@ -35,7 +35,7 @@ public class UserService : IUserService
     {
         var user = await _userRepository.GetByEmailAndPassword(loginRequestDto.Email.ToLower(),
             loginRequestDto.Password);
-        if (user == null) throw new EntityNotFoundException($"{loginRequestDto.Email} not found");
+        if (user == null) throw new EntityNotFoundException($"{loginRequestDto.Email} not found.");
         var roles = await _userRepository.GetUserRoles(user);
         return new AuthenticatedUser(user, roles);
     }
@@ -43,7 +43,7 @@ public class UserService : IUserService
     public async Task<UserReadDto> GetById(string id)
     {
         var user = await _userRepository.GetById(id);
-        if (user == null) throw new EntityNotFoundException($"User {id} not found");
+        if (user == null) throw new EntityNotFoundException($"User {id} not found.");
 
         var roles = await _userRepository.GetUserRoles(user);
         return new UserReadDto(user, roles);

@@ -14,8 +14,7 @@ public static class AssertResponseUtils
         var responseBody = await ResponseUtils.DeserializeContentAsync<ErrorDto>(response);
 
         // Assert
-        responseBody.Should()
-                    .BeEquivalentTo(new ErrorDto(HttpStatusCode.Unauthorized, "Please login and use provided tokens."));
+        responseBody.Should().BeEquivalentTo(new ErrorDto(HttpStatusCode.Unauthorized, "Please login and use provided tokens."));
     }
 
     public static async Task AssertForbiddenResponse(HttpResponseMessage response)

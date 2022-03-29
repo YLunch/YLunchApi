@@ -58,6 +58,6 @@ public class UsersControllerTest : UnitTestFixture
         var responseResult = Assert.IsType<ConflictObjectResult>(response.Result);
         var responseBody = Assert.IsType<ErrorDto>(responseResult.Value);
 
-        responseBody.Should().BeEquivalentTo(new ErrorDto(HttpStatusCode.Conflict, "User already exists"));
+        responseBody.Should().BeEquivalentTo(new ErrorDto(HttpStatusCode.Conflict, "User already exists."));
     }
 }

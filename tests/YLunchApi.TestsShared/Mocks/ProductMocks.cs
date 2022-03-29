@@ -7,7 +7,7 @@ public static class ProductMocks
 {
     public static ProductCreateDto ProductCreateDto => new()
     {
-        Name = "Margherite",
+        Name = "margherite",
         Price = 9.80,
         Description = "tomate, fromage",
         IsActive = true,
@@ -23,6 +23,7 @@ public static class ProductMocks
         {
             new() { Name = "pizza" },
             new() { Name = "italienne" }
-        }
+        },
+        Image = "data:image/png;base64,iVBORw0KGgoAAA..."
     };
 }

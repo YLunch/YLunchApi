@@ -6,8 +6,8 @@ namespace YLunchApi.Domain.RestaurantAggregate.Dto;
 
 public class ProductCreateDto
 {
-    [Required] public string Name { get; set; } = null!;
-    public string? Description { get; set; }
+    [Required] [Lowercase] public string Name { get; set; } = null!;
+    [Lowercase] public string? Description { get; set; }
     [Required] public double? Price { get; set; }
     [Required] public bool? IsActive { get; set; }
     [Required] public ProductType? ProductType { get; set; }

@@ -212,7 +212,7 @@ public class RestaurantsControllerTest : UnitTestFixture
         // Assert
         var responseResult = Assert.IsType<ConflictObjectResult>(response.Result);
         var responseBody = Assert.IsType<ErrorDto>(responseResult.Value);
-        responseBody.Should().BeEquivalentTo(new ErrorDto(HttpStatusCode.Conflict, "Restaurant already exists"));
+        responseBody.Should().BeEquivalentTo(new ErrorDto(HttpStatusCode.Conflict, "Restaurant already exists."));
     }
 
     #endregion
@@ -311,7 +311,7 @@ public class RestaurantsControllerTest : UnitTestFixture
         var responseBody = Assert.IsType<ErrorDto>(responseResult.Value);
         responseBody.Should()
                     .BeEquivalentTo(new ErrorDto(HttpStatusCode.NotFound,
-                        $"Restaurant {notExistingRestaurantId} not found"));
+                        $"Restaurant {notExistingRestaurantId} not found."));
     }
 
     #endregion

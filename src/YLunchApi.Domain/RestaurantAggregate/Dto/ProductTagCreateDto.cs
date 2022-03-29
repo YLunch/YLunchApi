@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using YLunchApi.Domain.RestaurantAggregate.Dto.Validators;
 
 namespace YLunchApi.Domain.RestaurantAggregate.Dto;
 
 public class ProductTagCreateDto
 {
-    [Required] public string Name { get; set; } = null!;
+    [Required] [Lowercase] public string Name { get; set; } = null!;
 }

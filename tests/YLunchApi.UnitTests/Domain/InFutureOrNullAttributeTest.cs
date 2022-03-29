@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using FluentAssertions;
 using Moq;
@@ -64,6 +65,7 @@ public class InFutureOrNullAttributeTest : UnitTestFixture
     }
 }
 
+[ExcludeFromCodeCoverage]
 internal static class InFutureOrNullAttributeExtension
 {
     public static ValidationResult? IsValid(this InFutureOrNullAttribute attribute, object? value, ValidationContext validationContext)

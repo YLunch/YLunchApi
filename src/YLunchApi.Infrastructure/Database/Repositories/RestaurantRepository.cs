@@ -49,7 +49,7 @@ public class RestaurantRepository : IRestaurantRepository
     {
         var restaurant = await RestaurantsQueryBase
             .FirstOrDefaultAsync(x => x.Id == id);
-        if (restaurant == null) throw new EntityNotFoundException($"Restaurant {id} not found");
+        if (restaurant == null) throw new EntityNotFoundException($"Restaurant {id} not found.");
         return ReformatRestaurant(restaurant);
     }
 

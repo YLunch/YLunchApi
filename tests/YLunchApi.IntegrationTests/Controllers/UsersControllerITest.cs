@@ -72,7 +72,7 @@ public class UsersControllerITest : ControllerITestBase
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Conflict);
         var content = await ResponseUtils.DeserializeContentAsync<ErrorDto>(response);
-        content.Should().BeEquivalentTo(new ErrorDto(HttpStatusCode.Conflict, "User already exists"));
+        content.Should().BeEquivalentTo(new ErrorDto(HttpStatusCode.Conflict, "User already exists."));
     }
 
     [Fact]
@@ -260,7 +260,7 @@ public class UsersControllerITest : ControllerITestBase
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Conflict);
         var content = await ResponseUtils.DeserializeContentAsync<ErrorDto>(response);
-        content.Should().BeEquivalentTo(new ErrorDto(HttpStatusCode.Conflict, "User already exists"));
+        content.Should().BeEquivalentTo(new ErrorDto(HttpStatusCode.Conflict, "User already exists."));
     }
 
     [Fact]

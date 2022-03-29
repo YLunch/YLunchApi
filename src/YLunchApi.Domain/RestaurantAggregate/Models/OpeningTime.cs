@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using YLunchApi.Domain.CommonAggregate.Models;
 using YLunchApi.Domain.Core.Utils;
 
@@ -5,8 +6,9 @@ namespace YLunchApi.Domain.RestaurantAggregate.Models;
 
 public abstract class OpeningTime : Entity
 {
-    public string RestaurantId { get; set; } = null!;
-    public virtual Restaurant? Restaurant { get; set; }
+    public string RestaurantId { get; [ExcludeFromCodeCoverage] set; } = null!;
+
+    [ExcludeFromCodeCoverage] public virtual Restaurant? Restaurant { get; set; }
     public DayOfWeek DayOfWeek { get; set; }
     public int OffsetInMinutes { get; set; }
     public int DurationInMinutes { get; set; }

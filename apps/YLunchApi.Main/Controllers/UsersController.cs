@@ -41,7 +41,7 @@ public class UsersController : ApplicationControllerBase
         }
         catch (EntityAlreadyExistsException)
         {
-            return Conflict(new ErrorDto(HttpStatusCode.Conflict, "User already exists"));
+            return Conflict(new ErrorDto(HttpStatusCode.Conflict, "User already exists."));
         }
     }
 }

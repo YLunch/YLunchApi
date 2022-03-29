@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using YLunchApi.Domain.CommonAggregate.Models;
 using YLunchApi.Domain.UserAggregate.Models;
 
@@ -6,7 +7,8 @@ namespace YLunchApi.Domain.RestaurantAggregate.Models;
 public class Restaurant : Entity
 {
     public string AdminId { get; set; } = null!;
-    public virtual User? Admin { get; set; }
+
+    [ExcludeFromCodeCoverage] public virtual User? Admin { get; set; }
     public string Name { get; set; } = null!;
     public string PhoneNumber { get; set; } = null!;
     public string Email { get; set; } = null!;
@@ -35,6 +37,7 @@ public class Restaurant : Entity
     public virtual ICollection<ClosingDate> ClosingDates { get; set; } = new List<ClosingDate>();
     public virtual ICollection<PlaceOpeningTime> PlaceOpeningTimes { get; set; } = new List<PlaceOpeningTime>();
     public virtual ICollection<OrderOpeningTime> OrderOpeningTimes { get; set; } = new List<OrderOpeningTime>();
+
     public virtual ICollection<Product> Products { get; set; } = new List<Product>();
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();

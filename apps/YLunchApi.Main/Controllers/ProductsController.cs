@@ -14,11 +14,13 @@ namespace YLunchApi.Main.Controllers;
 public class ProductsController : ApplicationControllerBase
 {
     private readonly IProductService _productService;
+    private readonly IRestaurantService _restaurantService;
 
-    public ProductsController(IHttpContextAccessor httpContextAccessor, IProductService productService) : base(
+    public ProductsController(IHttpContextAccessor httpContextAccessor, IProductService productService, IRestaurantService restaurantService) : base(
         httpContextAccessor)
     {
         _productService = productService;
+        _restaurantService = restaurantService;
     }
 
     [HttpPost("Restaurants/{restaurantId}/products")]
@@ -27,12 +29,17 @@ public class ProductsController : ApplicationControllerBase
     {
         try
         {
-            var productReadDto = await _productService.Create(productCreateDto, restaurantId);
+            var restaurant = await _restaurantService.GetById(restaurantId);
+            var productReadDto = await _productService.Create(productCreateDto, restaurant.Id);
             return Created("", productReadDto);
+        }
+        catch (EntityNotFoundException)
+        {
+            return NotFound(new ErrorDto(HttpStatusCode.NotFound, $"Restaurant: {restaurantId} not found."));
         }
         catch (EntityAlreadyExistsException)
         {
-            return Conflict(new ErrorDto(HttpStatusCode.Conflict, $"Product: {productCreateDto.Name} already exists"));
+            return Conflict(new ErrorDto(HttpStatusCode.Conflict, $"Product: {productCreateDto.Name} already exists."));
         }
     }
 
@@ -46,7 +53,7 @@ public class ProductsController : ApplicationControllerBase
         }
         catch (EntityNotFoundException)
         {
-            return NotFound(new ErrorDto(HttpStatusCode.NotFound, $"Product {productId} not found"));
+            return NotFound(new ErrorDto(HttpStatusCode.NotFound, $"Product {productId} not found."));
         }
     }
 }
