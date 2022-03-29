@@ -12,7 +12,7 @@ public class LowercaseAttribute : ValidationAttribute
             return true;
         }
 
-        return value.ToString() == value.ToString()?.ToLower();
+        return (string)value == ((string)value).ToLower();
     }
 
     public override string FormatErrorMessage(string name)

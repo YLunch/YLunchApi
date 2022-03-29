@@ -27,6 +27,8 @@ tags:
     description: users endpoints
   - name: restaurants
     description: restaurants endpoints
+  - name: products
+    description: products endpoints
 paths:
   /trials/anonymous:
     get:
@@ -655,6 +657,120 @@ paths:
                 $ref: '#/components/schemas/MessageDto'
               example:
                 message: Restaurant not found.
+  /restaurants/{restaurantId}/products:
+    post:
+      tags:
+        - products
+      summary: Product creation
+      description: |
+        - Authorization header: **yes**
+        - Granted roles:
+          - RestaurantAdmin
+      operationId: addProduct
+      parameters:
+        - in: path
+          name: restaurantId
+          required: true
+          description: The id of the restaurant in which you want to create a product
+          schema:
+            type: string
+      requestBody:
+        description: Product to create
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductCreateDto'
+      responses:
+        '201':
+          description: product created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductReadDto'
+        '400':
+          description: |
+            Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+              examples:
+                ValidationError:
+                  value:
+                    title: "One or more validation errors occurred."
+                    statusCode: 400
+                    errors:
+                      Name: [ "The Name field is required." ]
+                Other:
+                  value:
+                    title: "BadRequest"
+                    statusCode: 400
+                    errors:
+                      reasons: ["Something went wrong, please try again later."]
+        '404':
+          description: |
+            Not found:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+              example:
+                message: Restaurant not found.
+        '409':
+          description: |
+            Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "Conflict"
+                statusCode: 409
+                errors:
+                  reasons: ["Product already exists."]
+  /products/{productId}:
+    get:
+      tags:
+        - products
+      summary: Gets a product by id
+      operationId: getProductById
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          description: The id of the product you want to get
+          schema:
+            type: string
+      responses:
+        '200':
+          description: |
+            Success
+            - The product
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductReadDto'
+        '400':
+          description: |
+            Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "BadRequest"
+                statusCode: 400
+                errors:
+                  reasons: ["Something went wrong, please try again later."]
+        '404':
+          description: |
+            Not found:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+              example:
+                message: Product not found.
 components:
   schemas:
     MessageDto:
@@ -997,6 +1113,148 @@ components:
         isCurrentlyOpenInPlace:
           type: boolean
           description: 'True if the restaurant is open to eat in place.'
+    AllergenCreateDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: gluten
+          description: Must be lowercase.
+    AllergenReadDto:
+      type: object
+      properties:
+        id:
+          type: string
+          example: a00000e0-aaa0-000a-0000-00e00aa00e00
+        name:
+          type: string
+          example: gluten
+    ProductTagCreateDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: pizza
+          description: Must be lowercase. A tag to categorise a product.
+    ProductTagReadDto:
+      type: object
+      properties:
+        id:
+          type: string
+          example: a00000e0-aaa0-000a-0000-00e00aa00e00
+        name:
+          type: string
+          example: pizza
+    ProductCreateDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: my product
+          description: Must be lowercase.
+        description:
+          type: string
+          example: my ingredients
+          description: Must be lowercase.
+        price:
+          type: number
+          example: 9.8
+        quantity:
+          type: number
+          description: Must be between 1 and 10000 or `null` meaning infinite.
+          example: 3
+        isActive:
+          type: boolean
+          description: |
+            - `True` if the product is available
+            - `False` to force a product to be unavailable, bypasses the quantity'
+          example: true
+        productType:
+          type: number
+          example: '0'
+          description: |
+            One of:
+            - `0`: Starter,
+            - `1`: Main,
+            - `2`: Dessert,
+            - `3`: Drink,
+            - `4`: Menu,
+            - `5`: Daily,
+            - `6`: Other
+        expirationDateTime:
+          type: string
+          example: "2021-12-31T00:00:00.000000"
+          description: Must be in the future.
+        image:
+          type: string
+          description: Base 64 encoded image
+          example: 'data:image/png;base64,iVBORw0KGgoAAA...'
+        allergens:
+          type: array
+          items:
+            $ref: '#/components/schemas/AllergenCreateDto'
+        productTags:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductTagCreateDto'
+      required:
+        - name
+        - price
+        - isActive
+        - productType
+        - allergens
+    ProductReadDto:
+      type: object
+      properties:
+        id:
+          type: string
+          example: a00000e0-aaa0-000a-0000-00e00aa00e00
+        name:
+          type: string
+          example: my product
+        description:
+          type: string
+          example: my ingredients
+        price:
+          type: number
+          example: 9.8
+        quantity:
+          type: number
+          description: Quantity of product between 1 and 10000 or `null` meaning infinite.
+          example: 3
+        isActive:
+          type: boolean
+          description: |
+            - `True` if the product is available
+            - `False` if the product is unavailable, bypasses the quantity'
+          example: true
+        productType:
+          type: number
+          example: 0
+          description: |
+            One of:
+            - `0`: Starter,
+            - `1`: Main,
+            - `2`: Dessert,
+            - `3`: Drink,
+            - `4`: Menu,
+            - `5`: Daily,
+            - `6`: Other
+        expirationDateTime:
+          type: string
+          example: "2021-12-31T00:00:00.000000"
+        image:
+          type: string
+          description: Base 64 encoded image
+          example: 'data:image/png;base64,iVBORw0KGgoAAA...'
+        allergens:
+          type: array
+          items:
+            $ref: '#/components/schemas/AllergenReadDto'
+        productTags:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductTagReadDto'
   securitySchemes:
     Bearer:
       type: http

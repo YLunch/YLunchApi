@@ -124,6 +124,7 @@ public class ProductsControllerITest : ControllerITestBase
         {
             Name = "An invalid Name",
             Description = "An invalid Description",
+            Quantity = 0,
             Allergens = new List<dynamic>
             {
                 new { BadFieldName = "wrong value" }
@@ -143,6 +144,7 @@ public class ProductsControllerITest : ControllerITestBase
 
         responseBody.Should().MatchRegex(@"Name.*Must be lowercase\.");
         responseBody.Should().MatchRegex(@"Description.*Must be lowercase\.");
+        responseBody.Should().MatchRegex(@"Quantity.*The field Quantity must be between 1 and 10000\.");
         responseBody.Should().MatchRegex(@"Allergens.*The Name field is required\.");
         responseBody.Should().MatchRegex(@"ProductTags.*The Name field is required\.");
     }
