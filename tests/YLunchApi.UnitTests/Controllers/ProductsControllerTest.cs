@@ -107,6 +107,35 @@ public class ProductsControllerTest : UnitTestFixture
         responseBody.Should().BeEquivalentTo(new ErrorDto(HttpStatusCode.Conflict, $"Product: {productCreateDto.Name} already exists"));
     }
 
+    [Fact]
+    public async Task CreateProduct_Should_Return_A_201Created_And_Allergens_And_ProductTags_Should_Not_Be_Duplicated_When_They_Already_Exist()
+    {
+        // Arrange
+        var dateTime = DateTimeMocks.Monday20220321T1000Utc;
+        var productsController = await InitProductsController(dateTime);
+        var initialProductCreateDto = ProductMocks.ProductCreateDto;
+        initialProductCreateDto.Name = "First pizza";
+
+        var initialProductCreationResponse = await productsController.CreateProduct(_restaurant.Id, initialProductCreateDto);
+        var initialProductCreationResponseResult = Assert.IsType<CreatedResult>(initialProductCreationResponse.Result);
+        var initialProductCreationResponseBody = Assert.IsType<ProductReadDto>(initialProductCreationResponseResult.Value);
+
+        var existingAllergens = initialProductCreationResponseBody.Allergens;
+        var existingProductTags = initialProductCreationResponseBody.ProductTags;
+
+        var productCreateDto = ProductMocks.ProductCreateDto;
+
+        // Act
+        var response = await productsController.CreateProduct(_restaurant.Id, productCreateDto);
+
+        // Assert
+        var responseResult = Assert.IsType<CreatedResult>(response.Result);
+        var responseBody = Assert.IsType<ProductReadDto>(responseResult.Value);
+
+        responseBody.Allergens.Should().BeEquivalentTo(existingAllergens);
+        responseBody.ProductTags.Should().BeEquivalentTo(existingProductTags);
+    }
+
     #endregion
 
     #region GetRestaurantByIdTests
