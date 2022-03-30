@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using YLunchApi.Domain.CommonAggregate.Dto;
 using YLunchApi.Domain.Exceptions;
 using YLunchApi.Domain.RestaurantAggregate.Dto;
+using YLunchApi.Domain.RestaurantAggregate.Filters;
 using YLunchApi.Domain.RestaurantAggregate.Services;
 using YLunchApi.Domain.UserAggregate.Models;
 
@@ -56,4 +57,13 @@ public class ProductsController : ApplicationControllerBase
             return NotFound(new ErrorDto(HttpStatusCode.NotFound, $"Product {productId} not found."));
         }
     }
+    [HttpGet("restaurants/{restaurantId}/products")]
+    public async Task<ActionResult<IEnumerable<ProductReadDto>>> GetProducts([FromRoute] string restaurantId, [FromQuery] ProductFilter? productFilter = null)
+    {
+        var filter = productFilter ?? new ProductFilter(restaurantId);
+        var productsReadDto = await _productService.GetProducts(filter);
+        return Ok(productsReadDto);
+    } 
 }
+
+

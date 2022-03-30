@@ -2,6 +2,7 @@
 using YLunchApi.Domain.CommonAggregate.Services;
 using YLunchApi.Domain.Exceptions;
 using YLunchApi.Domain.RestaurantAggregate.Dto;
+using YLunchApi.Domain.RestaurantAggregate.Filters;
 using YLunchApi.Domain.RestaurantAggregate.Models;
 using YLunchApi.Domain.RestaurantAggregate.Services;
 
@@ -14,7 +15,8 @@ public class ProductService : IProductService
     private readonly IProductTagRepository _productTagRepository;
     private readonly IDateTimeProvider _dateTimeProvider;
 
-    public ProductService(IDateTimeProvider dateTimeProvider, IProductRepository productRepository, IAllergenRepository allergenRepository, IProductTagRepository productTagRepository)
+    public ProductService(IDateTimeProvider dateTimeProvider, IProductRepository productRepository,
+        IAllergenRepository allergenRepository, IProductTagRepository productTagRepository)
     {
         _dateTimeProvider = dateTimeProvider;
         _productRepository = productRepository;
@@ -29,34 +31,34 @@ public class ProductService : IProductService
         product.CreationDateTime = _dateTimeProvider.UtcNow;
 
         product.Allergens = product.Allergens
-                                   .Select(async x =>
-                                   {
-                                       try
-                                       {
-                                           return await _allergenRepository.GetByName(x.Name);
-                                       }
-                                       catch (EntityNotFoundException)
-                                       {
-                                           return x;
-                                       }
-                                   })
-                                   .Select(t => t.Result)
-                                   .ToList();
+            .Select(async x =>
+            {
+                try
+                {
+                    return await _allergenRepository.GetByName(x.Name);
+                }
+                catch (EntityNotFoundException)
+                {
+                    return x;
+                }
+            })
+            .Select(t => t.Result)
+            .ToList();
 
         product.ProductTags = product.ProductTags
-                                     .Select(async x =>
-                                     {
-                                         try
-                                         {
-                                             return await _productTagRepository.GetByName(x.Name);
-                                         }
-                                         catch (EntityNotFoundException)
-                                         {
-                                             return x;
-                                         }
-                                     })
-                                     .Select(t => t.Result)
-                                     .ToList();
+            .Select(async x =>
+            {
+                try
+                {
+                    return await _productTagRepository.GetByName(x.Name);
+                }
+                catch (EntityNotFoundException)
+                {
+                    return x;
+                }
+            })
+            .Select(t => t.Result)
+            .ToList();
 
         await _productRepository.Create(product);
         var productDb = await _productRepository.GetById(product.Id);
@@ -68,5 +70,11 @@ public class ProductService : IProductService
     {
         var product = await _productRepository.GetById(productId);
         return product.Adapt<ProductReadDto>();
+    }
+    
+    public async Task<ICollection<ProductReadDto>> GetProducts(ProductFilter productFilter) 
+    {
+        var products = await _productRepository.GetProducts(productFilter);
+        return products.Adapt<ICollection<ProductReadDto>>();
     }
 }

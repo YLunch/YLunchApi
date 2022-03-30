@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using YLunchApi.Domain.Exceptions;
+using YLunchApi.Domain.RestaurantAggregate.Filters;
 using YLunchApi.Domain.RestaurantAggregate.Models;
 using YLunchApi.Domain.RestaurantAggregate.Services;
 
@@ -38,6 +39,15 @@ public class ProductRepository : IProductRepository
         }
 
         return FormatProduct(product);
+    }
+
+    public async Task<ICollection<Product>> GetProducts(ProductFilter productFilter)
+    {
+        var products = await _context.Products
+            .Include(x => x.Allergens)
+            .Include(x => x.ProductTags)
+            .ToListAsync();
+        return products.Select(FormatProduct).ToList();
     }
 
     private static Product FormatProduct(Product product)
