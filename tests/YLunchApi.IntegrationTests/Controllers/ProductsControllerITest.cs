@@ -29,7 +29,33 @@ public class ProductsControllerITest : ControllerITestBase
         return await ResponseUtils.DeserializeContentAsync<RestaurantReadDto>(restaurantCreationResponse);
     }
 
-    private async Task<(DateTime, RestaurantReadDto, ProductCreateDto, ProductReadDto)> CreateProduct()
+    private async Task<ProductReadDto> CreateProduct(string restaurantId, ProductCreateDto productCreateDto)
+    {
+        // Arrange
+        var body = new
+        {
+            productCreateDto.Name,
+            productCreateDto.Price,
+            productCreateDto.Quantity,
+            productCreateDto.IsActive,
+            productCreateDto.ProductType,
+            productCreateDto.Image,
+            productCreateDto.ExpirationDateTime,
+            productCreateDto.Description,
+            productCreateDto.Allergens,
+            productCreateDto.ProductTags
+        };
+
+        // Act
+        var response = await Client.PostAsJsonAsync($"restaurants/{restaurantId}/products", body);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        var productReadDto = await ResponseUtils.DeserializeContentAsync<ProductReadDto>(response);
+        return productReadDto;
+    }
+
+    private async Task<(DateTime, RestaurantReadDto, ProductCreateDto, ProductReadDto)> CreateRestaurantAndProduct()
     {
         // Arrange
         var restaurant = await CreateRestaurant(RestaurantMocks.SimpleRestaurantCreateDto);
@@ -60,13 +86,13 @@ public class ProductsControllerITest : ControllerITestBase
 
     #endregion
 
-    #region CreateRestaurant_Tests
+    #region CreateRestaurantTests
 
     [Fact]
     public async Task CreateProduct_Should_Return_A_201Created()
     {
         // Arrange
-        var (dateTime, restaurant, body, responseBody) = await CreateProduct();
+        var (dateTime, restaurant, body, responseBody) = await CreateRestaurantAndProduct();
 
         responseBody.Id.Should().MatchRegex(GuidUtils.Regex);
         responseBody.RestaurantId.Should().Be(restaurant.Id);
@@ -240,13 +266,13 @@ public class ProductsControllerITest : ControllerITestBase
 
     #endregion
 
-    #region GetRestaurantById_Tests
+    #region GetRestaurantByIdTests
 
     [Fact]
     public async Task GetRestaurantById_Should_Return_A_200Ok()
     {
         // Arrange
-        var (dateTime, restaurant, body, product) = await CreateProduct();
+        var (dateTime, restaurant, body, product) = await CreateRestaurantAndProduct();
 
         // Act
         var response = await Client.GetAsync($"products/{product.Id}");
@@ -276,6 +302,157 @@ public class ProductsControllerITest : ControllerITestBase
                     .BeInAscendingOrder(x => x.Name);
         responseBody.ProductTags.Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
                     .Should().BeTrue();
+    }
+
+    #endregion
+
+    #region GetProductsTests
+
+    [Fact]
+    public async Task GetProducts_Should_Return_A_200Ok()
+    {
+        // Arrange
+        var restaurant = await CreateRestaurant(RestaurantMocks.SimpleRestaurantCreateDto);
+
+        var productCreateDto1 = ProductMocks.ProductCreateDto;
+        productCreateDto1.Name = "product1";
+        productCreateDto1.ExpirationDateTime = DateTime.UtcNow.AddDays(1);
+        var product1 = await CreateProduct(restaurant.Id, productCreateDto1);
+
+        var productCreateDto2 = ProductMocks.ProductCreateDto;
+        productCreateDto2.Name = "product2";
+        productCreateDto2.ExpirationDateTime = DateTime.UtcNow.AddDays(1);
+        var product2 = await CreateProduct(restaurant.Id, productCreateDto2);
+
+        var productCreateDto3 = ProductMocks.ProductCreateDto;
+        productCreateDto3.Name = "product3";
+        productCreateDto3.ExpirationDateTime = DateTime.UtcNow.AddDays(1);
+        var product3 = await CreateProduct(restaurant.Id, productCreateDto3);
+
+        var expectedProducts = new List<ProductReadDto>
+        {
+            product1,
+            product2,
+            product3
+        };
+
+        // Act
+        var response = await Client.GetAsync($"restaurants/{restaurant.Id}/products");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var responseBody = await ResponseUtils.DeserializeContentAsync<List<ProductReadDto>>(response);
+        responseBody.Count.Should().Be(3);
+
+        for (var i = 0; i < responseBody.Count; i++)
+        {
+            var actualProduct = responseBody[i];
+            var expectedProduct = expectedProducts[i];
+
+            actualProduct.Id.Should().Be(expectedProduct.Id);
+            actualProduct.RestaurantId.Should().Be(restaurant.Id);
+            actualProduct.Name.Should().Be(expectedProduct.Name);
+            actualProduct.Price.Should().Be(expectedProduct.Price);
+            actualProduct.Description.Should().Be(expectedProduct.Description);
+            actualProduct.IsActive.Should().Be(true);
+            actualProduct.Quantity.Should().Be(expectedProduct.Quantity);
+            actualProduct.ProductType.Should().Be(expectedProduct.ProductType);
+            actualProduct.Image.Should().Be(expectedProduct.Image);
+            actualProduct.CreationDateTime.Should().BeCloseTo(expectedProduct.CreationDateTime, TimeSpan.FromSeconds(5));
+            actualProduct.ExpirationDateTime.Should().BeCloseTo((DateTime)expectedProduct.ExpirationDateTime!, TimeSpan.FromSeconds(5));
+            actualProduct.Allergens.Should().BeEquivalentTo(expectedProduct.Allergens)
+                         .And
+                         .BeInAscendingOrder(x => x.Name);
+            actualProduct.ProductTags.Should().BeEquivalentTo(expectedProduct.ProductTags)
+                         .And
+                         .BeInAscendingOrder(x => x.Name);
+        }
+    }
+
+    [Fact]
+    public async Task GetProducts_Should_Return_A_200Ok_With_Correct_Products()
+    {
+        // Arrange
+        var restaurant = await CreateRestaurant(RestaurantMocks.SimpleRestaurantCreateDto);
+
+        var productCreateDto1 = ProductMocks.ProductCreateDto;
+        productCreateDto1.Name = "product1";
+        productCreateDto1.ExpirationDateTime = DateTime.UtcNow.AddDays(1);
+        productCreateDto1.IsActive = false;
+        await CreateProduct(restaurant.Id, productCreateDto1);
+
+        var productCreateDto2 = ProductMocks.ProductCreateDto;
+        productCreateDto2.Name = "product2";
+        productCreateDto2.ExpirationDateTime = DateTime.UtcNow.AddDays(1);
+        productCreateDto2.IsActive = false;
+        await CreateProduct(restaurant.Id, productCreateDto2);
+
+        var productCreateDto3 = ProductMocks.ProductCreateDto;
+        productCreateDto3.Name = "product3";
+        productCreateDto3.ExpirationDateTime = DateTime.UtcNow.AddDays(1);
+        var product3 = await CreateProduct(restaurant.Id, productCreateDto3);
+
+        var productCreateDto4 = ProductMocks.ProductCreateDto;
+        productCreateDto4.Name = "product4";
+        productCreateDto4.ExpirationDateTime = DateTime.UtcNow.AddDays(1);
+        productCreateDto4.Quantity = null;
+        var product4 = await CreateProduct(restaurant.Id, productCreateDto4);
+
+        var expectedProducts = new List<ProductReadDto>
+        {
+            product3,
+            product4
+        };
+
+        // Act
+        var response = await Client.GetAsync($"restaurants/{restaurant.Id}/products?page=2&size=2&isAvailable=true");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var responseBody = await ResponseUtils.DeserializeContentAsync<List<ProductReadDto>>(response);
+        responseBody.Count.Should().Be(2);
+
+        for (var i = 0; i < responseBody.Count; i++)
+        {
+            var actualProduct = responseBody[i];
+            var expectedProduct = expectedProducts[i];
+
+            actualProduct.Id.Should().Be(expectedProduct.Id);
+            actualProduct.RestaurantId.Should().Be(restaurant.Id);
+            actualProduct.Name.Should().Be(expectedProduct.Name);
+            actualProduct.Price.Should().Be(expectedProduct.Price);
+            actualProduct.Description.Should().Be(expectedProduct.Description);
+            actualProduct.IsActive.Should().Be(true);
+            actualProduct.Quantity.Should().Be(expectedProduct.Quantity);
+            actualProduct.ProductType.Should().Be(expectedProduct.ProductType);
+            actualProduct.Image.Should().Be(expectedProduct.Image);
+            actualProduct.CreationDateTime.Should().BeCloseTo(expectedProduct.CreationDateTime, TimeSpan.FromSeconds(5));
+            actualProduct.ExpirationDateTime.Should().BeCloseTo((DateTime)expectedProduct.ExpirationDateTime!, TimeSpan.FromSeconds(5));
+            actualProduct.Allergens.Should().BeEquivalentTo(expectedProduct.Allergens)
+                         .And
+                         .BeInAscendingOrder(x => x.Name);
+            actualProduct.ProductTags.Should().BeEquivalentTo(expectedProduct.ProductTags)
+                         .And
+                         .BeInAscendingOrder(x => x.Name);
+        }
+    }
+
+    [Fact]
+    public async Task GetProducts_Should_Return_A_400BadRequest_When_Invalid_Filter()
+    {
+        // Arrange
+        var restaurant = await CreateRestaurant(RestaurantMocks.SimpleRestaurantCreateDto);
+
+        // Act
+        var response = await Client.GetAsync($"restaurants/{restaurant.Id}/products?page=0&size=51&isAvailable=25");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        var responseBody = await ResponseUtils.DeserializeContentAsync(response);
+
+        responseBody.Should().Contain("Page must be an integer between 1 and 100000.");
+        responseBody.Should().Contain("Size must be an integer between 1 and 50.");
+        responseBody.Should().Contain("The value '25' is not valid for IsAvailable.");
     }
 
     #endregion

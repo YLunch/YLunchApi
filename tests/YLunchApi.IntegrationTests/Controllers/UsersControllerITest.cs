@@ -15,7 +15,7 @@ namespace YLunchApi.IntegrationTests.Controllers;
 [Collection("Sequential")]
 public class UsersControllerITest : ControllerITestBase
 {
-    #region CreateRestaurantAdmin_Tests
+    #region CreateRestaurantAdminTests
 
     [Theory]
     [InlineData("admin@restaurant.com", "Jean-Marc", "Dupont Henri", "0612345678", "Password1234.")]
@@ -203,7 +203,7 @@ public class UsersControllerITest : ControllerITestBase
 
     #endregion
 
-    #region CreateCustomer_Tests
+    #region CreateCustomerTests
 
     [Theory]
     [InlineData("anne-marie.martin@ynov.com", "Anne-Marie", "Martin-Jacques", "0687654321", "Password1234.")]

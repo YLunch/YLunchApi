@@ -58,12 +58,20 @@ public class ProductsController : ApplicationControllerBase
         }
     }
     [HttpGet("restaurants/{restaurantId}/products")]
-    public async Task<ActionResult<IEnumerable<ProductReadDto>>> GetProducts([FromRoute] string restaurantId, [FromQuery] ProductFilter? productFilter = null)
+    public async Task<ActionResult<ICollection<ProductReadDto>>> GetProductsByRestaurantId([FromRoute] string restaurantId, [FromQuery] ProductFilter? productFilter = null)
     {
-        var filter = productFilter ?? new ProductFilter();
-        filter.RestaurantId = restaurantId;
-        var productsReadDto = await _productService.GetProducts(filter);
-        return Ok(productsReadDto);
+        try
+        {
+            var restaurant = await _restaurantService.GetById(restaurantId);
+            var filter = productFilter ?? new ProductFilter();
+            filter.RestaurantId = restaurant.Id;
+            var productsReadDto = await _productService.GetProducts(filter);
+            return Ok(productsReadDto);
+        }
+        catch (EntityNotFoundException)
+        {
+            return NotFound(new ErrorDto(HttpStatusCode.NotFound, $"Restaurant: {restaurantId} not found."));
+        }
     } 
 }
 

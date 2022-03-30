@@ -15,7 +15,7 @@ namespace YLunchApi.IntegrationTests.Controllers;
 [Collection("Sequential")]
 public class AuthenticationControllerITest : ControllerITestBase
 {
-    #region Login_Tests
+    #region LoginTests
 
     [Fact]
     public async Task Login_Should_Return_A_200Ok()
@@ -68,7 +68,7 @@ public class AuthenticationControllerITest : ControllerITestBase
 
     #endregion
 
-    #region RefreshTokens_Tests
+    #region RefreshTokensTests
 
     [Fact]
     public async Task RefreshTokens_Should_Return_A_200Ok()
@@ -136,7 +136,7 @@ public class AuthenticationControllerITest : ControllerITestBase
 
     #endregion
 
-    #region GetCurrentUser_Tests
+    #region GetCurrentUserTests
 
     [Fact]
     public async Task GetCurrentUser_Should_Return_A_200Ok()

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using YLunchApi.Domain.CommonAggregate.Services;
 using YLunchApi.Domain.Exceptions;
 using YLunchApi.Domain.RestaurantAggregate.Filters;
 using YLunchApi.Domain.RestaurantAggregate.Models;
@@ -9,10 +10,12 @@ namespace YLunchApi.Infrastructure.Database.Repositories;
 public class ProductRepository : IProductRepository
 {
     private readonly ApplicationDbContext _context;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
-    public ProductRepository(ApplicationDbContext context)
+    public ProductRepository(ApplicationDbContext context, IDateTimeProvider dateTimeProvider)
     {
         _context = context;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public async Task Create(Product product)
@@ -29,10 +32,7 @@ public class ProductRepository : IProductRepository
 
     public async Task<Product> GetById(string productId)
     {
-        var product = await _context.Products
-                                    .Include(x => x.Allergens)
-                                    .Include(x => x.ProductTags)
-                                    .FirstOrDefaultAsync(x => x.Id == productId);
+        var product = await ProductQueryBase.FirstOrDefaultAsync(x => x.Id == productId);
         if (product == null)
         {
             throw new EntityNotFoundException();
@@ -43,13 +43,43 @@ public class ProductRepository : IProductRepository
 
     public async Task<ICollection<Product>> GetProducts(ProductFilter productFilter)
     {
-        var products = await _context.Products
-            .Include(x => x.Allergens)
-            .Include(x => x.ProductTags)
-            .Where(x=>x.RestaurantId == productFilter.RestaurantId)
-            .ToListAsync();
-        return products.Select(FormatProduct).ToList();
+        var query = ProductQueryBase
+                    .Skip((productFilter.Page - 1) * productFilter.Size)
+                    .Take(productFilter.Size);
+        query = GetProductByRestaurantId(query, productFilter.RestaurantId);
+        query = IsAvailable(query, productFilter.IsAvailable);
+
+        var products = await query.ToListAsync();
+        return products.Select(FormatProduct)
+                       .OrderBy(x => x.Name)
+                       .ToList();
     }
+
+    private IQueryable<Product> IsAvailable(IQueryable<Product> query, bool? isAvailable) =>
+        isAvailable switch
+        {
+            true => query.Where(x =>
+                x.IsActive &&
+                (x.Quantity > 1 || x.Quantity == null) &&
+                (x.ExpirationDateTime == null || x.ExpirationDateTime >= _dateTimeProvider.UtcNow)),
+            false => query.Where(x =>
+                !x.IsActive ||
+                x.Quantity == 0 ||
+                (x.ExpirationDateTime != null && x.ExpirationDateTime < _dateTimeProvider.UtcNow)),
+            null => query
+        };
+
+    private static IQueryable<Product> GetProductByRestaurantId(IQueryable<Product> query, string? restaurantId) =>
+        restaurantId switch
+        {
+            null => query,
+            _ => query.Where(x => x.RestaurantId == restaurantId)
+        };
+
+    private IQueryable<Product> ProductQueryBase =>
+        _context.Products
+                .Include(x => x.Allergens)
+                .Include(x => x.ProductTags);
 
     private static Product FormatProduct(Product product)
     {

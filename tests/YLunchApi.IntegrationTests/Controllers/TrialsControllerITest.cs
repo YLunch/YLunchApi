@@ -15,7 +15,7 @@ namespace YLunchApi.IntegrationTests.Controllers;
 [Collection("Sequential")]
 public class TrialsControllerITest : ControllerITestBase
 {
-    #region GetAnonymousTry_Tests
+    #region GetAnonymousTryTests
 
     [Fact]
     public async Task GetAnonymousTry_Should_Return_A_200Ok()
@@ -29,7 +29,7 @@ public class TrialsControllerITest : ControllerITestBase
 
     #endregion
 
-    #region GetAuthenticatedTry_Tests
+    #region GetAuthenticatedTryTests
 
     [Fact]
     public async Task GetAuthenticatedTry_As_Customer_Should_Return_A_200Ok()
@@ -132,7 +132,7 @@ public class TrialsControllerITest : ControllerITestBase
 
     #endregion
 
-    #region GetAuthenticatedRestaurantAdminTry_Tests
+    #region GetAuthenticatedRestaurantAdminTryTests
 
     [Fact]
     public async Task GetAuthenticatedRestaurantAdminTry_Should_Return_A_200Ok()
@@ -167,7 +167,7 @@ public class TrialsControllerITest : ControllerITestBase
 
     #endregion
 
-    #region GetAuthenticatedCustomerTry_Tests
+    #region GetAuthenticatedCustomerTryTests
 
     [Fact]
     public async Task GetAuthenticatedCustomerTry_Should_Return_A_200Ok()

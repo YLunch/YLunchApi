@@ -92,7 +92,7 @@ public class RestaurantsControllerITest : ControllerITestBase
 
     #endregion
 
-    #region CreateRestaurant_Tests
+    #region CreateRestaurantTests
 
     [Fact]
     public async Task CreateRestaurant_Should_Return_A_201Created()
@@ -482,7 +482,7 @@ public class RestaurantsControllerITest : ControllerITestBase
 
     #endregion
 
-    #region GetRestaurantById_Tests
+    #region GetRestaurantByIdTests
 
     [Fact]
     public async Task GetRestaurantById_Should_Return_A_200Ok()
@@ -538,7 +538,7 @@ public class RestaurantsControllerITest : ControllerITestBase
 
     #endregion
 
-    #region GetRestaurants_Tests
+    #region GetRestaurantsTests
 
     [Fact]
     public async Task GetRestaurants_Should_Return_A_200Ok_Containing_Restaurants()
@@ -1027,19 +1027,15 @@ public class RestaurantsControllerITest : ControllerITestBase
     [Fact]
     public async Task GetRestaurants_Should_Return_A_400BadRequest_When_Invalid_Filter()
     {
-        // Arrange
-        var authenticatedUserInfo = await Authenticate(UserMocks.RestaurantAdminCreateDto);
-        Client.SetAuthorizationHeader(authenticatedUserInfo.AccessToken);
-
-        // Act
+        // Arrange & Act
         var response = await Client.GetAsync("restaurants?page=0&size=31&isPublished=25&isCurrentlyOpenToOrder=abc");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         var responseBody = await ResponseUtils.DeserializeContentAsync(response);
 
-        responseBody.Should().Contain("Page must be an integer within 1 and 100000.");
-        responseBody.Should().Contain("Size must be an integer within 1 and 30.");
+        responseBody.Should().Contain("Page must be an integer between 1 and 100000.");
+        responseBody.Should().Contain("Size must be an integer between 1 and 30.");
         responseBody.Should().Contain("The value '25' is not valid for IsPublished.");
         responseBody.Should().Contain("The value 'abc' is not valid for IsCurrentlyOpenToOrder.");
     }
