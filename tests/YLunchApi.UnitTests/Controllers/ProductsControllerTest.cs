@@ -275,11 +275,11 @@ public class ProductsControllerTest : UnitTestFixture
             actualProduct.CreationDateTime.Should().BeCloseTo(dateTime, TimeSpan.FromSeconds(5));
             actualProduct.ExpirationDateTime.Should().BeCloseTo(dateTime.AddDays(1), TimeSpan.FromSeconds(5));
             actualProduct.Allergens.Should().BeEquivalentTo(expectedProduct.Allergens)
-                        .And
-                        .BeInAscendingOrder(x => x.Name);
+                         .And
+                         .BeInAscendingOrder(x => x.Name);
             actualProduct.ProductTags.Should().BeEquivalentTo(expectedProduct.ProductTags)
-                        .And
-                        .BeInAscendingOrder(x => x.Name);
+                         .And
+                         .BeInAscendingOrder(x => x.Name);
         }
     }
 
@@ -350,11 +350,11 @@ public class ProductsControllerTest : UnitTestFixture
             actualProduct.CreationDateTime.Should().BeCloseTo(dateTime, TimeSpan.FromSeconds(5));
             actualProduct.ExpirationDateTime.Should().BeCloseTo(dateTime.AddDays(1), TimeSpan.FromSeconds(5));
             actualProduct.Allergens.Should().BeEquivalentTo(expectedProduct.Allergens)
-                        .And
-                        .BeInAscendingOrder(x => x.Name);
+                         .And
+                         .BeInAscendingOrder(x => x.Name);
             actualProduct.ProductTags.Should().BeEquivalentTo(expectedProduct.ProductTags)
-                        .And
-                        .BeInAscendingOrder(x => x.Name);
+                         .And
+                         .BeInAscendingOrder(x => x.Name);
         }
     }
 
@@ -428,11 +428,11 @@ public class ProductsControllerTest : UnitTestFixture
             actualProduct.CreationDateTime.Should().BeCloseTo(dateTime, TimeSpan.FromSeconds(5));
             actualProduct.ExpirationDateTime.Should().BeCloseTo(dateTime.AddDays(1), TimeSpan.FromSeconds(5));
             actualProduct.Allergens.Should().BeEquivalentTo(expectedProduct.Allergens)
-                        .And
-                        .BeInAscendingOrder(x => x.Name);
+                         .And
+                         .BeInAscendingOrder(x => x.Name);
             actualProduct.ProductTags.Should().BeEquivalentTo(expectedProduct.ProductTags)
-                        .And
-                        .BeInAscendingOrder(x => x.Name);
+                         .And
+                         .BeInAscendingOrder(x => x.Name);
         }
     }
 

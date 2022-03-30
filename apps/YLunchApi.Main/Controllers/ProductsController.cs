@@ -57,6 +57,7 @@ public class ProductsController : ApplicationControllerBase
             return NotFound(new ErrorDto(HttpStatusCode.NotFound, $"Product {productId} not found."));
         }
     }
+
     [HttpGet("restaurants/{restaurantId}/products")]
     public async Task<ActionResult<ICollection<ProductReadDto>>> GetProductsByRestaurantId([FromRoute] string restaurantId, [FromQuery] ProductFilter? productFilter = null)
     {
@@ -72,7 +73,5 @@ public class ProductsController : ApplicationControllerBase
         {
             return NotFound(new ErrorDto(HttpStatusCode.NotFound, $"Restaurant: {restaurantId} not found."));
         }
-    } 
+    }
 }
-
-
