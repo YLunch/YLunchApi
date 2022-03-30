@@ -46,6 +46,7 @@ public class ProductRepository : IProductRepository
         var products = await _context.Products
             .Include(x => x.Allergens)
             .Include(x => x.ProductTags)
+            .Where(x=>x.RestaurantId == productFilter.RestaurantId)
             .ToListAsync();
         return products.Select(FormatProduct).ToList();
     }

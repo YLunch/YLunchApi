@@ -60,7 +60,8 @@ public class ProductsController : ApplicationControllerBase
     [HttpGet("restaurants/{restaurantId}/products")]
     public async Task<ActionResult<IEnumerable<ProductReadDto>>> GetProducts([FromRoute] string restaurantId, [FromQuery] ProductFilter? productFilter = null)
     {
-        var filter = productFilter ?? new ProductFilter(restaurantId);
+        var filter = productFilter ?? new ProductFilter();
+        filter.RestaurantId = restaurantId;
         var productsReadDto = await _productService.GetProducts(filter);
         return Ok(productsReadDto);
     } 
