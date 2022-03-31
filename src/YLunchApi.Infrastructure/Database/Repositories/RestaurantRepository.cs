@@ -58,8 +58,8 @@ public class RestaurantRepository : IRestaurantRepository
         var query = RestaurantsQueryBase
                     .Skip((restaurantFilter.Page - 1) * restaurantFilter.Size)
                     .Take(restaurantFilter.Size);
-        query = IsPublishedRestaurantsQuery(query, restaurantFilter.IsPublished);
-        query = IsCurrentlyOpenToOrderRestaurantsQuery(query, restaurantFilter.IsCurrentlyOpenToOrder);
+        query = FilterByIsPublished(query, restaurantFilter.IsPublished);
+        query = FilterByIsCurrentlyOpenToOrder(query, restaurantFilter.IsCurrentlyOpenToOrder);
         return (await query.ToListAsync()).Select(ReformatRestaurant).ToList();
     }
 
@@ -70,7 +70,7 @@ public class RestaurantRepository : IRestaurantRepository
                 .Include(x => x.OrderOpeningTimes.OrderBy(y => (int)y.DayOfWeek * 24 * 60 + y.OffsetInMinutes))
                 .OrderBy(restaurant => restaurant.CreationDateTime);
 
-    private static IQueryable<Restaurant> IsPublishedRestaurantsQuery(IQueryable<Restaurant> query, bool? isPublished) =>
+    private static IQueryable<Restaurant> FilterByIsPublished(IQueryable<Restaurant> query, bool? isPublished) =>
         isPublished switch
         {
             true => query.Where(x => x.IsPublished),
@@ -78,7 +78,7 @@ public class RestaurantRepository : IRestaurantRepository
             null => query
         };
 
-    private IQueryable<Restaurant> IsCurrentlyOpenToOrderRestaurantsQuery(IQueryable<Restaurant> query, bool? isCurrentlyOpenToOrderRestaurants)
+    private IQueryable<Restaurant> FilterByIsCurrentlyOpenToOrder(IQueryable<Restaurant> query, bool? isCurrentlyOpenToOrderRestaurants)
     {
         var utcNow = _dateTimeProvider.UtcNow;
         return isCurrentlyOpenToOrderRestaurants switch

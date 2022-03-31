@@ -46,8 +46,8 @@ public class ProductRepository : IProductRepository
         var query = ProductQueryBase
                     .Skip((productFilter.Page - 1) * productFilter.Size)
                     .Take(productFilter.Size);
-        query = GetProductByRestaurantId(query, productFilter.RestaurantId);
-        query = IsAvailable(query, productFilter.IsAvailable);
+        query = FilterByRestaurantId(query, productFilter.RestaurantId);
+        query = FilterByIsAvailable(query, productFilter.IsAvailable);
 
         var products = await query.ToListAsync();
         return products.Select(FormatProduct)
@@ -55,7 +55,7 @@ public class ProductRepository : IProductRepository
                        .ToList();
     }
 
-    private IQueryable<Product> IsAvailable(IQueryable<Product> query, bool? isAvailable) =>
+    private IQueryable<Product> FilterByIsAvailable(IQueryable<Product> query, bool? isAvailable) =>
         isAvailable switch
         {
             true => query.Where(x =>
@@ -69,7 +69,7 @@ public class ProductRepository : IProductRepository
             null => query
         };
 
-    private static IQueryable<Product> GetProductByRestaurantId(IQueryable<Product> query, string? restaurantId) =>
+    private static IQueryable<Product> FilterByRestaurantId(IQueryable<Product> query, string? restaurantId) =>
         restaurantId switch
         {
             null => query,

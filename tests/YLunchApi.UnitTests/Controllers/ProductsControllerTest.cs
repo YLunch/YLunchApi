@@ -437,6 +437,90 @@ public class ProductsControllerTest : UnitTestFixture
     }
 
     [Fact]
+    public async Task GetProducts_With_Filter_IsAvailable_False_Should_Return_A_200Ok_With_Correct_Products()
+    {
+        // Arrange
+        var dateTime = DateTimeMocks.Monday20220321T1000Utc;
+        _productsController = await InitProductsController(dateTime);
+
+        var productCreateDto1 = ProductMocks.ProductCreateDto;
+        productCreateDto1.Name = "product1";
+        productCreateDto1.Quantity = 0;
+        var product1 = await CreateProduct(productCreateDto1);
+
+        var productCreateDto2 = ProductMocks.ProductCreateDto;
+        productCreateDto2.Name = "product2";
+        productCreateDto2.IsActive = false;
+        var product2 = await CreateProduct(productCreateDto2);
+
+        var productCreateDto3 = ProductMocks.ProductCreateDto;
+        productCreateDto3.Name = "product3";
+        productCreateDto1.Quantity = null;
+        await CreateProduct(productCreateDto3);
+
+        var productCreateDto4 = ProductMocks.ProductCreateDto;
+        productCreateDto4.Name = "product4";
+        productCreateDto4.ExpirationDateTime = dateTime.AddDays(-1);
+        var product4 = await CreateProduct(productCreateDto4);
+
+        var productCreateDto5 = ProductMocks.ProductCreateDto;
+        productCreateDto5.Name = "product5";
+        await CreateProduct(productCreateDto5);
+
+        var expectedProducts = new List<ProductReadDto>
+        {
+            product1,
+            product2,
+            product4
+        };
+
+        var filter = new ProductFilter
+        {
+            IsAvailable = false
+        };
+
+        // Act
+        var response = await _productsController.GetProductsByRestaurantId(_restaurant.Id, filter);
+
+        // Assert
+        var responseResult = Assert.IsType<OkObjectResult>(response.Result);
+        var responseBody = Assert.IsType<List<ProductReadDto>>(responseResult.Value);
+        responseBody.Count.Should().Be(3);
+
+        responseBody[0].Name.Should().Be("product1");
+        responseBody[1].Name.Should().Be("product2");
+        responseBody[2].Name.Should().Be("product4");
+
+        for (var i = 0; i < responseBody.Count; i++)
+        {
+            var actualProduct = responseBody[i];
+            var expectedProduct = expectedProducts[i];
+
+            actualProduct.Id.Should().Be(expectedProduct.Id);
+            actualProduct.RestaurantId.Should().Be(_restaurant.Id);
+            actualProduct.Name.Should().Be(expectedProduct.Name);
+            actualProduct.Price.Should().Be(expectedProduct.Price);
+            actualProduct.Description.Should().Be(expectedProduct.Description);
+            actualProduct.IsActive.Should().Be(expectedProduct.IsActive);
+            actualProduct.Quantity.Should().Be(expectedProduct.Quantity);
+            actualProduct.ProductType.Should().Be(expectedProduct.ProductType);
+            actualProduct.Image.Should().Be(expectedProduct.Image);
+            actualProduct.CreationDateTime.Should().BeCloseTo(dateTime, TimeSpan.FromSeconds(5));
+            if (expectedProduct.ExpirationDateTime != null)
+            {
+                actualProduct.ExpirationDateTime.Should().BeCloseTo((DateTime)expectedProduct.ExpirationDateTime, TimeSpan.FromSeconds(5));
+            }
+
+            actualProduct.Allergens.Should().BeEquivalentTo(expectedProduct.Allergens)
+                         .And
+                         .BeInAscendingOrder(x => x.Name);
+            actualProduct.ProductTags.Should().BeEquivalentTo(expectedProduct.ProductTags)
+                         .And
+                         .BeInAscendingOrder(x => x.Name);
+        }
+    }
+
+    [Fact]
     public async Task GetProducts_Should_Return_A_404NotFound_When_Restaurant_Not_Found()
     {
         // Assert
