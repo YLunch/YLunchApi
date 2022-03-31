@@ -728,6 +728,52 @@ paths:
                 statusCode: 409
                 errors:
                   reasons: ["Product already exists."]
+    get:
+      tags:
+        - products
+      summary: Gets products
+      description: |
+        - Authorization header: **no**
+      operationId: getProducts
+      parameters:
+        - in: path
+          name: restaurantId
+          required: true
+          description: The id of the restaurant you want to get the products
+          schema:
+            type: string
+      responses:
+        '200':
+          description: |
+            Success
+            - The products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductReadDto'
+        '400':
+          description: |
+            Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "BadRequest"
+                statusCode: 400
+                errors:
+                  reasons: ["Something went wrong, please try again later."]
+        '404':
+          description: |
+            Not found:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+              example:
+                message: Restaurant not found.
   /products/{productId}:
     get:
       tags:
