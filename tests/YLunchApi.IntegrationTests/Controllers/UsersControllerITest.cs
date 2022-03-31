@@ -209,6 +209,10 @@ public class UsersControllerITest : ControllerITestBase
     [InlineData("anne-marie.martin@ynov.com", "Anne-Marie", "Martin-Jacques", "0687654321", "Password1234.")]
     [InlineData("anne.marie@ynov.com", "Anne Marie", "Martin Jacques", "0787654321", "PaSSword1234$")]
     [InlineData("anne.marie@ynov.com", "An-Ma", "Du-He", "0798765432", "paSS@1234word")]
+    [InlineData("anne.marie@ynov.com", "An'a", "D'He", "0798765432", "paSS@1234word")]
+    [InlineData("anne.marie@ynov.com", "An-a", "D-He", "0798765432", "paSS@1234word")]
+    [InlineData("anne.marie@ynov.com", "An a", "D He", "0798765432", "paSS@1234word")]
+    [InlineData("anne.marie@ynov.com", "a", "e", "0798765432", "paSS@1234word")]
     [InlineData("anne.marie@ynov.com", "An ma", "Du he", "0712345678", "paSS@1234word")]
     [InlineData("anne.marie@ynov.com", "An", "Du", "0712345678", "paSS@1234word")]
     public async Task CreateCustomer_Should_Return_A_201Created(string email,
@@ -229,6 +233,7 @@ public class UsersControllerITest : ControllerITestBase
 
         // Act
         var response = await Client.PostAsJsonAsync("customers", body);
+        var res = await ResponseUtils.DeserializeContentAsync(response);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Created);
