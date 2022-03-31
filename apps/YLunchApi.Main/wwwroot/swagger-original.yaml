@@ -739,9 +739,27 @@ paths:
         - in: path
           name: restaurantId
           required: true
-          description: The id of the restaurant you want to get the products
+          description: The id of the restaurant you want to get the products.
           schema:
             type: string
+        - in: query
+          name: page
+          required: false
+          description: The page you want within 1 and 10 000. Default 1.
+          schema:
+            type: number
+        - in: query
+          name: size
+          required: false
+          description: The size you want within 1 and 50. Default 50.
+          schema:
+            type: number
+        - in: query
+          name: isAvailable
+          required: false
+          description: To filter the restaurants that are available or not. Default null to get both. A product is available when isActive is true, quantity is null or > 1, expirationDateTime is null or in the future.
+          schema:
+            type: boolean
       responses:
         '200':
           description: |
