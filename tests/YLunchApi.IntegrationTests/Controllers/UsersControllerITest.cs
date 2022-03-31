@@ -309,7 +309,7 @@ public class UsersControllerITest : ControllerITestBase
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         var content = await ResponseUtils.DeserializeContentAsync(response);
-        content.Should().Contain("Email is invalid. You must provide your lowercase Ynov email without any accent or '.");
+        content.Should().Contain("Email is invalid. It should be a lowercase Ynov email format and could contain '.', '-' and/or '_' characters.");
     }
 
     [Theory]

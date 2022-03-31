@@ -902,6 +902,7 @@ components:
           type: string
           format: email
           example: admin@restaurant.com
+          description: "It should be lowercase email format and could contain '.', '-' and/or '_' characters."
         firstname:
           type: string
           example: Jean-Marc
@@ -929,6 +930,7 @@ components:
           type: string
           format: email
           example: anne-marie.martin@ynov.com
+          description: "It should be a lowercase Ynov email format and could contain '.', '-' and/or '_' characters."
         firstname:
           type: string
           example: Anne-Marie
