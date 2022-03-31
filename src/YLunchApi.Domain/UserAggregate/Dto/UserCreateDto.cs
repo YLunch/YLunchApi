@@ -6,8 +6,8 @@ public abstract class UserCreateDto
 {
     [Required]
     [RegularExpression(
-        @"^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)*\.[a-z]{2,20}$",
-        ErrorMessage = "Email is invalid. It should be lowercase email format. Example: example@example.com.")]
+        @"^[a-z0-9._-]+@[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)*\.[a-z]{2,20}$",
+        ErrorMessage = "Email is invalid. It should be lowercase email format and could contain '.', '-' and/or '_' characters. Example: example@example.com.")]
     public virtual string Email { get; set; } = null!;
 
     [Required]
@@ -23,14 +23,14 @@ public abstract class UserCreateDto
     public string PhoneNumber { get; set; } = null!;
 
     [RegularExpression(
-        @"^(:?[^\W0-9]{1,20}(?:[ \-'](?:[^\W0-9]{1,20})+)*)$",
-        ErrorMessage = "Firstname is invalid. Should contain only letters and '-'")]
+        @"^(:?[A-Za-zÀ-ÖØ-öø-ÿ]{1,50}(?:[ \-'](?:[A-Za-zÀ-ÖØ-öø-ÿ]{1,50})+)*)$",
+        ErrorMessage = "Firstname is invalid. Should contain only letters and - or ' or space as separators.")]
     [Required]
     public string Firstname { get; set; } = null!;
 
     [RegularExpression(
-        @"^(:?[^\W0-9]{1,20}(?:[ \-'](?:[^\W0-9]{1,20})+)*)$",
-        ErrorMessage = "Lastname is invalid. Should contain only letters and '-'")]
+        @"^(:?[A-Za-zÀ-ÖØ-öø-ÿ]{1,50}(?:[ \-'](?:[A-Za-zÀ-ÖØ-öø-ÿ]{1,50})+)*)$",
+        ErrorMessage = "Lastname is invalid. Should contain only letters and - or ' or space as separators.")]
     [Required]
     public string Lastname { get; set; } = null!;
 }

@@ -27,6 +27,7 @@ public class UserRepository : IUserRepository
     {
         var result = await _userManager.CreateAsync(user, password);
         var success = result.Succeeded;
+        if (!success) throw new UserRegistrationException();
 
         if (!await _roleManager.RoleExistsAsync(Roles.SuperAdmin))
             success &= (await _roleManager.CreateAsync(new IdentityRole(Roles.SuperAdmin))).Succeeded;

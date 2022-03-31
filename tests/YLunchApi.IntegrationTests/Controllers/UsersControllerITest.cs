@@ -102,6 +102,9 @@ public class UsersControllerITest : ControllerITestBase
     [InlineData("jean.dupont@restaurant")]
     [InlineData("jean.dupont@restaurant.c")]
     [InlineData("Jean.Dupont@Restaurant.com")]
+    [InlineData("Jean.Dup'ont@restaurant.com")]
+    [InlineData("Jean.Dup ont@restaurant.com")]
+    [InlineData("Jëan.Dupont@restaurant.com")]
     public async Task CreateRestaurantAdmin_Should_Return_A_400BadRequest_When_Email_Is_Invalid(
         string email
     )
@@ -118,7 +121,7 @@ public class UsersControllerITest : ControllerITestBase
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         var content = await ResponseUtils.DeserializeContentAsync(response);
-        content.Should().Contain("Email is invalid.");
+        content.Should().Contain("Email is invalid. It should be lowercase email format and could contain '.', '-' and/or '_' characters. Example: example@example.com.");
     }
 
     [Theory]
@@ -173,10 +176,7 @@ public class UsersControllerITest : ControllerITestBase
 
     [Theory]
     [InlineData("jean123", "dupont123")]
-    [InlineData("j", "d")]
     [InlineData("Je.", "Du.")]
-    [InlineData("Je-A", "Du-P")]
-    [InlineData("Je-A", "Du P")]
     public async Task CreateRestaurantAdmin_Should_Return_A_400BadRequest_When_Firstname_Or_Lastname_Is_Invalid(
         string firstname,
         string lastname
@@ -206,15 +206,15 @@ public class UsersControllerITest : ControllerITestBase
     #region CreateCustomerTests
 
     [Theory]
-    [InlineData("anne-marie.martin@ynov.com", "Anne-Marie", "Martin-Jacques", "0687654321", "Password1234.")]
-    [InlineData("anne.marie@ynov.com", "Anne Marie", "Martin Jacques", "0787654321", "PaSSword1234$")]
-    [InlineData("anne.marie@ynov.com", "An-Ma", "Du-He", "0798765432", "paSS@1234word")]
-    [InlineData("anne.marie@ynov.com", "An'a", "D'He", "0798765432", "paSS@1234word")]
-    [InlineData("anne.marie@ynov.com", "An-a", "D-He", "0798765432", "paSS@1234word")]
-    [InlineData("anne.marie@ynov.com", "An a", "D He", "0798765432", "paSS@1234word")]
-    [InlineData("anne.marie@ynov.com", "a", "e", "0798765432", "paSS@1234word")]
-    [InlineData("anne.marie@ynov.com", "An ma", "Du he", "0712345678", "paSS@1234word")]
-    [InlineData("anne.marie@ynov.com", "An", "Du", "0712345678", "paSS@1234word")]
+    [InlineData("anne-marie.martin-jacques@ynov.com", "Anne-Marie", "Martin-Jacques", "0687654321", "Password1234.")]
+    [InlineData("anne_marie.martin_jacques@ynov.com", "Anne Marie", "Martin Jacques", "0787654321", "PaSSword1234$")]
+    [InlineData("an-ma.du-he@ynov.com", "An-Ma", "Du-He", "0798765432", "paSS@1234word")]
+    [InlineData("an_a.d_he@ynov.com", "An'a", "D'He", "0798765432", "paSS@1234word")]
+    [InlineData("an-a.d-he@ynov.com", "An-a", "D-He", "0798765432", "paSS@1234word")]
+    [InlineData("an_a.d_he@ynov.com", "An a", "D He", "0798765432", "paSS@1234word")]
+    [InlineData("a.e@ynov.com", "a", "e", "0798765432", "paSS@1234word")]
+    [InlineData("an.du@ynov.com", "An", "Du", "0712345678", "paSS@1234word")]
+    [InlineData("loic-francois.d@ynov.com", "loïc-François", "Dépuit", "0712345678", "paSS@1234word")]
     public async Task CreateCustomer_Should_Return_A_201Created(string email,
                                                                 string firstname,
                                                                 string lastname,
@@ -290,6 +290,9 @@ public class UsersControllerITest : ControllerITestBase
     [InlineData("jean.dupont@")]
     [InlineData("@ynov.com")]
     [InlineData("jean.dupont@ynov.c")]
+    [InlineData("jean.düpont@ynov.com")]
+    [InlineData("jean.d'pont@ynov.com")]
+    [InlineData("jean.d pont@ynov.com")]
     public async Task CreateCustomer_Should_Return_A_400BadRequest_When_Email_Is_Invalid(
         string email
     )
@@ -306,7 +309,7 @@ public class UsersControllerITest : ControllerITestBase
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         var content = await ResponseUtils.DeserializeContentAsync(response);
-        content.Should().Contain("Email is invalid. You must provide your Ynov email");
+        content.Should().Contain("Email is invalid. You must provide your lowercase Ynov email without any accent or '.");
     }
 
     [Theory]
@@ -361,10 +364,7 @@ public class UsersControllerITest : ControllerITestBase
 
     [Theory]
     [InlineData("jean123", "dupont123")]
-    [InlineData("j", "d")]
     [InlineData("Je.", "Du.")]
-    [InlineData("Je-A", "Du-P")]
-    [InlineData("Je-A", "Du P")]
     public async Task CreateCustomer_Should_Return_A_400BadRequest_When_Firstname_Or_Lastname_Is_Invalid(
         string firstname,
         string lastname
@@ -384,9 +384,9 @@ public class UsersControllerITest : ControllerITestBase
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         var content = await ResponseUtils.DeserializeContentAsync(response);
         content.Should()
-               .Contain("Firstname is invalid")
+               .Contain("Firstname is invalid. Should contain only letters and - or ' or space as separators.")
                .And
-               .Contain("Lastname is invalid");
+               .Contain("Lastname is invalid. Should contain only letters and - or ' or space as separators.");
     }
 
     #endregion

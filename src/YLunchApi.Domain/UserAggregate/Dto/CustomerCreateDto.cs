@@ -7,7 +7,7 @@ public class CustomerCreateDto : UserCreateDto
     [Required]
     [EmailAddress]
     [RegularExpression(
-        @"^(:?[^\W0-9]{2,20}(?:[-](?:[^\W0-9]{2,20})+)*)\.(:?[^\W0-9]{2,20}(?:[-](?:[^\W0-9]{2,20})+)*)@ynov.com$",
-        ErrorMessage = "Email is invalid. You must provide your Ynov email")]
+        @"^(:?[a-z]{1,50}(?:[_\-](?:[a-z]{1,50})+)*)\.(:?[a-z]{1,50}(?:[_\-](?:[a-z]{1,50})+)*)@ynov.com$",
+        ErrorMessage = "Email is invalid. You must provide your lowercase Ynov email without any accent or '.")]
     public override string Email { get; set; } = null!;
 }
