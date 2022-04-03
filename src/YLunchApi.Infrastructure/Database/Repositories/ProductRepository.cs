@@ -21,7 +21,9 @@ public class ProductRepository : IProductRepository
     public async Task Create(Product product)
     {
         await _context.Products.AddAsync(product);
-        var existingProduct = await _context.Products.FirstOrDefaultAsync(x => x.Name == product.Name);
+        var existingProduct = await _context.Products
+                                            .Where(x => x.RestaurantId == product.RestaurantId)
+                                            .FirstOrDefaultAsync(x => x.Name == product.Name);
         if (existingProduct != null)
         {
             throw new EntityAlreadyExistsException();
