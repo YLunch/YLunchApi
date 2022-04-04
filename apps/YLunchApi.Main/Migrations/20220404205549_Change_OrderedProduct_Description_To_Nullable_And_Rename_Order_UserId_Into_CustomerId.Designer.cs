@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using YLunchApi.Infrastructure.Database;
 
@@ -10,9 +11,10 @@ using YLunchApi.Infrastructure.Database;
 namespace YLunchApi.Main.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220404205549_Change_OrderedProduct_Description_To_Nullable_And_Rename_Order_UserId_Into_CustomerId")]
+    partial class Change_OrderedProduct_Description_To_Nullable_And_Rename_Order_UserId_Into_CustomerId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

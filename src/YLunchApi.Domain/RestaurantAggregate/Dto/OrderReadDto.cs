@@ -19,7 +19,7 @@ public class OrderReadDto : EntityReadDto
 
     public ICollection<OrderStatusReadDto> OrderStatuses { get; set; } = null!;
 
-    public OrderStatusReadDto CurrentOrderStatus { get; set; }
+    public OrderStatusReadDto CurrentOrderStatus { get; set; } = null!;
 
     public bool IsAcknowledged { get; set; }
 
