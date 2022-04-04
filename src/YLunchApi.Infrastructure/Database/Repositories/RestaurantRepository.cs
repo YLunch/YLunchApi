@@ -55,11 +55,11 @@ public class RestaurantRepository : IRestaurantRepository
 
     public async Task<ICollection<Restaurant>> GetRestaurants(RestaurantFilter restaurantFilter)
     {
-        var query = RestaurantsQueryBase
-                    .Skip((restaurantFilter.Page - 1) * restaurantFilter.Size)
-                    .Take(restaurantFilter.Size);
+        var query = FilterByRestaurantAdminId(RestaurantsQueryBase, restaurantFilter.RestaurantAdminId);
         query = FilterByIsPublished(query, restaurantFilter.IsPublished);
         query = FilterByIsCurrentlyOpenToOrder(query, restaurantFilter.IsCurrentlyOpenToOrder);
+        query = query.Skip((restaurantFilter.Page - 1) * restaurantFilter.Size)
+                     .Take(restaurantFilter.Size);
         return (await query.ToListAsync()).Select(ReformatRestaurant).ToList();
     }
 
@@ -94,6 +94,13 @@ public class RestaurantRepository : IRestaurantRepository
             null => query
         };
     }
+
+    private static IQueryable<Restaurant> FilterByRestaurantAdminId(IQueryable<Restaurant> query, string? restaurantAdminId) =>
+        restaurantAdminId switch
+        {
+            null => query,
+            string => query.Where(x => x.AdminId == restaurantAdminId)
+        };
 
     private static Restaurant ReformatRestaurant(Restaurant restaurant)
     {

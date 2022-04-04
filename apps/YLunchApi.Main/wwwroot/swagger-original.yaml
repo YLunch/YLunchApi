@@ -554,17 +554,12 @@ paths:
       operationId: getRestaurants
       parameters:
         - in: query
-          name: page
+          name: restaurantAdminId
           required: false
-          description: The page you want within 1 and 10 000. Default 1.
+          description: To filter the restaurants that are related to the restaurantAdmin id. Default null to ignore this param and get all.
           schema:
-            type: number
-        - in: query
-          name: size
-          required: false
-          description: The size you want within 1 and 30. Default 30.
-          schema:
-            type: number
+            type: string
+            example: a00000e0-aaa0-000a-0000-00e00aa00e00
         - in: query
           name: isPublished
           required: false
@@ -577,6 +572,18 @@ paths:
           description: To filter the restaurants that are currently open to order or not. Default null to get both.
           schema:
             type: boolean
+        - in: query
+          name: page
+          required: false
+          description: The page you want within 1 and 10 000. Default 1.
+          schema:
+            type: number
+        - in: query
+          name: size
+          required: false
+          description: The size you want within 1 and 30. Default 30.
+          schema:
+            type: number
       responses:
         '200':
           description: |

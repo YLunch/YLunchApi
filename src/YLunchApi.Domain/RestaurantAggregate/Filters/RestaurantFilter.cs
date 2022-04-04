@@ -12,4 +12,5 @@ public class RestaurantFilter
 
     public bool? IsCurrentlyOpenToOrder { get; set; }
     public bool? IsPublished { get; set; }
+    public string? RestaurantAdminId { get; set; }
 }
