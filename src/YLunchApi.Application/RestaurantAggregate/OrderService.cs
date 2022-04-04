@@ -41,7 +41,7 @@ public class OrderService : IOrderService
 
         var totalPrice = products.Sum(x => x.Price);
         var order = orderCreateDto.Adapt<Order>();
-        order.CustomerId = customerId;
+        order.UserId = customerId;
         order.RestaurantId = restaurantId;
         order.OrderStatuses = new List<OrderStatus>
         {

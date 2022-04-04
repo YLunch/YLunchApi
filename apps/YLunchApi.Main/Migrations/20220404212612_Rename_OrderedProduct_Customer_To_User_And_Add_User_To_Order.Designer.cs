@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using YLunchApi.Infrastructure.Database;
 
@@ -10,9 +11,10 @@ using YLunchApi.Infrastructure.Database;
 namespace YLunchApi.Main.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220404212612_Rename_OrderedProduct_Customer_To_User_And_Add_User_To_Order")]
+    partial class Rename_OrderedProduct_Customer_To_User_And_Add_User_To_Order
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
