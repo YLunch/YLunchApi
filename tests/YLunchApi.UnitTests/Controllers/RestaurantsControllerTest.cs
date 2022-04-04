@@ -15,7 +15,6 @@ using YLunchApi.Domain.Core.Utils;
 using YLunchApi.Domain.RestaurantAggregate.Dto;
 using YLunchApi.Domain.RestaurantAggregate.Filters;
 using YLunchApi.Main.Controllers;
-using YLunchApi.TestsShared;
 using YLunchApi.TestsShared.Mocks;
 using YLunchApi.TestsShared.Models;
 using YLunchApi.UnitTests.Core.Configuration;

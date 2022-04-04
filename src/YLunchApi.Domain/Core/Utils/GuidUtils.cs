@@ -1,4 +1,4 @@
-namespace YLunchApi.TestsShared;
+namespace YLunchApi.Domain.Core.Utils;
 
 public static class GuidUtils
 {

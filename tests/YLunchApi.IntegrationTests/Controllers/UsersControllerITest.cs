@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
 using YLunchApi.Domain.CommonAggregate.Dto;
+using YLunchApi.Domain.Core.Utils;
 using YLunchApi.Domain.UserAggregate.Dto;
 using YLunchApi.Helpers.Extensions;
 using YLunchApi.IntegrationTests.Core.Utils;
-using YLunchApi.TestsShared;
 using YLunchApi.TestsShared.Mocks;
 
 namespace YLunchApi.IntegrationTests.Controllers;

@@ -7,10 +7,10 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
+using YLunchApi.Domain.Core.Utils;
 using YLunchApi.Domain.RestaurantAggregate.Dto;
 using YLunchApi.IntegrationTests.Core.Extensions;
 using YLunchApi.IntegrationTests.Core.Utils;
-using YLunchApi.TestsShared;
 using YLunchApi.TestsShared.Mocks;
 
 namespace YLunchApi.IntegrationTests.Controllers;

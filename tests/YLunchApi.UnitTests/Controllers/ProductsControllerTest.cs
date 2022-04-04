@@ -10,10 +10,10 @@ using Moq;
 using Xunit;
 using YLunchApi.Domain.CommonAggregate.Dto;
 using YLunchApi.Domain.CommonAggregate.Services;
+using YLunchApi.Domain.Core.Utils;
 using YLunchApi.Domain.RestaurantAggregate.Dto;
 using YLunchApi.Domain.RestaurantAggregate.Filters;
 using YLunchApi.Main.Controllers;
-using YLunchApi.TestsShared;
 using YLunchApi.TestsShared.Mocks;
 using YLunchApi.UnitTests.Core.Configuration;
 
@@ -29,6 +29,12 @@ public class ProductsControllerTest : UnitTestFixture
     }
 
     #region Utils
+
+    private async Task<ProductsController> InitProductsController(DateTime? customDateTime = null)
+    {
+        _restaurant = await CreateRestaurant(customDateTime);
+        return Fixture.GetImplementationFromService<ProductsController>();
+    }
 
     private async Task<RestaurantReadDto> CreateRestaurant(DateTime? customDateTime = null, string? restaurantName = null)
     {
@@ -55,12 +61,6 @@ public class ProductsControllerTest : UnitTestFixture
         // Assert
         var responseResult = Assert.IsType<CreatedResult>(response.Result);
         return Assert.IsType<ProductReadDto>(responseResult.Value);
-    }
-
-    private async Task<ProductsController> InitProductsController(DateTime? customDateTime = null)
-    {
-        _restaurant = await CreateRestaurant(customDateTime);
-        return Fixture.GetImplementationFromService<ProductsController>();
     }
 
     #endregion
