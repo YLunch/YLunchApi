@@ -61,6 +61,7 @@ public class OrderService : IOrderService
                                             {
                                                 OrderId = order.Id,
                                                 ProductId = x.Id,
+                                                UserId = customerId,
                                                 RestaurantId = x.RestaurantId,
                                                 Name = x.Name,
                                                 Description = x.Description,
