@@ -8,4 +8,5 @@ public interface IProductRepository
     Task Create(Product product);
     Task<Product> GetById(string productId);
     Task<ICollection<Product>> GetProducts(ProductFilter productFilter);
+    IQueryable<Product> ProductsQueryBase { get; }
 }

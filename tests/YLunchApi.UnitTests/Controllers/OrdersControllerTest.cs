@@ -72,10 +72,10 @@ public class OrdersControllerTest : UnitTestFixture
 
     #endregion
 
-    #region CreateProductTests
+    #region CreateOrderTests
 
     [Fact]
-    public async Task CreateProduct_Should_Return_A_201Created()
+    public async Task CreateOrder_Should_Return_A_201Created()
     {
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;

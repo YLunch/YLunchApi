@@ -34,7 +34,7 @@ public class ProductRepository : IProductRepository
 
     public async Task<Product> GetById(string productId)
     {
-        var product = await ProductQueryBase.FirstOrDefaultAsync(x => x.Id == productId);
+        var product = await ProductsQueryBase.FirstOrDefaultAsync(x => x.Id == productId);
         if (product == null)
         {
             throw new EntityNotFoundException();
@@ -45,7 +45,7 @@ public class ProductRepository : IProductRepository
 
     public async Task<ICollection<Product>> GetProducts(ProductFilter productFilter)
     {
-        var query = ProductQueryBase
+        var query = ProductsQueryBase
                     .Skip((productFilter.Page - 1) * productFilter.Size)
                     .Take(productFilter.Size);
         query = FilterByRestaurantId(query, productFilter.RestaurantId);
@@ -78,7 +78,7 @@ public class ProductRepository : IProductRepository
             _ => query.Where(x => x.RestaurantId == restaurantId)
         };
 
-    private IQueryable<Product> ProductQueryBase =>
+    public IQueryable<Product> ProductsQueryBase =>
         _context.Products
                 .Include(x => x.Allergens)
                 .Include(x => x.ProductTags);

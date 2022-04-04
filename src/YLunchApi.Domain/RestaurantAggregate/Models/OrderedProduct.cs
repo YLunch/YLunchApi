@@ -17,7 +17,7 @@ public class OrderedProduct : Entity
     public virtual Order? Order { get; set; }
 
     public string Name { get; set; } = null!;
-    public string Description { get; set; } = null!;
+    public string? Description { get; set; } = null!;
     public double Price { get; set; }
     public DateTime CreationDateTime { get; set; }
 

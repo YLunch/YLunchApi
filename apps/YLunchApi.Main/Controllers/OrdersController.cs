@@ -30,7 +30,7 @@ public class OrdersController : ApplicationControllerBase
         try
         {
             var restaurant = await _restaurantService.GetById(restaurantId);
-            var orderReadDto = await _orderService.Create(restaurant.Id, orderCreateDto);
+            var orderReadDto = await _orderService.Create(CurrentUserId!, restaurant.Id, orderCreateDto);
             return Created("", orderReadDto);
         }
         catch (EntityNotFoundException exception)

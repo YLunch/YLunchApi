@@ -42,6 +42,7 @@ public class UnitTestFixtureBase
         _serviceCollection.AddScoped<RestaurantsController>();
         _serviceCollection.AddScoped<AuthenticationController>();
         _serviceCollection.AddScoped<ProductsController>();
+        _serviceCollection.AddScoped<OrdersController>();
 
         _serviceCollection.AddDbContext<ApplicationDbContext>(options =>
             options.UseInMemoryDatabase($"YLunchDatabaseForUnitTests-{DatabaseId}"));
@@ -67,6 +68,9 @@ public class UnitTestFixtureBase
 
         _serviceCollection.AddScoped<IAllergenRepository, AllergenRepository>();
         _serviceCollection.AddScoped<IProductTagRepository, ProductTagRepository>();
+
+        _serviceCollection.AddScoped<IOrderRepository, OrderRepository>();
+        _serviceCollection.AddScoped<IOrderService, OrderService>();
 
         _serviceCollection.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 

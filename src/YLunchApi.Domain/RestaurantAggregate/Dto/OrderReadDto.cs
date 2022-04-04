@@ -4,7 +4,7 @@ namespace YLunchApi.Domain.RestaurantAggregate.Dto;
 
 public class OrderReadDto : EntityReadDto
 {
-    public string UserId { get; set; } = null!;
+    public string CustomerId { get; set; } = null!;
     public string RestaurantId { get; set; } = null!;
 
     public bool IsDeleted { get; set; }
