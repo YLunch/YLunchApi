@@ -1434,7 +1434,7 @@ public class RestaurantsControllerTest : UnitTestFixture
         GetRestaurants_With_Filter_RestaurantAdminId_Should_Return_A_200Ok_With_Correct_Restaurants()
     {
         // Arrange
-        var restaurantAdminId = new AuthenticatedUserInfo(TokenMocks.ValidRestaurantAdminAccessToken, "").UserId;
+        var restaurantAdminId = new DecodedAccessToken(TokenMocks.ValidRestaurantAdminAccessToken, "").UserId;
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
         await CreateRestaurant("restaurant1", dateTime, TokenMocks.ValidRestaurantAdmin2AccessToken);
 

@@ -25,7 +25,7 @@ public class AuthenticationControllerTest : UnitTestFixture
     {
     }
 
-    private async Task<AuthenticatedUserInfo> Login(UserCreateDto user, string role)
+    private async Task<DecodedAccessToken> Login(UserCreateDto user, string role)
     {
         // Arrange
         Fixture.InitFixture();
@@ -53,7 +53,7 @@ public class AuthenticationControllerTest : UnitTestFixture
         jwtSecurityToken.UserId.Should().BeEquivalentTo(userDb.Id);
         jwtSecurityToken.Subject.Should().BeEquivalentTo(userDb.Email);
 
-        return new AuthenticatedUserInfo(responseBody.AccessToken, responseBody.RefreshToken);
+        return new DecodedAccessToken(responseBody.AccessToken, responseBody.RefreshToken);
     }
 
     [Fact]
@@ -96,12 +96,12 @@ public class AuthenticationControllerTest : UnitTestFixture
         var refreshTokenRepository = Fixture.GetImplementationFromService<IRefreshTokenRepository>();
         var controller = Fixture.GetImplementationFromService<AuthenticationController>();
 
-        var authenticatedUserInfo = await Login(UserMocks.RestaurantAdminCreateDto, Roles.RestaurantAdmin);
+        var decodedAccessToken = await Login(UserMocks.RestaurantAdminCreateDto, Roles.RestaurantAdmin);
 
         var refreshTokensRequest = new TokenUpdateDto
         {
-            AccessToken = authenticatedUserInfo.AccessToken,
-            RefreshToken = authenticatedUserInfo.RefreshToken
+            AccessToken = decodedAccessToken.AccessToken,
+            RefreshToken = decodedAccessToken.RefreshToken
         };
 
         // Act
@@ -111,10 +111,10 @@ public class AuthenticationControllerTest : UnitTestFixture
         var responseResult = Assert.IsType<OkObjectResult>(response.Result);
         var responseBody = Assert.IsType<TokenReadDto>(responseResult.Value);
 
-        var newAuthenticatedUserInfo = new AuthenticatedUserInfo(responseBody.AccessToken, responseBody.RefreshToken);
+        var newAuthenticatedUserInfo = new DecodedAccessToken(responseBody.AccessToken, responseBody.RefreshToken);
         newAuthenticatedUserInfo.RefreshToken.Should().Be(responseBody.RefreshToken);
-        newAuthenticatedUserInfo.UserId.Should().BeEquivalentTo(authenticatedUserInfo.UserId);
-        newAuthenticatedUserInfo.Subject.Should().BeEquivalentTo(authenticatedUserInfo.UserEmail);
+        newAuthenticatedUserInfo.UserId.Should().BeEquivalentTo(decodedAccessToken.UserId);
+        newAuthenticatedUserInfo.Subject.Should().BeEquivalentTo(decodedAccessToken.UserEmail);
 
         var oldRefreshToken = await refreshTokenRepository.GetByToken(refreshTokensRequest.RefreshToken);
         oldRefreshToken = Assert.IsType<RefreshToken>(oldRefreshToken);
@@ -184,8 +184,8 @@ public class AuthenticationControllerTest : UnitTestFixture
     public async Task GetCurrentUser_Should_Return_A_200Ok_Containing_Current_User_RestaurantAdmin()
     {
         // Arrange
-        var authenticatedUserInfo = await Login(UserMocks.RestaurantAdminCreateDto, Roles.RestaurantAdmin);
-        Fixture.InitFixture(configuration => configuration.AccessToken = authenticatedUserInfo.AccessToken);
+        var decodedAccessToken = await Login(UserMocks.RestaurantAdminCreateDto, Roles.RestaurantAdmin);
+        Fixture.InitFixture(configuration => configuration.AccessToken = decodedAccessToken.AccessToken);
         var controller = Fixture.GetImplementationFromService<AuthenticationController>();
 
         // Act
@@ -195,15 +195,15 @@ public class AuthenticationControllerTest : UnitTestFixture
         var responseResult = Assert.IsType<OkObjectResult>(response.Result);
         var responseBody = Assert.IsType<UserReadDto>(responseResult.Value);
 
-        responseBody.Should().BeEquivalentTo(UserMocks.RestaurantAdminUserReadDto(authenticatedUserInfo.UserId));
+        responseBody.Should().BeEquivalentTo(UserMocks.RestaurantAdminUserReadDto(decodedAccessToken.UserId));
     }
 
     [Fact]
     public async Task GetCurrentUser_Should_Return_A_200Ok_Containing_Current_User_Customer()
     {
         // Arrange
-        var authenticatedUserInfo = await Login(UserMocks.CustomerCreateDto, Roles.Customer);
-        Fixture.InitFixture(configuration => configuration.AccessToken = authenticatedUserInfo.AccessToken);
+        var decodedAccessToken = await Login(UserMocks.CustomerCreateDto, Roles.Customer);
+        Fixture.InitFixture(configuration => configuration.AccessToken = decodedAccessToken.AccessToken);
         var controller = Fixture.GetImplementationFromService<AuthenticationController>();
 
         // Act
@@ -213,7 +213,7 @@ public class AuthenticationControllerTest : UnitTestFixture
         var responseResult = Assert.IsType<OkObjectResult>(response.Result);
         var responseBody = Assert.IsType<UserReadDto>(responseResult.Value);
 
-        responseBody.Should().BeEquivalentTo(UserMocks.CustomerUserReadDto(authenticatedUserInfo.UserId));
+        responseBody.Should().BeEquivalentTo(UserMocks.CustomerUserReadDto(decodedAccessToken.UserId));
     }
 
     [Fact]

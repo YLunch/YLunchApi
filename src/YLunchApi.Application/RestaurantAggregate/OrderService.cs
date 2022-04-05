@@ -41,6 +41,7 @@ public class OrderService : IOrderService
 
         var totalPrice = products.Sum(x => x.Price);
         var order = orderCreateDto.Adapt<Order>();
+        order.CreationDateTime = _dateTimeProvider.UtcNow;
         order.UserId = customerId;
         order.RestaurantId = restaurantId;
         order.OrderStatuses = new List<OrderStatus>
@@ -67,8 +68,8 @@ public class OrderService : IOrderService
                                                 Description = x.Description,
                                                 Price = x.Price,
                                                 CreationDateTime = x.CreationDateTime,
-                                                Allergens = string.Join(",", x.Allergens.Select(y => y.Name)),
-                                                ProductTags = string.Join(",", x.ProductTags.Select(y => y.Name))
+                                                Allergens = string.Join(",", x.Allergens.OrderBy(y => y.Name).Select(y => y.Name)),
+                                                ProductTags = string.Join(",", x.ProductTags.OrderBy(y => y.Name).Select(y => y.Name))
                                             };
                                             return orderedProduct;
                                         })

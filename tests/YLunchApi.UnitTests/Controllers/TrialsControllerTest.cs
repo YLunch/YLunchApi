@@ -47,9 +47,9 @@ public class TrialsControllerTest : UnitTestFixture
         var responseResult = Assert.IsType<OkObjectResult>(response.Result);
         var responseBody = Assert.IsType<MessageDto>(responseResult.Value);
 
-        var authenticatedUserInfo = new ApplicationSecurityToken(TokenMocks.ValidCustomerAccessToken);
+        var decodedAccessToken = new ApplicationSecurityToken(TokenMocks.ValidCustomerAccessToken);
         responseBody.Should().BeEquivalentTo(new MessageDto(
-            $"YLunchApi is running, you are authenticated as {authenticatedUserInfo.UserEmail} with Id: {authenticatedUserInfo.UserId} and Roles: {Roles.ListToString(authenticatedUserInfo.UserRoles)}."));
+            $"YLunchApi is running, you are authenticated as {decodedAccessToken.UserEmail} with Id: {decodedAccessToken.UserId} and Roles: {Roles.ListToString(decodedAccessToken.UserRoles)}."));
     }
 
     [Fact]
@@ -66,9 +66,9 @@ public class TrialsControllerTest : UnitTestFixture
         var responseResult = Assert.IsType<OkObjectResult>(response.Result);
         var responseBody = Assert.IsType<MessageDto>(responseResult.Value);
 
-        var authenticatedUserInfo = new ApplicationSecurityToken(TokenMocks.ValidRestaurantAdminAccessToken);
+        var decodedAccessToken = new ApplicationSecurityToken(TokenMocks.ValidRestaurantAdminAccessToken);
         responseBody.Should().BeEquivalentTo(new MessageDto(
-            $"YLunchApi is running, you are authenticated as {authenticatedUserInfo.UserEmail} with Id: {authenticatedUserInfo.UserId} and Roles: {Roles.RestaurantAdmin}."));
+            $"YLunchApi is running, you are authenticated as {decodedAccessToken.UserEmail} with Id: {decodedAccessToken.UserId} and Roles: {Roles.RestaurantAdmin}."));
     }
 
     [Fact]
@@ -85,8 +85,8 @@ public class TrialsControllerTest : UnitTestFixture
         var responseResult = Assert.IsType<OkObjectResult>(response.Result);
         var responseBody = Assert.IsType<MessageDto>(responseResult.Value);
 
-        var authenticatedUserInfo = new ApplicationSecurityToken(TokenMocks.ValidCustomerAccessToken);
+        var decodedAccessToken = new ApplicationSecurityToken(TokenMocks.ValidCustomerAccessToken);
         responseBody.Should().BeEquivalentTo(new MessageDto(
-            $"YLunchApi is running, you are authenticated as {authenticatedUserInfo.UserEmail} with Id: {authenticatedUserInfo.UserId} and Roles: {Roles.Customer}."));
+            $"YLunchApi is running, you are authenticated as {decodedAccessToken.UserEmail} with Id: {decodedAccessToken.UserId} and Roles: {Roles.Customer}."));
     }
 }
