@@ -12,17 +12,27 @@ public class OrderService : IOrderService
 {
     private readonly IOrderRepository _orderRepository;
     private readonly IProductRepository _productRepository;
+    private readonly IRestaurantRepository _restaurantRepository;
+    private readonly IRestaurantService _restaurantService;
     private readonly IDateTimeProvider _dateTimeProvider;
 
-    public OrderService(IOrderRepository orderRepository, IDateTimeProvider dateTimeProvider, IProductRepository productRepository)
+    public OrderService(IOrderRepository orderRepository, IDateTimeProvider dateTimeProvider, IProductRepository productRepository, IRestaurantRepository restaurantRepository, IRestaurantService restaurantService)
     {
         _orderRepository = orderRepository;
         _dateTimeProvider = dateTimeProvider;
         _productRepository = productRepository;
+        _restaurantRepository = restaurantRepository;
+        _restaurantService = restaurantService;
     }
 
     public async Task<OrderReadDto> Create(string customerId, string restaurantId, OrderCreateDto orderCreateDto)
     {
+        var restaurant = await _restaurantRepository.GetById(restaurantId);
+        if (!_restaurantService.IsOpenToOrder(restaurant, (DateTime)orderCreateDto.ReservedForDateTime!))
+        {
+            throw new ReservedForDateTimeOutOfOpenToOrderOpeningTimesException();
+        }
+
         var products = orderCreateDto.ProductIds!
                                      .Select(productId =>
                                      {

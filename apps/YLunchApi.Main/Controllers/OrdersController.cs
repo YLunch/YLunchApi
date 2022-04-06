@@ -14,13 +14,11 @@ namespace YLunchApi.Main.Controllers;
 public class OrdersController : ApplicationControllerBase
 {
     private readonly IOrderService _orderService;
-    private readonly IRestaurantService _restaurantService;
 
-    public OrdersController(IHttpContextAccessor httpContextAccessor, IOrderService orderService, IRestaurantService restaurantService) : base(
+    public OrdersController(IHttpContextAccessor httpContextAccessor, IOrderService orderService) : base(
         httpContextAccessor)
     {
         _orderService = orderService;
-        _restaurantService = restaurantService;
     }
 
     [HttpPost("Restaurants/{restaurantId}/orders")]
@@ -29,14 +27,17 @@ public class OrdersController : ApplicationControllerBase
     {
         try
         {
-            var restaurant = await _restaurantService.GetById(restaurantId);
-            var orderReadDto = await _orderService.Create(CurrentUserId!, restaurant.Id, orderCreateDto);
+            var orderReadDto = await _orderService.Create(CurrentUserId!, restaurantId, orderCreateDto);
             return Created("", orderReadDto);
         }
         catch (EntityNotFoundException)
         {
             // todo filter exception for restaurant or product not found
             return NotFound(new ErrorDto(HttpStatusCode.NotFound, $"Restaurant: {restaurantId} not found."));
+        }
+        catch (ReservedForDateTimeOutOfOpenToOrderOpeningTimesException)
+        {
+            return BadRequest(new ErrorDto(HttpStatusCode.BadRequest, "ReservedForDateTime must be set when the restaurant is open for orders."));
         }
     }
 }

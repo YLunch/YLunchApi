@@ -17,4 +17,50 @@ public static class RestaurantMocks
         ZipCode = "06560",
         StreetNumber = "1"
     };
+
+    public static RestaurantCreateDto PrepareFullRestaurant(string? restaurantName = null)
+    {
+        var dateTime = DateTimeMocks.Monday20220321T1000Utc;
+        var restaurantCreateDto = SimpleRestaurantCreateDto;
+        restaurantCreateDto.Name = restaurantName ?? restaurantCreateDto.Name;
+
+        restaurantCreateDto.ClosingDates = new List<ClosingDateCreateDto>
+        {
+            new() { ClosingDateTime = dateTime.AddDays(-1) },
+            new() { ClosingDateTime = dateTime.AddDays(1) }
+        };
+
+        restaurantCreateDto.PlaceOpeningTimes = new List<OpeningTimeCreateDto>
+        {
+            new()
+            {
+                DayOfWeek = dateTime.AddDays(-1).DayOfWeek,
+                OffsetInMinutes = dateTime.Hour * 60 + dateTime.Minute,
+                DurationInMinutes = 2 * 60
+            },
+            new()
+            {
+                DayOfWeek = dateTime.DayOfWeek,
+                OffsetInMinutes = dateTime.Hour * 60 + dateTime.Minute,
+                DurationInMinutes = 2 * 60
+            }
+        };
+
+        restaurantCreateDto.OrderOpeningTimes = new List<OpeningTimeCreateDto>
+        {
+            new()
+            {
+                DayOfWeek = dateTime.AddDays(-1).DayOfWeek,
+                OffsetInMinutes = dateTime.Hour * 60 + dateTime.Minute,
+                DurationInMinutes = 2 * 60
+            },
+            new()
+            {
+                DayOfWeek = dateTime.DayOfWeek,
+                OffsetInMinutes = dateTime.Hour * 60 + dateTime.Minute,
+                DurationInMinutes = 2 * 60
+            }
+        };
+        return restaurantCreateDto;
+    }
 }

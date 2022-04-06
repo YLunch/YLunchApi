@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 using YLunchApi.Authentication.Models;
+using YLunchApi.Domain.CommonAggregate.Dto;
 using YLunchApi.Domain.CommonAggregate.Services;
 using YLunchApi.Domain.Core.Utils;
 using YLunchApi.Domain.RestaurantAggregate.Dto;
@@ -38,19 +40,6 @@ public class OrdersControllerTest : UnitTestFixture
         return Fixture.GetImplementationFromService<OrdersController>();
     }
 
-    // private async Task<UserReadDto> CreateCustomer(DateTime? customDateTime = null, string? userEmail = null)
-    // {
-    //     var dateTimeProviderMock = new Mock<IDateTimeProvider>();
-    //     dateTimeProviderMock.Setup(x => x.UtcNow).Returns(customDateTime ?? DateTime.UtcNow);
-    //     Fixture.InitFixture(configuration => { configuration.DateTimeProvider = dateTimeProviderMock.Object; });
-    //     var customerCreateDto = UserMocks.CustomerCreateDto;
-    //     customerCreateDto.Email = userEmail ?? customerCreateDto.Email;
-    //     var usersController = Fixture.GetImplementationFromService<UsersController>();
-    //     var response = await usersController.Create(customerCreateDto);
-    //     var responseResult = Assert.IsType<CreatedResult>(response.Result);
-    //     return Assert.IsType<UserReadDto>(responseResult.Value);
-    // }
-
     #endregion
 
     #region CreateOrderTests
@@ -60,7 +49,7 @@ public class OrdersControllerTest : UnitTestFixture
     {
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
-        var restaurant = await CreateRestaurant(RestaurantMocks.SimpleRestaurantCreateDto, dateTime);
+        var restaurant = await CreateRestaurant(RestaurantMocks.PrepareFullRestaurant(), dateTime);
 
         var productCreateDto1 = ProductMocks.ProductCreateDto;
         productCreateDto1.Name = "product1";
@@ -81,7 +70,7 @@ public class OrdersControllerTest : UnitTestFixture
                 product1.Id,
                 product2.Id
             },
-            ReservedForDateTime = dateTime.AddHours(3),
+            ReservedForDateTime = dateTime.AddHours(1),
             CustomerComment = "Customer comment"
         };
 
@@ -111,7 +100,7 @@ public class OrdersControllerTest : UnitTestFixture
         responseBody.IsAccepted.Should().Be(false);
         responseBody.IsAcknowledged.Should().Be(false);
         responseBody.CreationDateTime.Should().Be(dateTime);
-        responseBody.ReservedForDateTime.Should().BeCloseTo(dateTime.AddHours(3), TimeSpan.FromSeconds(5));
+        responseBody.ReservedForDateTime.Should().BeCloseTo(dateTime.AddHours(1), TimeSpan.FromSeconds(5));
         responseBody.OrderedProducts.Count.Should().Be(2);
         responseBody.OrderedProducts
                     .Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
@@ -144,6 +133,44 @@ public class OrdersControllerTest : UnitTestFixture
             DateTime = dateTime,
             State = OrderState.Idling
         }, options => options.Excluding(x => x.Id));
+    }
+
+    [Fact]
+    public async Task CreateOrder_Should_Return_A_400BadRequest_When_ReservedForDateTime_Is_Out_Of_OrderOpeningTimes()
+    {
+        // Arrange
+        var dateTime = DateTimeMocks.Monday20220321T1000Utc;
+        var restaurant = await CreateRestaurant(RestaurantMocks.PrepareFullRestaurant(), dateTime);
+
+        var productCreateDto1 = ProductMocks.ProductCreateDto;
+        productCreateDto1.Name = "product1";
+        var product1 = await CreateProduct(restaurant.Id, dateTime, productCreateDto1);
+
+        var productCreateDto2 = ProductMocks.ProductCreateDto;
+        productCreateDto2.Name = "product2";
+        var product2 = await CreateProduct(restaurant.Id, dateTime, productCreateDto2);
+
+        var ordersController = InitOrdersController(TokenMocks.ValidCustomerAccessToken, dateTime);
+
+        var orderCreateDto = new OrderCreateDto
+        {
+            ProductIds = new List<string>
+            {
+                product1.Id,
+                product2.Id
+            },
+            ReservedForDateTime = dateTime.AddHours(3),
+            CustomerComment = "Customer comment"
+        };
+
+        // Act
+        var response = await ordersController.CreateOrder(restaurant.Id, orderCreateDto);
+
+        // Assert
+        var responseResult = Assert.IsType<BadRequestObjectResult>(response.Result);
+        var responseBody = Assert.IsType<ErrorDto>(responseResult.Value);
+
+        responseBody.Should().BeEquivalentTo(new ErrorDto(HttpStatusCode.BadRequest, "ReservedForDateTime must be set when the restaurant is open for orders."));
     }
 
     #endregion

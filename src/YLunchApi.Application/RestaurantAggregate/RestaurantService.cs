@@ -22,25 +22,23 @@ public class RestaurantService : IRestaurantService
     {
         var restaurantReadDto = restaurant.Adapt<RestaurantReadDto>();
         restaurantReadDto.IsPublished = CanPublish(restaurant);
-        restaurantReadDto.IsCurrentlyOpenToOrder = IsCurrentlyOpenToOrder(restaurant);
-        restaurantReadDto.IsCurrentlyOpenInPlace = IsCurrentlyOpenInPlace(restaurant);
+        restaurantReadDto.IsCurrentlyOpenToOrder = IsOpenToOrder(restaurant, _dateTimeProvider.UtcNow);
+        restaurantReadDto.IsCurrentlyOpenInPlace = IsOpenInPlace(restaurant, _dateTimeProvider.UtcNow);
         return restaurantReadDto;
     }
 
-    private bool IsCurrentlyOpenInPlace(Restaurant restaurant)
+    public bool IsOpenInPlace(Restaurant restaurant, DateTime dateTime)
     {
-        var utcNow = _dateTimeProvider.UtcNow;
         return restaurant.IsOpen &&
-               restaurant.ClosingDates.All(x => x.ClosingDateTime.Date != utcNow.Date) &&
-               restaurant.PlaceOpeningTimes.Any(x => x.Contains(utcNow));
+               restaurant.ClosingDates.All(x => x.ClosingDateTime.Date != dateTime.Date) &&
+               restaurant.PlaceOpeningTimes.Any(x => x.Contains(dateTime));
     }
 
-    private bool IsCurrentlyOpenToOrder(Restaurant restaurant)
+    public bool IsOpenToOrder(Restaurant restaurant, DateTime dateTime)
     {
-        var utcNow = _dateTimeProvider.UtcNow;
         return restaurant.IsOpen &&
-               restaurant.ClosingDates.All(x => x.ClosingDateTime.Date != utcNow.Date) &&
-               restaurant.OrderOpeningTimes.Any(x => x.Contains(utcNow));
+               restaurant.ClosingDates.All(x => x.ClosingDateTime.Date != dateTime.Date) &&
+               restaurant.OrderOpeningTimes.Any(x => x.Contains(dateTime));
     }
 
     private static bool CanPublish(Restaurant restaurant)
