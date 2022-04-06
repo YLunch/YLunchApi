@@ -16,6 +16,7 @@ public class ApplicationControllerBaseTest : UnitTestFixture
     {
     }
 
+
     [Fact]
     public void UserInfo_Should_Be_Unset_When_Http_Context_Is_Null()
     {
