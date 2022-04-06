@@ -7,13 +7,13 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
+using YLunchApi.Authentication.Models;
 using YLunchApi.Domain.CommonAggregate.Services;
 using YLunchApi.Domain.Core.Utils;
 using YLunchApi.Domain.RestaurantAggregate.Dto;
 using YLunchApi.Domain.RestaurantAggregate.Models.Enums;
 using YLunchApi.Main.Controllers;
 using YLunchApi.TestsShared.Mocks;
-using YLunchApi.TestsShared.Models;
 using YLunchApi.UnitTests.Core.Configuration;
 
 namespace YLunchApi.UnitTests.Controllers;
@@ -26,13 +26,13 @@ public class OrdersControllerTest : UnitTestFixture
 
     #region Utils
 
-    private OrdersController InitOrdersController(DateTime? customDateTime = null, string? accessToken = null)
+    private OrdersController InitOrdersController(string accessToken, DateTime? customDateTime = null)
     {
         var dateTimeProviderMock = new Mock<IDateTimeProvider>();
         dateTimeProviderMock.Setup(x => x.UtcNow).Returns(customDateTime ?? DateTime.UtcNow);
         Fixture.InitFixture(configuration =>
         {
-            configuration.AccessToken = accessToken ?? TokenMocks.ValidCustomerAccessToken;
+            configuration.AccessToken = accessToken;
             configuration.DateTimeProvider = dateTimeProviderMock.Object;
         });
         return Fixture.GetImplementationFromService<OrdersController>();
@@ -51,40 +51,6 @@ public class OrdersControllerTest : UnitTestFixture
     //     return Assert.IsType<UserReadDto>(responseResult.Value);
     // }
 
-    private async Task<RestaurantReadDto> CreateRestaurant(DateTime? customDateTime = null, string? restaurantName = null)
-    {
-        var dateTimeProviderMock = new Mock<IDateTimeProvider>();
-        dateTimeProviderMock.Setup(x => x.UtcNow).Returns(customDateTime ?? DateTime.UtcNow);
-        Fixture.InitFixture(configuration =>
-        {
-            configuration.AccessToken = TokenMocks.ValidRestaurantAdminAccessToken;
-            configuration.DateTimeProvider = dateTimeProviderMock.Object;
-        });
-        var restaurantsController = Fixture.GetImplementationFromService<RestaurantsController>();
-        var restaurantCreateDto = RestaurantMocks.SimpleRestaurantCreateDto;
-        restaurantCreateDto.Name = restaurantName ?? restaurantCreateDto.Name;
-        var restaurantCreationResponse = await restaurantsController.CreateRestaurant(restaurantCreateDto);
-        var restaurantCreationResponseResult = Assert.IsType<CreatedResult>(restaurantCreationResponse.Result);
-        return Assert.IsType<RestaurantReadDto>(restaurantCreationResponseResult.Value);
-    }
-
-    private async Task<ProductReadDto> CreateProduct(string restaurantId, DateTime? customDateTime = null, string? productName = null)
-    {
-        var dateTimeProviderMock = new Mock<IDateTimeProvider>();
-        dateTimeProviderMock.Setup(x => x.UtcNow).Returns(customDateTime ?? DateTime.UtcNow);
-        Fixture.InitFixture(configuration =>
-        {
-            configuration.AccessToken = TokenMocks.ValidRestaurantAdminAccessToken;
-            configuration.DateTimeProvider = dateTimeProviderMock.Object;
-        });
-        var productsController = Fixture.GetImplementationFromService<ProductsController>();
-        var productCreateDto = ProductMocks.ProductCreateDto;
-        productCreateDto.Name = productName ?? productCreateDto.Name;
-        var response = await productsController.CreateProduct(restaurantId, productCreateDto);
-        var responseResult = Assert.IsType<CreatedResult>(response.Result);
-        return Assert.IsType<ProductReadDto>(responseResult.Value);
-    }
-
     #endregion
 
     #region CreateOrderTests
@@ -94,13 +60,19 @@ public class OrdersControllerTest : UnitTestFixture
     {
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
-        var restaurant = await CreateRestaurant(dateTime);
-        var product1 = await CreateProduct(restaurant.Id, dateTime, "product1");
-        var product2 = await CreateProduct(restaurant.Id, dateTime, "product2");
+        var restaurant = await CreateRestaurant(RestaurantMocks.SimpleRestaurantCreateDto, dateTime);
 
-        var customerId = new DecodedAccessToken(TokenMocks.ValidCustomerAccessToken, "").UserId;
+        var productCreateDto1 = ProductMocks.ProductCreateDto;
+        productCreateDto1.Name = "product1";
+        var product1 = await CreateProduct(restaurant.Id, dateTime, productCreateDto1);
 
-        var ordersController = InitOrdersController(dateTime);
+        var productCreateDto2 = ProductMocks.ProductCreateDto;
+        productCreateDto2.Name = "product2";
+        var product2 = await CreateProduct(restaurant.Id, dateTime, productCreateDto2);
+
+        var customerId = new ApplicationSecurityToken(TokenMocks.ValidCustomerAccessToken).UserId;
+
+        var ordersController = InitOrdersController(TokenMocks.ValidCustomerAccessToken, dateTime);
 
         var orderCreateDto = new OrderCreateDto
         {

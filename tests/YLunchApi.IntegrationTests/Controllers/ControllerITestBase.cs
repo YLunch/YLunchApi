@@ -26,7 +26,7 @@ public abstract class ControllerITestBase : IClassFixture<WebApplicationFactory<
         Client = webApplication.CreateClient();
     }
 
-    protected async Task<DecodedAccessToken> Authenticate(CustomerCreateDto customerCreateDto)
+    protected async Task<ApplicationSecurityTokenAndRefreshToken> Authenticate(CustomerCreateDto customerCreateDto)
     {
         var customerCreationRequestBody = new
         {
@@ -44,7 +44,7 @@ public abstract class ControllerITestBase : IClassFixture<WebApplicationFactory<
         return decodedAccessToken;
     }
 
-    protected async Task<DecodedAccessToken> Authenticate(RestaurantAdminCreateDto restaurantAdminCreateDto)
+    protected async Task<ApplicationSecurityTokenAndRefreshToken> Authenticate(RestaurantAdminCreateDto restaurantAdminCreateDto)
     {
         var restaurantAdminCreationRequestBody = new
         {
@@ -62,7 +62,7 @@ public abstract class ControllerITestBase : IClassFixture<WebApplicationFactory<
         return decodedAccessToken;
     }
 
-    private async Task<DecodedAccessToken> AuthenticateUser(UserCreateDto userCreateDto)
+    private async Task<ApplicationSecurityTokenAndRefreshToken> AuthenticateUser(UserCreateDto userCreateDto)
     {
         // Arrange
         var userLoginRequestBody = new
@@ -81,6 +81,6 @@ public abstract class ControllerITestBase : IClassFixture<WebApplicationFactory<
         Assert.IsType<string>(tokens.RefreshToken);
         var applicationSecurityToken = new ApplicationSecurityToken(tokens.AccessToken);
         applicationSecurityToken.UserEmail.Should().Be(userCreateDto.Email);
-        return new DecodedAccessToken(tokens.AccessToken, tokens.RefreshToken);
+        return new ApplicationSecurityTokenAndRefreshToken(tokens.AccessToken, tokens.RefreshToken);
     }
 }

@@ -16,7 +16,6 @@ using YLunchApi.Domain.RestaurantAggregate.Dto;
 using YLunchApi.Domain.RestaurantAggregate.Filters;
 using YLunchApi.Main.Controllers;
 using YLunchApi.TestsShared.Mocks;
-using YLunchApi.TestsShared.Models;
 using YLunchApi.UnitTests.Core.Configuration;
 
 namespace YLunchApi.UnitTests.Controllers;
@@ -44,9 +43,9 @@ public class RestaurantsControllerTest : UnitTestFixture
         return Fixture.GetImplementationFromService<RestaurantsController>();
     }
 
-    private async Task<RestaurantReadDto> CreateRestaurant(string restaurantName, DateTime dateTime, string? accessToken = null)
+    private static RestaurantCreateDto PrepareFullRestaurant(string restaurantName)
     {
-        var restaurantsController = InitRestaurantsController(dateTime, accessToken);
+        var dateTime = DateTimeMocks.Monday20220321T1000Utc;
         var restaurantCreateDto = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurantCreateDto.Name = restaurantName;
 
@@ -87,18 +86,7 @@ public class RestaurantsControllerTest : UnitTestFixture
                 DurationInMinutes = 2 * 60
             }
         };
-
-        var restaurantCreationResponse = await restaurantsController.CreateRestaurant(restaurantCreateDto);
-        var restaurantCreationResponseResult = Assert.IsType<CreatedResult>(restaurantCreationResponse.Result);
-        return Assert.IsType<RestaurantReadDto>(restaurantCreationResponseResult.Value);
-    }
-
-    private async Task<RestaurantReadDto> CreateRestaurant(RestaurantCreateDto restaurantCreateDto, DateTime dateTime)
-    {
-        var restaurantsController = InitRestaurantsController(dateTime);
-        var restaurantCreationResponse = await restaurantsController.CreateRestaurant(restaurantCreateDto);
-        var restaurantCreationResponseResult = Assert.IsType<CreatedResult>(restaurantCreationResponse.Result);
-        return Assert.IsType<RestaurantReadDto>(restaurantCreationResponseResult.Value);
+        return restaurantCreateDto;
     }
 
     #endregion
@@ -949,8 +937,8 @@ public class RestaurantsControllerTest : UnitTestFixture
         var restaurantsController = InitRestaurantsController(dateTime);
         var expectedRestaurants = new List<RestaurantReadDto>
         {
-            await CreateRestaurant("restaurant1", dateTime),
-            await CreateRestaurant("restaurant2", dateTime)
+            await CreateRestaurant(PrepareFullRestaurant("restaurant1"), dateTime),
+            await CreateRestaurant(PrepareFullRestaurant("restaurant2"), dateTime)
         };
 
         // Act
@@ -1013,16 +1001,16 @@ public class RestaurantsControllerTest : UnitTestFixture
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
         var restaurantsController = InitRestaurantsController(dateTime);
-        await CreateRestaurant("restaurant1", dateTime);
-        await CreateRestaurant("restaurant2", dateTime);
-        await CreateRestaurant("restaurant3", dateTime);
-        await CreateRestaurant("restaurant4", dateTime);
-        await CreateRestaurant("restaurant5", dateTime);
-        await CreateRestaurant("restaurant6", dateTime);
+        await CreateRestaurant(PrepareFullRestaurant("restaurant1"), dateTime);
+        await CreateRestaurant(PrepareFullRestaurant("restaurant2"), dateTime);
+        await CreateRestaurant(PrepareFullRestaurant("restaurant3"), dateTime);
+        await CreateRestaurant(PrepareFullRestaurant("restaurant4"), dateTime);
+        await CreateRestaurant(PrepareFullRestaurant("restaurant5"), dateTime);
+        await CreateRestaurant(PrepareFullRestaurant("restaurant6"), dateTime);
         var expectedRestaurants = new List<RestaurantReadDto>
         {
-            await CreateRestaurant("restaurant7", dateTime),
-            await CreateRestaurant("restaurant8", dateTime)
+            await CreateRestaurant(PrepareFullRestaurant("restaurant7"), dateTime),
+            await CreateRestaurant(PrepareFullRestaurant("restaurant8"), dateTime)
         };
         var filter = new RestaurantFilter
         {
@@ -1096,21 +1084,21 @@ public class RestaurantsControllerTest : UnitTestFixture
         restaurant1.Name = "restaurant1";
         await CreateRestaurant(restaurant1, dateTime);
 
-        var restaurant2 = await CreateRestaurant("restaurant2", dateTime);
+        var restaurant2 = await CreateRestaurant(PrepareFullRestaurant("restaurant2"), dateTime);
 
         var restaurant3 = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurant3.Name = "restaurant3";
         await CreateRestaurant(restaurant3, dateTime);
 
-        var restaurant4 = await CreateRestaurant("restaurant4", dateTime);
+        var restaurant4 = await CreateRestaurant(PrepareFullRestaurant("restaurant4"), dateTime);
 
         var restaurant5 = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurant5.Name = "restaurant5";
         await CreateRestaurant(restaurant5, dateTime);
 
-        var restaurant6 = await CreateRestaurant("restaurant6", dateTime);
+        var restaurant6 = await CreateRestaurant(PrepareFullRestaurant("restaurant6"), dateTime);
 
-        var restaurant7 = await CreateRestaurant("restaurant7", dateTime);
+        var restaurant7 = await CreateRestaurant(PrepareFullRestaurant("restaurant7"), dateTime);
 
         var expectedRestaurants = new List<RestaurantReadDto>
         {
@@ -1190,21 +1178,21 @@ public class RestaurantsControllerTest : UnitTestFixture
         restaurantCreateDto1.Name = "restaurant1";
         var restaurant1 = await CreateRestaurant(restaurantCreateDto1, dateTime);
 
-        await CreateRestaurant("restaurant2", dateTime);
+        await CreateRestaurant(PrepareFullRestaurant("restaurant2"), dateTime);
 
         var restaurantCreateDto3 = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurantCreateDto3.Name = "restaurant3";
         var restaurant3 = await CreateRestaurant(restaurantCreateDto3, dateTime);
 
-        await CreateRestaurant("restaurant4", dateTime);
+        await CreateRestaurant(PrepareFullRestaurant("restaurant4"), dateTime);
 
         var restaurantCreateDto5 = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurantCreateDto5.Name = "restaurant5";
         var restaurant5 = await CreateRestaurant(restaurantCreateDto5, dateTime);
 
-        await CreateRestaurant("restaurant6", dateTime);
+        await CreateRestaurant(PrepareFullRestaurant("restaurant6"), dateTime);
 
-        await CreateRestaurant("restaurant7", dateTime);
+        await CreateRestaurant(PrepareFullRestaurant("restaurant7"), dateTime);
 
         var expectedRestaurants = new List<RestaurantReadDto>
         {
@@ -1266,21 +1254,21 @@ public class RestaurantsControllerTest : UnitTestFixture
         restaurant1.Name = "restaurant1";
         await CreateRestaurant(restaurant1, dateTime);
 
-        var restaurant2 = await CreateRestaurant("restaurant2", dateTime);
+        var restaurant2 = await CreateRestaurant(PrepareFullRestaurant("restaurant2"), dateTime);
 
         var restaurant3 = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurant3.Name = "restaurant3";
         await CreateRestaurant(restaurant3, dateTime);
 
-        var restaurant4 = await CreateRestaurant("restaurant4", dateTime);
+        var restaurant4 = await CreateRestaurant(PrepareFullRestaurant("restaurant4"), dateTime);
 
         var restaurant5 = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurant5.Name = "restaurant5";
         await CreateRestaurant(restaurant5, dateTime);
 
-        var restaurant6 = await CreateRestaurant("restaurant6", dateTime);
+        var restaurant6 = await CreateRestaurant(PrepareFullRestaurant("restaurant6"), dateTime);
 
-        var restaurant7 = await CreateRestaurant("restaurant7", dateTime);
+        var restaurant7 = await CreateRestaurant(PrepareFullRestaurant("restaurant7"), dateTime);
 
         var restaurant8 = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurant8.Name = "restaurant8";
@@ -1363,21 +1351,21 @@ public class RestaurantsControllerTest : UnitTestFixture
         restaurantCreateDto1.Name = "restaurant1";
         var restaurant1 = await CreateRestaurant(restaurantCreateDto1, dateTime);
 
-        await CreateRestaurant("restaurant2", dateTime);
+        await CreateRestaurant(PrepareFullRestaurant("restaurant2"), dateTime);
 
         var restaurantCreateDto3 = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurantCreateDto3.Name = "restaurant3";
         var restaurant3 = await CreateRestaurant(restaurantCreateDto3, dateTime);
 
-        await CreateRestaurant("restaurant4", dateTime);
+        await CreateRestaurant(PrepareFullRestaurant("restaurant4"), dateTime);
 
         var restaurantCreateDto5 = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurantCreateDto5.Name = "restaurant5";
         var restaurant5 = await CreateRestaurant(restaurantCreateDto5, dateTime);
 
-        await CreateRestaurant("restaurant6", dateTime);
+        await CreateRestaurant(PrepareFullRestaurant("restaurant6"), dateTime);
 
-        await CreateRestaurant("restaurant7", dateTime);
+        await CreateRestaurant(PrepareFullRestaurant("restaurant7"), dateTime);
 
         var expectedRestaurants = new List<RestaurantReadDto>
         {
@@ -1434,21 +1422,22 @@ public class RestaurantsControllerTest : UnitTestFixture
         GetRestaurants_With_Filter_RestaurantAdminId_Should_Return_A_200Ok_With_Correct_Restaurants()
     {
         // Arrange
-        var restaurantAdminId = new DecodedAccessToken(TokenMocks.ValidRestaurantAdminAccessToken, "").UserId;
+        var restaurantAdminId = new ApplicationSecurityToken(TokenMocks.ValidRestaurantAdminAccessToken).UserId;
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
-        await CreateRestaurant("restaurant1", dateTime, TokenMocks.ValidRestaurantAdmin2AccessToken);
 
-        var restaurant2 = await CreateRestaurant("restaurant2", dateTime);
+        await CreateRestaurant(PrepareFullRestaurant("restaurant1"), dateTime, TokenMocks.ValidRestaurantAdmin2AccessToken);
 
-        await CreateRestaurant("restaurant3", dateTime, TokenMocks.ValidRestaurantAdmin2AccessToken);
+        var restaurant2 = await CreateRestaurant(PrepareFullRestaurant("restaurant2"), dateTime);
 
-        var restaurant4 = await CreateRestaurant("restaurant4", dateTime);
+        await CreateRestaurant(PrepareFullRestaurant("restaurant3"), dateTime, TokenMocks.ValidRestaurantAdmin2AccessToken);
 
-        await CreateRestaurant("restaurant5", dateTime, TokenMocks.ValidRestaurantAdmin2AccessToken);
+        var restaurant4 = await CreateRestaurant(PrepareFullRestaurant("restaurant4"), dateTime);
 
-        var restaurant6 = await CreateRestaurant("restaurant6", dateTime);
+        await CreateRestaurant(PrepareFullRestaurant("restaurant5"), dateTime, TokenMocks.ValidRestaurantAdmin2AccessToken);
 
-        var restaurant7 = await CreateRestaurant("restaurant7", dateTime);
+        var restaurant6 = await CreateRestaurant(PrepareFullRestaurant("restaurant6"), dateTime);
+
+        var restaurant7 = await CreateRestaurant(PrepareFullRestaurant("restaurant7"), dateTime);
 
         var expectedRestaurants = new List<RestaurantReadDto>
         {

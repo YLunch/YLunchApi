@@ -20,13 +20,13 @@ public class UnitTestFixture : IClassFixture<UnitTestFixtureBase>
         fixture.DatabaseId = Guid.NewGuid().ToString();
     }
 
-    protected async Task<RestaurantReadDto> CreateRestaurant(RestaurantCreateDto restaurantCreateDto, DateTime? customDateTime = null)
+    protected async Task<RestaurantReadDto> CreateRestaurant(RestaurantCreateDto restaurantCreateDto, DateTime customDateTime, string? accessToken = null)
     {
         var dateTimeProviderMock = new Mock<IDateTimeProvider>();
-        dateTimeProviderMock.Setup(x => x.UtcNow).Returns(customDateTime ?? DateTime.UtcNow);
+        dateTimeProviderMock.Setup(x => x.UtcNow).Returns(customDateTime);
         Fixture.InitFixture(configuration =>
         {
-            configuration.AccessToken = TokenMocks.ValidRestaurantAdminAccessToken;
+            configuration.AccessToken = accessToken ?? TokenMocks.ValidRestaurantAdminAccessToken;
             configuration.DateTimeProvider = dateTimeProviderMock.Object;
         });
         var restaurantsController = Fixture.GetImplementationFromService<RestaurantsController>();

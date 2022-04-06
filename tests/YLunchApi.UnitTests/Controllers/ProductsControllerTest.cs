@@ -129,7 +129,7 @@ public class ProductsControllerTest : UnitTestFixture
     public async Task CreateProduct_Should_Return_A_409Conflict()
     {
         // Arrange
-        var restaurant = await CreateRestaurant(RestaurantMocks.SimpleRestaurantCreateDto);
+        var restaurant = await CreateRestaurant(RestaurantMocks.SimpleRestaurantCreateDto, DateTimeMocks.Monday20220321T1000Utc);
         var productsController = InitProductsController();
         var productCreateDto = ProductMocks.ProductCreateDto;
 
