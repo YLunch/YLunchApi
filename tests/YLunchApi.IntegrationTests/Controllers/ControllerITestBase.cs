@@ -26,7 +26,7 @@ public abstract class ControllerITestBase : IClassFixture<WebApplicationFactory<
         Client = webApplication.CreateClient();
     }
 
-    protected async Task<ApplicationSecurityTokenAndRefreshToken> Authenticate(CustomerCreateDto customerCreateDto)
+    protected async Task<DecodedTokens> Authenticate(CustomerCreateDto customerCreateDto)
     {
         var customerCreationRequestBody = new
         {
@@ -39,12 +39,12 @@ public abstract class ControllerITestBase : IClassFixture<WebApplicationFactory<
 
         _ = await Client.PostAsJsonAsync("customers", customerCreationRequestBody);
 
-        var decodedAccessToken = await AuthenticateUser(customerCreateDto);
-        decodedAccessToken.UserRoles.Should().BeEquivalentTo(new List<string> { Roles.Customer });
-        return decodedAccessToken;
+        var decodedTokens = await AuthenticateUser(customerCreateDto);
+        decodedTokens.UserRoles.Should().BeEquivalentTo(new List<string> { Roles.Customer });
+        return decodedTokens;
     }
 
-    protected async Task<ApplicationSecurityTokenAndRefreshToken> Authenticate(RestaurantAdminCreateDto restaurantAdminCreateDto)
+    protected async Task<DecodedTokens> Authenticate(RestaurantAdminCreateDto restaurantAdminCreateDto)
     {
         var restaurantAdminCreationRequestBody = new
         {
@@ -57,12 +57,12 @@ public abstract class ControllerITestBase : IClassFixture<WebApplicationFactory<
 
         _ = await Client.PostAsJsonAsync("restaurant-admins", restaurantAdminCreationRequestBody);
 
-        var decodedAccessToken = await AuthenticateUser(restaurantAdminCreateDto);
-        decodedAccessToken.UserRoles.Should().BeEquivalentTo(new List<string> { Roles.RestaurantAdmin });
-        return decodedAccessToken;
+        var decodedTokens = await AuthenticateUser(restaurantAdminCreateDto);
+        decodedTokens.UserRoles.Should().BeEquivalentTo(new List<string> { Roles.RestaurantAdmin });
+        return decodedTokens;
     }
 
-    private async Task<ApplicationSecurityTokenAndRefreshToken> AuthenticateUser(UserCreateDto userCreateDto)
+    private async Task<DecodedTokens> AuthenticateUser(UserCreateDto userCreateDto)
     {
         // Arrange
         var userLoginRequestBody = new
@@ -81,6 +81,6 @@ public abstract class ControllerITestBase : IClassFixture<WebApplicationFactory<
         Assert.IsType<string>(tokens.RefreshToken);
         var applicationSecurityToken = new ApplicationSecurityToken(tokens.AccessToken);
         applicationSecurityToken.UserEmail.Should().Be(userCreateDto.Email);
-        return new ApplicationSecurityTokenAndRefreshToken(tokens.AccessToken, tokens.RefreshToken);
+        return new DecodedTokens(tokens.AccessToken, tokens.RefreshToken);
     }
 }

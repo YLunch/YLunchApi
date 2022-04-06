@@ -74,12 +74,12 @@ public class AuthenticationControllerITest : ControllerITestBase
     public async Task RefreshTokens_Should_Return_A_200Ok()
     {
         // Arrange
-        var decodedAccessToken = await Authenticate(UserMocks.CustomerCreateDto);
+        var decodedTokens = await Authenticate(UserMocks.CustomerCreateDto);
 
         var refreshTokensBody = new
         {
-            decodedAccessToken.AccessToken,
-            decodedAccessToken.RefreshToken
+            decodedTokens.AccessToken,
+            decodedTokens.RefreshToken
         };
 
         // Act
@@ -142,8 +142,8 @@ public class AuthenticationControllerITest : ControllerITestBase
     public async Task GetCurrentUser_Should_Return_A_200Ok()
     {
         // Arrange
-        var decodedAccessToken = await Authenticate(UserMocks.CustomerCreateDto);
-        Client.SetAuthorizationHeader(decodedAccessToken.AccessToken);
+        var decodedTokens = await Authenticate(UserMocks.CustomerCreateDto);
+        Client.SetAuthorizationHeader(decodedTokens.AccessToken);
 
         // Act
         var response = await Client.GetAsync("authentication/current-user");
@@ -151,7 +151,7 @@ public class AuthenticationControllerITest : ControllerITestBase
         var responseBody = await ResponseUtils.DeserializeContentAsync<UserReadDto>(response);
 
         // Assert
-        responseBody.Should().BeEquivalentTo(UserMocks.CustomerUserReadDto(decodedAccessToken.UserId));
+        responseBody.Should().BeEquivalentTo(UserMocks.CustomerUserReadDto(decodedTokens.UserId));
     }
 
     [Fact]

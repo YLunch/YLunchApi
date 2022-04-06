@@ -22,8 +22,8 @@ public class ProductsControllerITest : ControllerITestBase
 
     private async Task<RestaurantReadDto> CreateRestaurant(RestaurantCreateDto restaurantCreateDto)
     {
-        var decodedAccessToken = await Authenticate(UserMocks.RestaurantAdminCreateDto);
-        Client.SetAuthorizationHeader(decodedAccessToken.AccessToken);
+        var decodedTokens = await Authenticate(UserMocks.RestaurantAdminCreateDto);
+        Client.SetAuthorizationHeader(decodedTokens.AccessToken);
         var restaurantCreationResponse = await Client.PostAsJsonAsync("restaurants", restaurantCreateDto);
         restaurantCreationResponse.StatusCode.Should().Be(HttpStatusCode.Created);
         return await ResponseUtils.DeserializeContentAsync<RestaurantReadDto>(restaurantCreationResponse);
@@ -240,8 +240,8 @@ public class ProductsControllerITest : ControllerITestBase
     {
         // Arrange
         var restaurant = await CreateRestaurant(RestaurantMocks.SimpleRestaurantCreateDto);
-        var decodedAccessToken = await Authenticate(UserMocks.CustomerCreateDto);
-        Client.SetAuthorizationHeader(decodedAccessToken.AccessToken);
+        var decodedTokens = await Authenticate(UserMocks.CustomerCreateDto);
+        Client.SetAuthorizationHeader(decodedTokens.AccessToken);
         var dateTime = DateTime.UtcNow;
         var productCreateDto = ProductMocks.ProductCreateDto;
         var body = new
