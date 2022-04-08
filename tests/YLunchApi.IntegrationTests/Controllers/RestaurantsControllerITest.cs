@@ -194,6 +194,7 @@ public class RestaurantsControllerITest : ControllerITestBase
 
         responseBody.IsPublished.Should().Be(true);
     }
+
     [Fact]
     public async Task CreateRestaurant_Non_Having_Optional_Fields_Should_Return_A_201Created()
     {

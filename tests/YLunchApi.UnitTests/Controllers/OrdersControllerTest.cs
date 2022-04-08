@@ -213,5 +213,45 @@ public class OrdersControllerTest : UnitTestFixture
         responseBody.Should().BeEquivalentTo(new ErrorDto(HttpStatusCode.NotFound, $"Restaurant: {notExistingRestaurantId} not found."));
     }
 
+    [Fact]
+    public async Task CreateOrder_Should_Return_A_404NotFound_When_A_Product_Is_Not_Found()
+    {
+        // Arrange
+        var dateTime = DateTimeMocks.Monday20220321T1000Utc;
+        var restaurant = await CreateRestaurant(RestaurantMocks.PrepareFullRestaurant(), dateTime);
+
+        var productCreateDto1 = ProductMocks.ProductCreateDto;
+        productCreateDto1.Name = "product1";
+        await CreateProduct(restaurant.Id, dateTime, productCreateDto1);
+
+        var productCreateDto2 = ProductMocks.ProductCreateDto;
+        productCreateDto2.Name = "product2";
+        var product2 = await CreateProduct(restaurant.Id, dateTime, productCreateDto2);
+
+        var ordersController = InitOrdersController(TokenMocks.ValidCustomerAccessToken, dateTime);
+
+        var notExistingProductId = Guid.NewGuid().ToString();
+        var orderCreateDto = new OrderCreateDto
+        {
+            ProductIds = new List<string>
+            {
+                notExistingProductId,
+                product2.Id
+            },
+            ReservedForDateTime = dateTime.AddHours(1),
+            CustomerComment = "Customer comment"
+        };
+
+
+        // Act
+        var response = await ordersController.CreateOrder(restaurant.Id, orderCreateDto);
+
+        // Assert
+        var responseResult = Assert.IsType<NotFoundObjectResult>(response.Result);
+        var responseBody = Assert.IsType<ErrorDto>(responseResult.Value);
+
+        responseBody.Should().BeEquivalentTo(new ErrorDto(HttpStatusCode.NotFound, $"Product: {notExistingProductId} not found."));
+    }
+
     #endregion
 }

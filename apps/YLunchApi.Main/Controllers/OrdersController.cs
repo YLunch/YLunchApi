@@ -30,10 +30,13 @@ public class OrdersController : ApplicationControllerBase
             var orderReadDto = await _orderService.Create(CurrentUserId!, restaurantId, orderCreateDto);
             return Created("", orderReadDto);
         }
-        catch (EntityNotFoundException)
+        catch (EntityNotFoundException exception)
         {
-            // todo filter exception for restaurant or product not found
-            return NotFound(new ErrorDto(HttpStatusCode.NotFound, $"Restaurant: {restaurantId} not found."));
+            return exception.Message switch
+            {
+                { } m when m.Contains("Product") => NotFound(new ErrorDto(HttpStatusCode.NotFound, $"{exception.Message} not found.")),
+                _ => NotFound(new ErrorDto(HttpStatusCode.NotFound, $"Restaurant: {restaurantId} not found."))
+            };
         }
         catch (ReservedForDateTimeOutOfOpenToOrderOpeningTimesException)
         {

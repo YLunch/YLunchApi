@@ -39,10 +39,10 @@ public class OrderService : IOrderService
                                          var product = _productRepository
                                                        .ProductsQueryBase
                                                        .Where(x => x.RestaurantId == restaurantId)
-                                                       .First(x => x.Id == productId);
+                                                       .FirstOrDefault(x => x.Id == productId);
                                          if (product == null)
                                          {
-                                             throw new EntityNotFoundException($"Product:{productId}");
+                                             throw new EntityNotFoundException($"Product: {productId}");
                                          }
 
                                          return product;

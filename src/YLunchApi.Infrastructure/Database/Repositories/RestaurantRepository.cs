@@ -99,7 +99,7 @@ public class RestaurantRepository : IRestaurantRepository
         restaurantAdminId switch
         {
             null => query,
-            string => query.Where(x => x.AdminId == restaurantAdminId)
+            not null => query.Where(x => x.AdminId == restaurantAdminId)
         };
 
     private static Restaurant ReformatRestaurant(Restaurant restaurant)
