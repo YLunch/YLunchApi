@@ -12,11 +12,11 @@ using YLunchApi.UnitTests.Core.Configuration;
 
 namespace YLunchApi.UnitTests.Domain;
 
-public class InFutureOrNullAttributeTest : UnitTestFixture
+public class FutureAttributeTest : UnitTestFixture
 {
-    private readonly InFutureOrNullAttribute _attribute = new();
+    private readonly FutureAttribute _attribute = new();
 
-    public InFutureOrNullAttributeTest(UnitTestFixtureBase fixture) : base(fixture)
+    public FutureAttributeTest(UnitTestFixtureBase fixture) : base(fixture)
     {
         var dateTimeProviderMock = new Mock<IDateTimeProvider>();
         dateTimeProviderMock.Setup(x => x.UtcNow).Returns(DateTimeMocks.Monday20220321T1000Utc);
@@ -24,7 +24,7 @@ public class InFutureOrNullAttributeTest : UnitTestFixture
     }
 
     [Fact]
-    public void Null_Should_Be_Invalid()
+    public void Null_Should_Be_Valid()
     {
         // Arrange & Act & Assert
         _attribute.IsValid(null, new ValidationContext("")).Should().BeNull();
@@ -66,15 +66,15 @@ public class InFutureOrNullAttributeTest : UnitTestFixture
 }
 
 [ExcludeFromCodeCoverage]
-internal static class InFutureOrNullAttributeExtension
+internal static class FutureAttributeExtension
 {
-    public static ValidationResult? IsValid(this InFutureOrNullAttribute attribute, object? value, ValidationContext validationContext)
+    public static ValidationResult? IsValid(this FutureAttribute attribute, object? value, ValidationContext validationContext)
     {
         var isValidMethod = attribute.GetType()
                                      .GetMethod("IsValid", BindingFlags.NonPublic | BindingFlags.Instance);
         if (isValidMethod == null)
         {
-            throw new InvalidOperationException("IsValidMethod of InFutureOrNullAttribute is null");
+            throw new InvalidOperationException("IsValidMethod of FutureAttribute is null");
         }
 
         return isValidMethod.Invoke(attribute, new[] { value, validationContext }) as ValidationResult;

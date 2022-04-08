@@ -10,7 +10,7 @@ public class NonOverridingOpeningTimesAttribute : ValidationAttribute
     {
         if (value == null)
         {
-            return false;
+            return true;
         }
 
         var orderedOpeningTimes = ((ICollection<OpeningTimeCreateDto>)value)

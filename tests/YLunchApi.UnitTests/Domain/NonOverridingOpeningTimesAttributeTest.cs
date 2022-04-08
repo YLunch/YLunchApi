@@ -12,10 +12,10 @@ public class NonOverridingOpeningTimesAttributeTest
     private readonly NonOverridingOpeningTimesAttribute _attribute = new();
 
     [Fact]
-    public void Null_Should_Be_Invalid()
+    public void Null_Should_Be_Valid()
     {
         // Arrange & Act & Assert
-        _attribute.IsValid(null).Should().BeFalse();
+        _attribute.IsValid(null).Should().BeTrue();
     }
 
     [Fact]

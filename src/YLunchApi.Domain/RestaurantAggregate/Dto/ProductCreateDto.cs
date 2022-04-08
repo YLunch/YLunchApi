@@ -12,7 +12,7 @@ public class ProductCreateDto
     [Required] public bool? IsActive { get; set; }
     [Range(1, 10000)] public int? Quantity { get; set; }
     [Required] public ProductType? ProductType { get; set; }
-    [InFutureOrNull] public DateTime? ExpirationDateTime { get; set; }
+    [Future] public DateTime? ExpirationDateTime { get; set; }
     public string? Image { get; set; }
     [Required] public ICollection<AllergenCreateDto> Allergens { get; set; } = null!;
 

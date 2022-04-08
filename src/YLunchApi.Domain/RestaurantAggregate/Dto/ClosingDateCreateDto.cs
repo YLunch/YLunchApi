@@ -1,10 +1,10 @@
 using System.ComponentModel.DataAnnotations;
+using YLunchApi.Domain.RestaurantAggregate.Dto.Validators;
 
 namespace YLunchApi.Domain.RestaurantAggregate.Dto
 {
     public class ClosingDateCreateDto
     {
-        // Todo valid date if in the future
-        [Required] public DateTime ClosingDateTime { get; set; }
+        [Required] [Future] public DateTime ClosingDateTime { get; set; }
     }
 }

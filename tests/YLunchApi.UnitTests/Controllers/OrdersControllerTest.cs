@@ -173,5 +173,45 @@ public class OrdersControllerTest : UnitTestFixture
         responseBody.Should().BeEquivalentTo(new ErrorDto(HttpStatusCode.BadRequest, "ReservedForDateTime must be set when the restaurant is open for orders."));
     }
 
+    [Fact]
+    public async Task CreateOrder_Should_Return_A_404NotFound_When_Restaurant_Is_Not_Found()
+    {
+        // Arrange
+        var dateTime = DateTimeMocks.Monday20220321T1000Utc;
+        var restaurant = await CreateRestaurant(RestaurantMocks.PrepareFullRestaurant(), dateTime);
+
+        var productCreateDto1 = ProductMocks.ProductCreateDto;
+        productCreateDto1.Name = "product1";
+        var product1 = await CreateProduct(restaurant.Id, dateTime, productCreateDto1);
+
+        var productCreateDto2 = ProductMocks.ProductCreateDto;
+        productCreateDto2.Name = "product2";
+        var product2 = await CreateProduct(restaurant.Id, dateTime, productCreateDto2);
+
+        var ordersController = InitOrdersController(TokenMocks.ValidCustomerAccessToken, dateTime);
+
+        var orderCreateDto = new OrderCreateDto
+        {
+            ProductIds = new List<string>
+            {
+                product1.Id,
+                product2.Id
+            },
+            ReservedForDateTime = dateTime.AddHours(3),
+            CustomerComment = "Customer comment"
+        };
+
+        var notExistingRestaurantId = Guid.NewGuid().ToString();
+
+        // Act
+        var response = await ordersController.CreateOrder(notExistingRestaurantId, orderCreateDto);
+
+        // Assert
+        var responseResult = Assert.IsType<NotFoundObjectResult>(response.Result);
+        var responseBody = Assert.IsType<ErrorDto>(responseResult.Value);
+
+        responseBody.Should().BeEquivalentTo(new ErrorDto(HttpStatusCode.NotFound, $"Restaurant: {notExistingRestaurantId} not found."));
+    }
+
     #endregion
 }

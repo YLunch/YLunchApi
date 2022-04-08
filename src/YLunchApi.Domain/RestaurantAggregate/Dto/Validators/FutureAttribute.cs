@@ -4,7 +4,7 @@ using YLunchApi.Domain.CommonAggregate.Services;
 namespace YLunchApi.Domain.RestaurantAggregate.Dto.Validators;
 
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
-public class InFutureOrNullAttribute : ValidationAttribute
+public class FutureAttribute : ValidationAttribute
 {
     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
     {

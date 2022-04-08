@@ -40,8 +40,8 @@ public class RestaurantsControllerITest : ControllerITestBase
             RestaurantMocks.SimpleRestaurantCreateDto.IsPublic,
             ClosingDates = new List<dynamic>
             {
-                new { ClosingDateTime = DateTime.Parse("2021-12-31") },
-                new { ClosingDateTime = DateTime.Parse("2021-12-25") }
+                new { ClosingDateTime = DateTime.UtcNow.AddYears(1).AddDays(10) },
+                new { ClosingDateTime = DateTime.UtcNow.AddYears(1).AddDays(-10) }
             },
             PlaceOpeningTimes = new List<dynamic>
             {
@@ -114,8 +114,8 @@ public class RestaurantsControllerITest : ControllerITestBase
             RestaurantMocks.SimpleRestaurantCreateDto.IsPublic,
             ClosingDates = new List<dynamic>
             {
-                new { ClosingDateTime = DateTime.Parse("2021-12-31") },
-                new { ClosingDateTime = DateTime.Parse("2021-12-25") }
+                new { ClosingDateTime = DateTime.UtcNow.AddYears(1).AddDays(10) },
+                new { ClosingDateTime = DateTime.UtcNow.AddYears(1).AddDays(-10) }
             },
             PlaceOpeningTimes = new List<dynamic>
             {
@@ -194,6 +194,49 @@ public class RestaurantsControllerITest : ControllerITestBase
 
         responseBody.IsPublished.Should().Be(true);
     }
+    [Fact]
+    public async Task CreateRestaurant_Non_Having_Optional_Fields_Should_Return_A_201Created()
+    {
+        // Arrange
+        var decodedTokens = await Authenticate(UserMocks.RestaurantAdminCreateDto);
+        Client.SetAuthorizationHeader(decodedTokens.AccessToken);
+        var body = new
+        {
+            RestaurantMocks.SimpleRestaurantCreateDto.Name,
+            RestaurantMocks.SimpleRestaurantCreateDto.Email,
+            RestaurantMocks.SimpleRestaurantCreateDto.PhoneNumber,
+            RestaurantMocks.SimpleRestaurantCreateDto.Country,
+            RestaurantMocks.SimpleRestaurantCreateDto.City,
+            RestaurantMocks.SimpleRestaurantCreateDto.ZipCode,
+            RestaurantMocks.SimpleRestaurantCreateDto.StreetName,
+            RestaurantMocks.SimpleRestaurantCreateDto.StreetNumber,
+            RestaurantMocks.SimpleRestaurantCreateDto.IsOpen,
+            RestaurantMocks.SimpleRestaurantCreateDto.IsPublic
+        };
+
+        // Act
+        var response = await Client.PostAsJsonAsync("restaurants", body);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        var responseBody = await ResponseUtils.DeserializeContentAsync<RestaurantReadDto>(response);
+
+        responseBody.Id.Should().MatchRegex(GuidUtils.Regex);
+        responseBody.AdminId.Should().Be(decodedTokens.UserId);
+        responseBody.Email.Should().Be(body.Email);
+        responseBody.PhoneNumber.Should().Be(body.PhoneNumber);
+        responseBody.CreationDateTime.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
+        responseBody.Name.Should().Be(body.Name);
+        responseBody.City.Should().Be(body.City);
+        responseBody.Country.Should().Be(body.Country);
+        responseBody.StreetName.Should().Be(body.StreetName);
+        responseBody.ZipCode.Should().Be(body.ZipCode);
+        responseBody.StreetNumber.Should().Be(body.StreetNumber);
+        responseBody.IsOpen.Should().Be(body.IsOpen);
+        responseBody.IsPublic.Should().Be(body.IsPublic);
+
+        responseBody.IsPublished.Should().Be(false);
+    }
 
     [Fact]
     public async Task CreateRestaurant_Should_Return_A_400BadRequest_When_Missing_Fields()
@@ -266,7 +309,8 @@ public class RestaurantsControllerITest : ControllerITestBase
             RestaurantMocks.SimpleRestaurantCreateDto.IsPublic,
             ClosingDates = new List<dynamic>
             {
-                new { }
+                new { ClosingDateTime = DateTime.UtcNow.AddYears(1).AddDays(10) },
+                new { ClosingDateTime = DateTime.UtcNow.AddYears(1).AddDays(-10) }
             },
             PlaceOpeningTimes = new List<dynamic>
             {
@@ -401,7 +445,7 @@ public class RestaurantsControllerITest : ControllerITestBase
             RestaurantMocks.SimpleRestaurantCreateDto.IsPublic,
             ClosingDates = new List<ClosingDateCreateDto>
             {
-                new() { ClosingDateTime = DateTime.Parse("2021-12-25") }
+                new() { ClosingDateTime = DateTime.UtcNow.AddYears(1).AddDays(10) }
             },
             PlaceOpeningTimes = new List<OpeningTimeCreateDto>
             {
@@ -450,7 +494,7 @@ public class RestaurantsControllerITest : ControllerITestBase
             RestaurantMocks.SimpleRestaurantCreateDto.IsPublic,
             ClosingDates = new List<ClosingDateCreateDto>
             {
-                new() { ClosingDateTime = DateTime.Parse("2021-12-25") }
+                new() { ClosingDateTime = DateTime.UtcNow.AddYears(1).AddDays(10) }
             },
             PlaceOpeningTimes = new List<OpeningTimeCreateDto>
             {

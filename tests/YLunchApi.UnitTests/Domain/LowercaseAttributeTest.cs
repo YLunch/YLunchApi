@@ -9,21 +9,21 @@ public class LowercaseAttributeTest
     private readonly LowercaseAttribute _attribute = new();
 
     [Fact]
-    public void Null_Should_Be_Invalid()
+    public void Null_Should_Be_Valid()
     {
         // Arrange & Act & Assert
         _attribute.IsValid(null).Should().BeTrue();
     }
 
     [Fact]
-    public void Opening_Times_Should_Be_Valid()
+    public void Value_Should_Be_Valid()
     {
         // Arrange & Act & Assert
         _attribute.IsValid("lowercase").Should().BeTrue();
     }
 
     [Fact]
-    public void Opening_Times_Should_Be_Invalid()
+    public void Value_Should_Be_Invalid()
     {
         // Arrange & Act & Assert
         _attribute.IsValid("Lowercase").Should().BeFalse();
