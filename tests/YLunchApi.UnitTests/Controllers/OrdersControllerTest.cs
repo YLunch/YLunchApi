@@ -49,7 +49,8 @@ public class OrdersControllerTest : UnitTestFixture
     {
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
-        var restaurant = await CreateRestaurant(RestaurantMocks.PrepareFullRestaurant(), dateTime);
+        var restaurantCreateDto = RestaurantMocks.PrepareFullRestaurant(RestaurantMocks.SimpleRestaurantCreateDto.Name, dateTime);
+        var restaurant = await CreateRestaurant(restaurantCreateDto, dateTime);
 
         var productCreateDto1 = ProductMocks.ProductCreateDto;
         productCreateDto1.Name = "product1";
@@ -140,7 +141,8 @@ public class OrdersControllerTest : UnitTestFixture
     {
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
-        var restaurant = await CreateRestaurant(RestaurantMocks.PrepareFullRestaurant(), dateTime);
+        var restaurantCreateDto = RestaurantMocks.PrepareFullRestaurant(RestaurantMocks.SimpleRestaurantCreateDto.Name, dateTime);
+        var restaurant = await CreateRestaurant(restaurantCreateDto, dateTime);
 
         var productCreateDto1 = ProductMocks.ProductCreateDto;
         productCreateDto1.Name = "product1";
@@ -178,7 +180,8 @@ public class OrdersControllerTest : UnitTestFixture
     {
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
-        var restaurant = await CreateRestaurant(RestaurantMocks.PrepareFullRestaurant(), dateTime);
+        var restaurantCreateDto = RestaurantMocks.PrepareFullRestaurant(RestaurantMocks.SimpleRestaurantCreateDto.Name, dateTime);
+        var restaurant = await CreateRestaurant(restaurantCreateDto, dateTime);
 
         var productCreateDto1 = ProductMocks.ProductCreateDto;
         productCreateDto1.Name = "product1";
@@ -218,7 +221,8 @@ public class OrdersControllerTest : UnitTestFixture
     {
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
-        var restaurant = await CreateRestaurant(RestaurantMocks.PrepareFullRestaurant(), dateTime);
+        var restaurantCreateDto = RestaurantMocks.PrepareFullRestaurant(RestaurantMocks.SimpleRestaurantCreateDto.Name, dateTime);
+        var restaurant = await CreateRestaurant(restaurantCreateDto, dateTime);
 
         var productCreateDto1 = ProductMocks.ProductCreateDto;
         productCreateDto1.Name = "product1";

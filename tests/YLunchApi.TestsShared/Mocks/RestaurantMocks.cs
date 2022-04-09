@@ -18,11 +18,10 @@ public static class RestaurantMocks
         StreetNumber = "1"
     };
 
-    public static RestaurantCreateDto PrepareFullRestaurant(string? restaurantName = null)
+    public static RestaurantCreateDto PrepareFullRestaurant(string restaurantName, DateTime dateTime)
     {
-        var dateTime = DateTimeMocks.Monday20220321T1000Utc;
         var restaurantCreateDto = SimpleRestaurantCreateDto;
-        restaurantCreateDto.Name = restaurantName ?? restaurantCreateDto.Name;
+        restaurantCreateDto.Name = restaurantName;
 
         restaurantCreateDto.ClosingDates = new List<ClosingDateCreateDto>
         {

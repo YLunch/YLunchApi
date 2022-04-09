@@ -21,7 +21,7 @@ public class AuthenticationControllerITest : ControllerITestBase
     public async Task Login_Should_Return_A_200Ok()
     {
         // Arrange, Act and Assert
-        _ = await Authenticate(UserMocks.CustomerCreateDto);
+        _ = await CreateAndLogin(UserMocks.CustomerCreateDto);
     }
 
     [Fact]
@@ -74,7 +74,7 @@ public class AuthenticationControllerITest : ControllerITestBase
     public async Task RefreshTokens_Should_Return_A_200Ok()
     {
         // Arrange
-        var decodedTokens = await Authenticate(UserMocks.CustomerCreateDto);
+        var decodedTokens = await CreateAndLogin(UserMocks.CustomerCreateDto);
 
         var refreshTokensBody = new
         {
@@ -142,7 +142,7 @@ public class AuthenticationControllerITest : ControllerITestBase
     public async Task GetCurrentUser_Should_Return_A_200Ok()
     {
         // Arrange
-        var decodedTokens = await Authenticate(UserMocks.CustomerCreateDto);
+        var decodedTokens = await CreateAndLogin(UserMocks.CustomerCreateDto);
         Client.SetAuthorizationHeader(decodedTokens.AccessToken);
 
         // Act

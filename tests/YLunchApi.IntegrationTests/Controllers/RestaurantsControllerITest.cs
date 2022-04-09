@@ -23,7 +23,7 @@ public class RestaurantsControllerITest : ControllerITestBase
 
     private async Task<RestaurantReadDto> CreateFullRestaurant(string? name = null)
     {
-        var decodedTokens = await Authenticate(UserMocks.RestaurantAdminCreateDto);
+        var decodedTokens = await CreateAndLogin(UserMocks.RestaurantAdminCreateDto);
         Client.SetAuthorizationHeader(decodedTokens.AccessToken);
         var utcNow = DateTime.UtcNow;
         var body = new
@@ -82,7 +82,7 @@ public class RestaurantsControllerITest : ControllerITestBase
 
     private async Task<RestaurantReadDto> CreateSimpleRestaurant(RestaurantCreateDto restaurantCreateDto)
     {
-        var decodedTokens = await Authenticate(UserMocks.RestaurantAdminCreateDto);
+        var decodedTokens = await CreateAndLogin(UserMocks.RestaurantAdminCreateDto);
         Client.SetAuthorizationHeader(decodedTokens.AccessToken);
         var restaurantCreationResponse = await Client.PostAsJsonAsync("restaurants", restaurantCreateDto);
         restaurantCreationResponse.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -97,7 +97,7 @@ public class RestaurantsControllerITest : ControllerITestBase
     public async Task CreateRestaurant_Should_Return_A_201Created()
     {
         // Arrange
-        var decodedTokens = await Authenticate(UserMocks.RestaurantAdminCreateDto);
+        var decodedTokens = await CreateAndLogin(UserMocks.RestaurantAdminCreateDto);
         Client.SetAuthorizationHeader(decodedTokens.AccessToken);
         var utcNow = DateTime.UtcNow;
         var body = new
@@ -199,7 +199,7 @@ public class RestaurantsControllerITest : ControllerITestBase
     public async Task CreateRestaurant_Non_Having_Optional_Fields_Should_Return_A_201Created()
     {
         // Arrange
-        var decodedTokens = await Authenticate(UserMocks.RestaurantAdminCreateDto);
+        var decodedTokens = await CreateAndLogin(UserMocks.RestaurantAdminCreateDto);
         Client.SetAuthorizationHeader(decodedTokens.AccessToken);
         var body = new
         {
@@ -243,7 +243,7 @@ public class RestaurantsControllerITest : ControllerITestBase
     public async Task CreateRestaurant_Should_Return_A_400BadRequest_When_Missing_Fields()
     {
         // Arrange
-        var decodedTokens = await Authenticate(UserMocks.RestaurantAdminCreateDto);
+        var decodedTokens = await CreateAndLogin(UserMocks.RestaurantAdminCreateDto);
         Client.SetAuthorizationHeader(decodedTokens.AccessToken);
         var body = new
         {
@@ -294,7 +294,7 @@ public class RestaurantsControllerITest : ControllerITestBase
     public async Task CreateRestaurant_Should_Return_A_400BadRequest_When_Invalid_Fields()
     {
         // Arrange
-        var decodedTokens = await Authenticate(UserMocks.RestaurantAdminCreateDto);
+        var decodedTokens = await CreateAndLogin(UserMocks.RestaurantAdminCreateDto);
         Client.SetAuthorizationHeader(decodedTokens.AccessToken);
         var body = new
         {
@@ -366,7 +366,7 @@ public class RestaurantsControllerITest : ControllerITestBase
     public async Task CreateRestaurant_Should_Return_A_400BadRequest_When_Overriding_Opening_Times()
     {
         // Arrange
-        var decodedTokens = await Authenticate(UserMocks.RestaurantAdminCreateDto);
+        var decodedTokens = await CreateAndLogin(UserMocks.RestaurantAdminCreateDto);
         Client.SetAuthorizationHeader(decodedTokens.AccessToken);
         var body = new
         {
@@ -479,7 +479,7 @@ public class RestaurantsControllerITest : ControllerITestBase
     public async Task CreateRestaurant_Should_Return_A_403Forbidden()
     {
         // Arrange
-        var decodedTokens = await Authenticate(UserMocks.CustomerCreateDto);
+        var decodedTokens = await CreateAndLogin(UserMocks.CustomerCreateDto);
         Client.SetAuthorizationHeader(decodedTokens.AccessToken);
         var body = new
         {

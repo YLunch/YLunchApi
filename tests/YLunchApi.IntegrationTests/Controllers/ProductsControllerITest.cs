@@ -20,15 +20,6 @@ public class ProductsControllerITest : ControllerITestBase
 {
     #region Utils
 
-    private async Task<RestaurantReadDto> CreateRestaurant(RestaurantCreateDto restaurantCreateDto)
-    {
-        var decodedTokens = await Authenticate(UserMocks.RestaurantAdminCreateDto);
-        Client.SetAuthorizationHeader(decodedTokens.AccessToken);
-        var restaurantCreationResponse = await Client.PostAsJsonAsync("restaurants", restaurantCreateDto);
-        restaurantCreationResponse.StatusCode.Should().Be(HttpStatusCode.Created);
-        return await ResponseUtils.DeserializeContentAsync<RestaurantReadDto>(restaurantCreationResponse);
-    }
-
     private async Task<ProductReadDto> CreateProduct(string restaurantId, ProductCreateDto productCreateDto)
     {
         // Arrange
@@ -58,7 +49,8 @@ public class ProductsControllerITest : ControllerITestBase
     private async Task<(DateTime, RestaurantReadDto, ProductCreateDto, ProductReadDto)> CreateRestaurantAndProduct()
     {
         // Arrange
-        var restaurant = await CreateRestaurant(RestaurantMocks.SimpleRestaurantCreateDto);
+        var decodedTokens = await CreateAndLogin(UserMocks.RestaurantAdminCreateDto);
+        var restaurant = await CreateRestaurant(decodedTokens.AccessToken, RestaurantMocks.SimpleRestaurantCreateDto);
         var dateTime = DateTime.UtcNow;
         var productCreateDto = ProductMocks.ProductCreateDto;
         var body = new
@@ -118,10 +110,11 @@ public class ProductsControllerITest : ControllerITestBase
     }
 
     [Fact]
-    public async Task CreateRestaurant_Should_Return_A_400BadRequest_When_Missing_Fields()
+    public async Task CreateProduct_Should_Return_A_400BadRequest_When_Missing_Fields()
     {
         // Arrange
-        var restaurant = await CreateRestaurant(RestaurantMocks.SimpleRestaurantCreateDto);
+        var decodedTokens = await CreateAndLogin(UserMocks.RestaurantAdminCreateDto);
+        var restaurant = await CreateRestaurant(decodedTokens.AccessToken, RestaurantMocks.SimpleRestaurantCreateDto);
         var body = new
         {
             Name = ""
@@ -142,10 +135,11 @@ public class ProductsControllerITest : ControllerITestBase
     }
 
     [Fact]
-    public async Task CreateRestaurant_Should_Return_A_400BadRequest_When_Invalid_Fields()
+    public async Task CreateProduct_Should_Return_A_400BadRequest_When_Invalid_Fields()
     {
         // Arrange
-        var restaurant = await CreateRestaurant(RestaurantMocks.SimpleRestaurantCreateDto);
+        var decodedTokens = await CreateAndLogin(UserMocks.RestaurantAdminCreateDto);
+        var restaurant = await CreateRestaurant(decodedTokens.AccessToken, RestaurantMocks.SimpleRestaurantCreateDto);
         var body = new
         {
             Name = "An invalid Name",
@@ -176,10 +170,11 @@ public class ProductsControllerITest : ControllerITestBase
     }
 
     [Fact]
-    public async Task CreateRestaurant_Should_Return_A_400BadRequest_When_Allergens_And_ProductTags_Are_Invalid()
+    public async Task CreateProduct_Should_Return_A_400BadRequest_When_Allergens_And_ProductTags_Are_Invalid()
     {
         // Arrange
-        var restaurant = await CreateRestaurant(RestaurantMocks.SimpleRestaurantCreateDto);
+        var decodedTokens = await CreateAndLogin(UserMocks.RestaurantAdminCreateDto);
+        var restaurant = await CreateRestaurant(decodedTokens.AccessToken, RestaurantMocks.SimpleRestaurantCreateDto);
         var body = new
         {
             Name = "An invalid Name",
@@ -208,10 +203,11 @@ public class ProductsControllerITest : ControllerITestBase
     }
 
     [Fact]
-    public async Task CreateRestaurant_Should_Return_A_401Unauthorized()
+    public async Task CreateProduct_Should_Return_A_401Unauthorized()
     {
         // Arrange
-        var restaurant = await CreateRestaurant(RestaurantMocks.SimpleRestaurantCreateDto);
+        var decodedTokens = await CreateAndLogin(UserMocks.RestaurantAdminCreateDto);
+        var restaurant = await CreateRestaurant(decodedTokens.AccessToken, RestaurantMocks.SimpleRestaurantCreateDto);
         Client.SetAuthorizationHeader(TokenMocks.ExpiredAccessToken);
         var dateTime = DateTime.UtcNow;
         var productCreateDto = ProductMocks.ProductCreateDto;
@@ -236,12 +232,13 @@ public class ProductsControllerITest : ControllerITestBase
     }
 
     [Fact]
-    public async Task CreateRestaurant_Should_Return_A_403Forbidden()
+    public async Task CreateProduct_Should_Return_A_403Forbidden_When_User_Is_Not_Owner_Of_The_Restaurant()
     {
         // Arrange
-        var restaurant = await CreateRestaurant(RestaurantMocks.SimpleRestaurantCreateDto);
-        var decodedTokens = await Authenticate(UserMocks.CustomerCreateDto);
-        Client.SetAuthorizationHeader(decodedTokens.AccessToken);
+        var decodedTokensOfRestaurantAdmin = await CreateAndLogin(UserMocks.RestaurantAdminCreateDto);
+        var restaurant = await CreateRestaurant(decodedTokensOfRestaurantAdmin.AccessToken, RestaurantMocks.SimpleRestaurantCreateDto);
+        var decodedTokensOfUser = await CreateAndLogin(UserMocks.CustomerCreateDto);
+        Client.SetAuthorizationHeader(decodedTokensOfUser.AccessToken);
         var dateTime = DateTime.UtcNow;
         var productCreateDto = ProductMocks.ProductCreateDto;
         var body = new
@@ -312,7 +309,8 @@ public class ProductsControllerITest : ControllerITestBase
     public async Task GetProducts_Should_Return_A_200Ok()
     {
         // Arrange
-        var restaurant = await CreateRestaurant(RestaurantMocks.SimpleRestaurantCreateDto);
+        var decodedTokens = await CreateAndLogin(UserMocks.RestaurantAdminCreateDto);
+        var restaurant = await CreateRestaurant(decodedTokens.AccessToken, RestaurantMocks.SimpleRestaurantCreateDto);
 
         var productCreateDto1 = ProductMocks.ProductCreateDto;
         productCreateDto1.Name = "product1";
@@ -373,7 +371,8 @@ public class ProductsControllerITest : ControllerITestBase
     public async Task GetProducts_Should_Return_A_200Ok_With_Correct_Products()
     {
         // Arrange
-        var restaurant = await CreateRestaurant(RestaurantMocks.SimpleRestaurantCreateDto);
+        var decodedTokens = await CreateAndLogin(UserMocks.RestaurantAdminCreateDto);
+        var restaurant = await CreateRestaurant(decodedTokens.AccessToken, RestaurantMocks.SimpleRestaurantCreateDto);
 
         var productCreateDto1 = ProductMocks.ProductCreateDto;
         productCreateDto1.Name = "product1";
@@ -441,7 +440,8 @@ public class ProductsControllerITest : ControllerITestBase
     public async Task GetProducts_Should_Return_A_400BadRequest_When_Invalid_Filter()
     {
         // Arrange
-        var restaurant = await CreateRestaurant(RestaurantMocks.SimpleRestaurantCreateDto);
+        var decodedTokens = await CreateAndLogin(UserMocks.RestaurantAdminCreateDto);
+        var restaurant = await CreateRestaurant(decodedTokens.AccessToken, RestaurantMocks.SimpleRestaurantCreateDto);
 
         // Act
         var response = await Client.GetAsync($"restaurants/{restaurant.Id}/products?page=0&size=51&isAvailable=25");

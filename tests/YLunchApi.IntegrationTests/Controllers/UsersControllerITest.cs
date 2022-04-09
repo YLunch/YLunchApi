@@ -233,7 +233,6 @@ public class UsersControllerITest : ControllerITestBase
 
         // Act
         var response = await Client.PostAsJsonAsync("customers", body);
-        var res = await ResponseUtils.DeserializeContentAsync(response);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Created);
