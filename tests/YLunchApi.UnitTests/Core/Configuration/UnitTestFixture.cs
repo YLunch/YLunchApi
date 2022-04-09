@@ -35,10 +35,10 @@ public class UnitTestFixture : IClassFixture<UnitTestFixtureBase>
         return Assert.IsType<RestaurantReadDto>(restaurantCreationResponseResult.Value);
     }
 
-    protected async Task<ProductReadDto> CreateProduct(string restaurantId, DateTime? customDateTime = null, ProductCreateDto? productCreateDto = null)
+    protected async Task<ProductReadDto> CreateProduct(string restaurantId, DateTime dateTime, ProductCreateDto productCreateDto)
     {
         var dateTimeProviderMock = new Mock<IDateTimeProvider>();
-        dateTimeProviderMock.Setup(x => x.UtcNow).Returns(customDateTime ?? DateTime.UtcNow);
+        dateTimeProviderMock.Setup(x => x.UtcNow).Returns(dateTime);
         Fixture.InitFixture(configuration =>
         {
             configuration.AccessToken = TokenMocks.ValidRestaurantAdminAccessToken;
@@ -46,7 +46,7 @@ public class UnitTestFixture : IClassFixture<UnitTestFixtureBase>
         });
         var productsController = Fixture.GetImplementationFromService<ProductsController>();
 
-        var response = await productsController.CreateProduct(restaurantId, productCreateDto ?? ProductMocks.ProductCreateDto);
+        var response = await productsController.CreateProduct(restaurantId, productCreateDto);
 
         var responseResult = Assert.IsType<CreatedResult>(response.Result);
         return Assert.IsType<ProductReadDto>(responseResult.Value);

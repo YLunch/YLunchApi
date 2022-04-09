@@ -51,6 +51,7 @@ public class ProductsControllerTest : UnitTestFixture
         var restaurant = await CreateRestaurant(RestaurantMocks.SimpleRestaurantCreateDto, dateTime);
         var productsController = InitProductsController(dateTime);
         var productCreateDto = ProductMocks.ProductCreateDto;
+        productCreateDto.ExpirationDateTime = dateTime.AddDays(1);
 
         // Act
         var response = await productsController.CreateProduct(restaurant.Id, productCreateDto);
@@ -112,7 +113,7 @@ public class ProductsControllerTest : UnitTestFixture
         responseBody.ProductType.Should().Be(productCreateDto.ProductType);
         responseBody.Image.Should().Be(productCreateDto.Image);
         responseBody.CreationDateTime.Should().BeCloseTo(dateTime, TimeSpan.FromSeconds(5));
-        responseBody.ExpirationDateTime.Should().BeCloseTo(dateTime.AddDays(1), TimeSpan.FromSeconds(5));
+        responseBody.ExpirationDateTime.Should().BeNull();
         responseBody.Allergens.Should().BeEquivalentTo(productCreateDto.Allergens)
                     .And
                     .BeInAscendingOrder(x => x.Name);
@@ -201,6 +202,7 @@ public class ProductsControllerTest : UnitTestFixture
         var restaurant = await CreateRestaurant(RestaurantMocks.SimpleRestaurantCreateDto, dateTime);
         var productsController = InitProductsController(dateTime);
         var productCreateDto = ProductMocks.ProductCreateDto;
+        productCreateDto.ExpirationDateTime = dateTime.AddDays(1);
 
         var productCreationResponse = await productsController.CreateProduct(restaurant.Id, productCreateDto);
         var productCreationResponseResult = Assert.IsType<CreatedResult>(productCreationResponse.Result);
@@ -263,6 +265,7 @@ public class ProductsControllerTest : UnitTestFixture
 
         var productCreateDto1 = ProductMocks.ProductCreateDto;
         productCreateDto1.Name = "product1";
+        productCreateDto1.ExpirationDateTime = dateTime.AddDays(1);
         var product1 = await CreateProduct(restaurant.Id, dateTime, productCreateDto1);
 
         var productCreateDto2 = ProductMocks.ProductCreateDto;
@@ -298,7 +301,11 @@ public class ProductsControllerTest : UnitTestFixture
             actualProduct.ProductType.Should().Be(expectedProduct.ProductType);
             actualProduct.Image.Should().Be(expectedProduct.Image);
             actualProduct.CreationDateTime.Should().BeCloseTo(dateTime, TimeSpan.FromSeconds(5));
-            actualProduct.ExpirationDateTime.Should().BeCloseTo(dateTime.AddDays(1), TimeSpan.FromSeconds(5));
+            _ = expectedProduct.ExpirationDateTime switch
+            {
+                null => actualProduct.ExpirationDateTime.Should().BeNull(),
+                { } dt => actualProduct.ExpirationDateTime.Should().BeCloseTo(dt, TimeSpan.FromSeconds(5))
+            };
             actualProduct.Allergens.Should().BeEquivalentTo(expectedProduct.Allergens)
                          .And
                          .BeInAscendingOrder(x => x.Name);
@@ -329,6 +336,7 @@ public class ProductsControllerTest : UnitTestFixture
 
         var productCreateDto4 = ProductMocks.ProductCreateDto;
         productCreateDto4.Name = "product4";
+        productCreateDto4.ExpirationDateTime = dateTime.AddDays(1);
         var product4 = await CreateProduct(restaurant.Id, dateTime, productCreateDto4);
 
         var productCreateDto5 = ProductMocks.ProductCreateDto;
@@ -373,7 +381,11 @@ public class ProductsControllerTest : UnitTestFixture
             actualProduct.ProductType.Should().Be(expectedProduct.ProductType);
             actualProduct.Image.Should().Be(expectedProduct.Image);
             actualProduct.CreationDateTime.Should().BeCloseTo(dateTime, TimeSpan.FromSeconds(5));
-            actualProduct.ExpirationDateTime.Should().BeCloseTo(dateTime.AddDays(1), TimeSpan.FromSeconds(5));
+            _ = expectedProduct.ExpirationDateTime switch
+            {
+                null => actualProduct.ExpirationDateTime.Should().BeNull(),
+                { } dt => actualProduct.ExpirationDateTime.Should().BeCloseTo(dt, TimeSpan.FromSeconds(5))
+            };
             actualProduct.Allergens.Should().BeEquivalentTo(expectedProduct.Allergens)
                          .And
                          .BeInAscendingOrder(x => x.Name);
@@ -412,6 +424,7 @@ public class ProductsControllerTest : UnitTestFixture
 
         var productCreateDto5 = ProductMocks.ProductCreateDto;
         productCreateDto5.Name = "product5";
+        productCreateDto5.ExpirationDateTime = dateTime.AddDays(1);
         var product5 = await CreateProduct(restaurant.Id, dateTime, productCreateDto5);
 
         var expectedProducts = new List<ProductReadDto>
@@ -451,7 +464,11 @@ public class ProductsControllerTest : UnitTestFixture
             actualProduct.ProductType.Should().Be(expectedProduct.ProductType);
             actualProduct.Image.Should().Be(expectedProduct.Image);
             actualProduct.CreationDateTime.Should().BeCloseTo(dateTime, TimeSpan.FromSeconds(5));
-            actualProduct.ExpirationDateTime.Should().BeCloseTo(dateTime.AddDays(1), TimeSpan.FromSeconds(5));
+            _ = expectedProduct.ExpirationDateTime switch
+            {
+                null => actualProduct.ExpirationDateTime.Should().BeNull(),
+                { } dt => actualProduct.ExpirationDateTime.Should().BeCloseTo(dt, TimeSpan.FromSeconds(5))
+            };
             actualProduct.Allergens.Should().BeEquivalentTo(expectedProduct.Allergens)
                          .And
                          .BeInAscendingOrder(x => x.Name);
@@ -490,6 +507,7 @@ public class ProductsControllerTest : UnitTestFixture
 
         var productCreateDto5 = ProductMocks.ProductCreateDto;
         productCreateDto5.Name = "product5";
+        productCreateDto5.ExpirationDateTime = dateTime.AddDays(1);
         await CreateProduct(restaurant.Id, dateTime, productCreateDto5);
 
         var expectedProducts = new List<ProductReadDto>
@@ -531,11 +549,11 @@ public class ProductsControllerTest : UnitTestFixture
             actualProduct.ProductType.Should().Be(expectedProduct.ProductType);
             actualProduct.Image.Should().Be(expectedProduct.Image);
             actualProduct.CreationDateTime.Should().BeCloseTo(dateTime, TimeSpan.FromSeconds(5));
-            if (expectedProduct.ExpirationDateTime != null)
+            _ = expectedProduct.ExpirationDateTime switch
             {
-                actualProduct.ExpirationDateTime.Should().BeCloseTo((DateTime)expectedProduct.ExpirationDateTime, TimeSpan.FromSeconds(5));
-            }
-
+                null => actualProduct.ExpirationDateTime.Should().BeNull(),
+                { } dt => actualProduct.ExpirationDateTime.Should().BeCloseTo(dt, TimeSpan.FromSeconds(5))
+            };
             actualProduct.Allergens.Should().BeEquivalentTo(expectedProduct.Allergens)
                          .And
                          .BeInAscendingOrder(x => x.Name);

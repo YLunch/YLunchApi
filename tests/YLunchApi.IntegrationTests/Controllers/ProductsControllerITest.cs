@@ -18,102 +18,22 @@ namespace YLunchApi.IntegrationTests.Controllers;
 [Collection("Sequential")]
 public class ProductsControllerITest : ControllerITestBase
 {
-    #region Utils
-
-    private async Task<ProductReadDto> CreateProduct(string restaurantId, ProductCreateDto productCreateDto)
-    {
-        // Arrange
-        var body = new
-        {
-            productCreateDto.Name,
-            productCreateDto.Price,
-            productCreateDto.Quantity,
-            productCreateDto.IsActive,
-            productCreateDto.ProductType,
-            productCreateDto.Image,
-            productCreateDto.ExpirationDateTime,
-            productCreateDto.Description,
-            productCreateDto.Allergens,
-            productCreateDto.ProductTags
-        };
-
-        // Act
-        var response = await Client.PostAsJsonAsync($"restaurants/{restaurantId}/products", body);
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Created);
-        var productReadDto = await ResponseUtils.DeserializeContentAsync<ProductReadDto>(response);
-        return productReadDto;
-    }
-
-    private async Task<(DateTime, RestaurantReadDto, ProductCreateDto, ProductReadDto)> CreateRestaurantAndProduct()
-    {
-        // Arrange
-        var decodedTokens = await CreateAndLogin(UserMocks.RestaurantAdminCreateDto);
-        var restaurant = await CreateRestaurant(decodedTokens.AccessToken, RestaurantMocks.SimpleRestaurantCreateDto);
-        var dateTime = DateTime.UtcNow;
-        var productCreateDto = ProductMocks.ProductCreateDto;
-        var body = new
-        {
-            productCreateDto.Name,
-            productCreateDto.Price,
-            productCreateDto.Quantity,
-            productCreateDto.IsActive,
-            productCreateDto.ProductType,
-            productCreateDto.Image,
-            ExpirationDateTime = dateTime.AddDays(1),
-            productCreateDto.Description,
-            productCreateDto.Allergens,
-            productCreateDto.ProductTags
-        };
-
-        // Act
-        var response = await Client.PostAsJsonAsync($"restaurants/{restaurant.Id}/products", body);
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Created);
-        var productReadDto = await ResponseUtils.DeserializeContentAsync<ProductReadDto>(response);
-        return (dateTime, restaurant, productCreateDto, productReadDto);
-    }
-
-    #endregion
-
     #region CreateRestaurantTests
 
     [Fact]
     public async Task CreateProduct_Should_Return_A_201Created()
     {
         // Arrange
-        var (dateTime, restaurant, body, responseBody) = await CreateRestaurantAndProduct();
-
-        responseBody.Id.Should().MatchRegex(GuidUtils.Regex);
-        responseBody.RestaurantId.Should().Be(restaurant.Id);
-        responseBody.Name.Should().Be(body.Name);
-        responseBody.Price.Should().Be(body.Price);
-        responseBody.Description.Should().Be(body.Description);
-        responseBody.IsActive.Should().Be(true);
-        responseBody.Quantity.Should().Be(body.Quantity);
-        responseBody.ProductType.Should().Be(body.ProductType);
-        responseBody.Image.Should().Be(body.Image);
-        responseBody.CreationDateTime.Should().BeCloseTo(dateTime, TimeSpan.FromSeconds(5));
-        responseBody.ExpirationDateTime.Should().BeCloseTo(dateTime.AddDays(1), TimeSpan.FromSeconds(5));
-        responseBody.Allergens.Should().BeEquivalentTo(body.Allergens)
-                    .And
-                    .BeInAscendingOrder(x => x.Name);
-        responseBody.Allergens.Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
-                    .Should().BeTrue();
-        responseBody.ProductTags.Should().BeEquivalentTo(body.ProductTags)
-                    .And
-                    .BeInAscendingOrder(x => x.Name);
-        responseBody.ProductTags.Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
-                    .Should().BeTrue();
+        var decodedTokens = await CreateAndLoginUser(UserMocks.RestaurantAdminCreateDto);
+        var restaurant = await CreateRestaurant(decodedTokens.AccessToken, RestaurantMocks.SimpleRestaurantCreateDto);
+        _ = await CreateProduct(decodedTokens.AccessToken, restaurant.Id, ProductMocks.ProductCreateDto);
     }
 
     [Fact]
     public async Task CreateProduct_Should_Return_A_400BadRequest_When_Missing_Fields()
     {
         // Arrange
-        var decodedTokens = await CreateAndLogin(UserMocks.RestaurantAdminCreateDto);
+        var decodedTokens = await CreateAndLoginUser(UserMocks.RestaurantAdminCreateDto);
         var restaurant = await CreateRestaurant(decodedTokens.AccessToken, RestaurantMocks.SimpleRestaurantCreateDto);
         var body = new
         {
@@ -138,13 +58,14 @@ public class ProductsControllerITest : ControllerITestBase
     public async Task CreateProduct_Should_Return_A_400BadRequest_When_Invalid_Fields()
     {
         // Arrange
-        var decodedTokens = await CreateAndLogin(UserMocks.RestaurantAdminCreateDto);
+        var decodedTokens = await CreateAndLoginUser(UserMocks.RestaurantAdminCreateDto);
         var restaurant = await CreateRestaurant(decodedTokens.AccessToken, RestaurantMocks.SimpleRestaurantCreateDto);
         var body = new
         {
             Name = "An invalid Name",
             Description = "An invalid Description",
             Quantity = 0,
+            ExpirationDateTime = DateTime.UtcNow.AddDays(-1),
             Allergens = new List<dynamic>
             {
                 new { BadFieldName = "wrong value" }
@@ -167,13 +88,14 @@ public class ProductsControllerITest : ControllerITestBase
         responseBody.Should().MatchRegex(@"Quantity.*The field Quantity must be between 1 and 10000\.");
         responseBody.Should().MatchRegex(@"Allergens.*The Name field is required\.");
         responseBody.Should().MatchRegex(@"ProductTags.*The Name field is required\.");
+        responseBody.Should().MatchRegex(@"ExpirationDateTime.*The Name field is required\.");
     }
 
     [Fact]
     public async Task CreateProduct_Should_Return_A_400BadRequest_When_Allergens_And_ProductTags_Are_Invalid()
     {
         // Arrange
-        var decodedTokens = await CreateAndLogin(UserMocks.RestaurantAdminCreateDto);
+        var decodedTokens = await CreateAndLoginUser(UserMocks.RestaurantAdminCreateDto);
         var restaurant = await CreateRestaurant(decodedTokens.AccessToken, RestaurantMocks.SimpleRestaurantCreateDto);
         var body = new
         {
@@ -202,11 +124,13 @@ public class ProductsControllerITest : ControllerITestBase
         responseBody.Should().MatchRegex(@"ProductTags.*Must be lowercase\.");
     }
 
+
+
     [Fact]
     public async Task CreateProduct_Should_Return_A_401Unauthorized()
     {
         // Arrange
-        var decodedTokens = await CreateAndLogin(UserMocks.RestaurantAdminCreateDto);
+        var decodedTokens = await CreateAndLoginUser(UserMocks.RestaurantAdminCreateDto);
         var restaurant = await CreateRestaurant(decodedTokens.AccessToken, RestaurantMocks.SimpleRestaurantCreateDto);
         Client.SetAuthorizationHeader(TokenMocks.ExpiredAccessToken);
         var dateTime = DateTime.UtcNow;
@@ -235,11 +159,11 @@ public class ProductsControllerITest : ControllerITestBase
     public async Task CreateProduct_Should_Return_A_403Forbidden_When_User_Is_Not_Owner_Of_The_Restaurant()
     {
         // Arrange
-        var decodedTokensOfRestaurantAdmin = await CreateAndLogin(UserMocks.RestaurantAdminCreateDto);
-        var restaurant = await CreateRestaurant(decodedTokensOfRestaurantAdmin.AccessToken, RestaurantMocks.SimpleRestaurantCreateDto);
-        var decodedTokensOfUser = await CreateAndLogin(UserMocks.CustomerCreateDto);
-        Client.SetAuthorizationHeader(decodedTokensOfUser.AccessToken);
         var dateTime = DateTime.UtcNow;
+        var decodedTokensOfRestaurantAdmin = await CreateAndLoginUser(UserMocks.RestaurantAdminCreateDto);
+        var restaurant = await CreateRestaurant(decodedTokensOfRestaurantAdmin.AccessToken, RestaurantMocks.SimpleRestaurantCreateDto);
+        var decodedTokensOfUser = await CreateAndLoginUser(UserMocks.CustomerCreateDto);
+        Client.SetAuthorizationHeader(decodedTokensOfUser.AccessToken);
         var productCreateDto = ProductMocks.ProductCreateDto;
         var body = new
         {
@@ -269,7 +193,10 @@ public class ProductsControllerITest : ControllerITestBase
     public async Task GetRestaurantById_Should_Return_A_200Ok()
     {
         // Arrange
-        var (dateTime, restaurant, body, product) = await CreateRestaurantAndProduct();
+        var dateTime = DateTime.UtcNow;
+        var decodedTokens = await CreateAndLoginUser(UserMocks.RestaurantAdminCreateDto);
+        var restaurant = await CreateRestaurant(decodedTokens.AccessToken, RestaurantMocks.SimpleRestaurantCreateDto);
+        var product = await CreateProduct(decodedTokens.AccessToken, restaurant.Id, ProductMocks.ProductCreateDto);
 
         // Act
         var response = await Client.GetAsync($"products/{product.Id}");
@@ -280,21 +207,21 @@ public class ProductsControllerITest : ControllerITestBase
 
         responseBody.Id.Should().MatchRegex(GuidUtils.Regex);
         responseBody.RestaurantId.Should().Be(restaurant.Id);
-        responseBody.Name.Should().Be(body.Name);
-        responseBody.Price.Should().Be(body.Price);
-        responseBody.Description.Should().Be(body.Description);
+        responseBody.Name.Should().Be(product.Name);
+        responseBody.Price.Should().Be(product.Price);
+        responseBody.Description.Should().Be(product.Description);
         responseBody.IsActive.Should().Be(true);
-        responseBody.Quantity.Should().Be(body.Quantity);
-        responseBody.ProductType.Should().Be(body.ProductType);
-        responseBody.Image.Should().Be(body.Image);
+        responseBody.Quantity.Should().Be(product.Quantity);
+        responseBody.ProductType.Should().Be(product.ProductType);
+        responseBody.Image.Should().Be(product.Image);
         responseBody.CreationDateTime.Should().BeCloseTo(dateTime, TimeSpan.FromSeconds(5));
-        responseBody.ExpirationDateTime.Should().BeCloseTo(dateTime.AddDays(1), TimeSpan.FromSeconds(5));
-        responseBody.Allergens.Should().BeEquivalentTo(body.Allergens)
+        responseBody.ExpirationDateTime.Should().BeNull();
+        responseBody.Allergens.Should().BeEquivalentTo(product.Allergens)
                     .And
                     .BeInAscendingOrder(x => x.Name);
         responseBody.Allergens.Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
                     .Should().BeTrue();
-        responseBody.ProductTags.Should().BeEquivalentTo(body.ProductTags)
+        responseBody.ProductTags.Should().BeEquivalentTo(product.ProductTags)
                     .And
                     .BeInAscendingOrder(x => x.Name);
         responseBody.ProductTags.Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
@@ -309,23 +236,23 @@ public class ProductsControllerITest : ControllerITestBase
     public async Task GetProducts_Should_Return_A_200Ok()
     {
         // Arrange
-        var decodedTokens = await CreateAndLogin(UserMocks.RestaurantAdminCreateDto);
+        var decodedTokens = await CreateAndLoginUser(UserMocks.RestaurantAdminCreateDto);
         var restaurant = await CreateRestaurant(decodedTokens.AccessToken, RestaurantMocks.SimpleRestaurantCreateDto);
 
         var productCreateDto1 = ProductMocks.ProductCreateDto;
         productCreateDto1.Name = "product1";
         productCreateDto1.ExpirationDateTime = DateTime.UtcNow.AddDays(1);
-        var product1 = await CreateProduct(restaurant.Id, productCreateDto1);
+        var product1 = await CreateProduct(decodedTokens.AccessToken, restaurant.Id, productCreateDto1);
 
         var productCreateDto2 = ProductMocks.ProductCreateDto;
         productCreateDto2.Name = "product2";
         productCreateDto2.ExpirationDateTime = DateTime.UtcNow.AddDays(1);
-        var product2 = await CreateProduct(restaurant.Id, productCreateDto2);
+        var product2 = await CreateProduct(decodedTokens.AccessToken, restaurant.Id, productCreateDto2);
 
         var productCreateDto3 = ProductMocks.ProductCreateDto;
         productCreateDto3.Name = "product3";
         productCreateDto3.ExpirationDateTime = DateTime.UtcNow.AddDays(1);
-        var product3 = await CreateProduct(restaurant.Id, productCreateDto3);
+        var product3 = await CreateProduct(decodedTokens.AccessToken, restaurant.Id, productCreateDto3);
 
         var expectedProducts = new List<ProductReadDto>
         {
@@ -371,31 +298,31 @@ public class ProductsControllerITest : ControllerITestBase
     public async Task GetProducts_Should_Return_A_200Ok_With_Correct_Products()
     {
         // Arrange
-        var decodedTokens = await CreateAndLogin(UserMocks.RestaurantAdminCreateDto);
+        var decodedTokens = await CreateAndLoginUser(UserMocks.RestaurantAdminCreateDto);
         var restaurant = await CreateRestaurant(decodedTokens.AccessToken, RestaurantMocks.SimpleRestaurantCreateDto);
 
         var productCreateDto1 = ProductMocks.ProductCreateDto;
         productCreateDto1.Name = "product1";
         productCreateDto1.ExpirationDateTime = DateTime.UtcNow.AddDays(1);
         productCreateDto1.IsActive = false;
-        await CreateProduct(restaurant.Id, productCreateDto1);
+        await CreateProduct(decodedTokens.AccessToken, restaurant.Id, productCreateDto1);
 
         var productCreateDto2 = ProductMocks.ProductCreateDto;
         productCreateDto2.Name = "product2";
         productCreateDto2.ExpirationDateTime = DateTime.UtcNow.AddDays(1);
         productCreateDto2.IsActive = false;
-        await CreateProduct(restaurant.Id, productCreateDto2);
+        await CreateProduct(decodedTokens.AccessToken, restaurant.Id, productCreateDto2);
 
         var productCreateDto3 = ProductMocks.ProductCreateDto;
         productCreateDto3.Name = "product3";
         productCreateDto3.ExpirationDateTime = DateTime.UtcNow.AddDays(1);
-        var product3 = await CreateProduct(restaurant.Id, productCreateDto3);
+        var product3 = await CreateProduct(decodedTokens.AccessToken, restaurant.Id, productCreateDto3);
 
         var productCreateDto4 = ProductMocks.ProductCreateDto;
         productCreateDto4.Name = "product4";
         productCreateDto4.ExpirationDateTime = DateTime.UtcNow.AddDays(1);
         productCreateDto4.Quantity = null;
-        var product4 = await CreateProduct(restaurant.Id, productCreateDto4);
+        var product4 = await CreateProduct(decodedTokens.AccessToken, restaurant.Id, productCreateDto4);
 
         var expectedProducts = new List<ProductReadDto>
         {
@@ -440,7 +367,7 @@ public class ProductsControllerITest : ControllerITestBase
     public async Task GetProducts_Should_Return_A_400BadRequest_When_Invalid_Filter()
     {
         // Arrange
-        var decodedTokens = await CreateAndLogin(UserMocks.RestaurantAdminCreateDto);
+        var decodedTokens = await CreateAndLoginUser(UserMocks.RestaurantAdminCreateDto);
         var restaurant = await CreateRestaurant(decodedTokens.AccessToken, RestaurantMocks.SimpleRestaurantCreateDto);
 
         // Act

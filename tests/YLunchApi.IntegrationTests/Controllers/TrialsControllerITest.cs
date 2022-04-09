@@ -35,7 +35,7 @@ public class TrialsControllerITest : ControllerITestBase
     public async Task GetAuthenticatedTry_As_Customer_Should_Return_A_200Ok()
     {
         // Arrange
-        var decodedTokens = await CreateAndLogin(UserMocks.CustomerCreateDto);
+        var decodedTokens = await CreateAndLoginUser(UserMocks.CustomerCreateDto);
         Client.SetAuthorizationHeader(decodedTokens.AccessToken);
 
         // Act
@@ -73,7 +73,7 @@ public class TrialsControllerITest : ControllerITestBase
     public async Task GetAuthenticatedTry_As_RestaurantAdmin_Should_Return_A_200Ok()
     {
         // Arrange
-        var decodedTokens = await CreateAndLogin(UserMocks.RestaurantAdminCreateDto);
+        var decodedTokens = await CreateAndLoginUser(UserMocks.RestaurantAdminCreateDto);
         Client.SetAuthorizationHeader(decodedTokens.AccessToken);
 
         // Act
@@ -138,7 +138,7 @@ public class TrialsControllerITest : ControllerITestBase
     public async Task GetAuthenticatedRestaurantAdminTry_Should_Return_A_200Ok()
     {
         // Arrange
-        var decodedTokens = await CreateAndLogin(UserMocks.RestaurantAdminCreateDto);
+        var decodedTokens = await CreateAndLoginUser(UserMocks.RestaurantAdminCreateDto);
         Client.SetAuthorizationHeader(decodedTokens.AccessToken);
 
         // Act
@@ -155,7 +155,7 @@ public class TrialsControllerITest : ControllerITestBase
     public async Task GetAuthenticatedRestaurantAdminTry_Should_Return_A_403Forbidden()
     {
         // Arrange
-        var decodedTokens = await CreateAndLogin(UserMocks.CustomerCreateDto);
+        var decodedTokens = await CreateAndLoginUser(UserMocks.CustomerCreateDto);
         Client.SetAuthorizationHeader(decodedTokens.AccessToken);
 
         // Act
@@ -173,7 +173,7 @@ public class TrialsControllerITest : ControllerITestBase
     public async Task GetAuthenticatedCustomerTry_Should_Return_A_200Ok()
     {
         // Arrange
-        var decodedTokens = await CreateAndLogin(UserMocks.CustomerCreateDto);
+        var decodedTokens = await CreateAndLoginUser(UserMocks.CustomerCreateDto);
         Client.SetAuthorizationHeader(decodedTokens.AccessToken);
 
         // Act
@@ -190,7 +190,7 @@ public class TrialsControllerITest : ControllerITestBase
     public async Task GetAuthenticatedCustomerTry_Should_Return_A_403Forbidden()
     {
         // Arrange
-        var decodedTokens = await CreateAndLogin(UserMocks.RestaurantAdminCreateDto);
+        var decodedTokens = await CreateAndLoginUser(UserMocks.RestaurantAdminCreateDto);
         Client.SetAuthorizationHeader(decodedTokens.AccessToken);
 
         // Act

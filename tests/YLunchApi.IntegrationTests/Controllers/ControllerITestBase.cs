@@ -111,7 +111,7 @@ public abstract class ControllerITestBase : IClassFixture<WebApplicationFactory<
         return new DecodedTokens(tokens.AccessToken, tokens.RefreshToken);
     }
 
-    protected async Task<DecodedTokens> CreateAndLogin(CustomerCreateDto customerCreateDto)
+    protected async Task<DecodedTokens> CreateAndLoginUser(CustomerCreateDto customerCreateDto)
     {
         var customerCreationRequestBody = new
         {
@@ -129,7 +129,7 @@ public abstract class ControllerITestBase : IClassFixture<WebApplicationFactory<
         return decodedTokens;
     }
 
-    protected async Task<DecodedTokens> CreateAndLogin(RestaurantAdminCreateDto restaurantAdminCreateDto)
+    protected async Task<DecodedTokens> CreateAndLoginUser(RestaurantAdminCreateDto restaurantAdminCreateDto)
     {
         var restaurantAdminCreationRequestBody = new
         {
@@ -167,15 +167,9 @@ public abstract class ControllerITestBase : IClassFixture<WebApplicationFactory<
             restaurantCreateDto.StreetNumber,
             restaurantCreateDto.IsOpen,
             restaurantCreateDto.IsPublic,
-            ClosingDates = restaurantCreateDto.ClosingDates
-                                              .Select(x => x.Adapt<dynamic>())
-                                              .ToList(),
-            PlaceOpeningTimes = restaurantCreateDto.PlaceOpeningTimes
-                                                   .Select(x => x.Adapt<dynamic>())
-                                                   .ToList(),
-            OrderOpeningTimes = restaurantCreateDto.OrderOpeningTimes
-                                                   .Select(x => x.Adapt<dynamic>())
-                                                   .ToList()
+            restaurantCreateDto.ClosingDates,
+            restaurantCreateDto.PlaceOpeningTimes,
+            restaurantCreateDto.OrderOpeningTimes
         };
 
         // Act
@@ -222,6 +216,60 @@ public abstract class ControllerITestBase : IClassFixture<WebApplicationFactory<
         Assert.IsType<bool>(responseBody.IsCurrentlyOpenToOrder);
 
         Assert.IsType<bool>(responseBody.IsPublished);
+
+        return responseBody;
+    }
+
+    protected async Task<ProductReadDto> CreateProduct(string accessToken, string restaurantId, ProductCreateDto productCreateDto)
+    {
+        // Arrange
+        Client.SetAuthorizationHeader(accessToken);
+        var body = new
+        {
+            productCreateDto.Name,
+            productCreateDto.Price,
+            productCreateDto.Quantity,
+            productCreateDto.IsActive,
+            productCreateDto.ProductType,
+            productCreateDto.Image,
+            productCreateDto.ExpirationDateTime,
+            productCreateDto.Description,
+            productCreateDto.Allergens,
+            productCreateDto.ProductTags
+        };
+
+        // Act
+        var response = await Client.PostAsJsonAsync($"restaurants/{restaurantId}/products", body);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        var responseBody = await ResponseUtils.DeserializeContentAsync<ProductReadDto>(response);
+
+        responseBody.Id.Should().MatchRegex(GuidUtils.Regex);
+        responseBody.RestaurantId.Should().Be(restaurantId);
+        responseBody.Name.Should().Be(body.Name);
+        responseBody.Price.Should().Be(body.Price);
+        responseBody.Description.Should().Be(body.Description);
+        responseBody.IsActive.Should().Be((bool)body.IsActive!);
+        responseBody.Quantity.Should().Be(body.Quantity);
+        responseBody.ProductType.Should().Be(body.ProductType);
+        responseBody.Image.Should().Be(body.Image);
+        responseBody.CreationDateTime.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
+        _ = productCreateDto.ExpirationDateTime switch
+        {
+            { } expirationDateTime => responseBody.ExpirationDateTime.Should().BeCloseTo(expirationDateTime, TimeSpan.FromSeconds(5)),
+            null => responseBody.ExpirationDateTime.Should().BeNull()
+        };
+        responseBody.Allergens.Should().BeEquivalentTo(body.Allergens)
+                    .And
+                    .BeInAscendingOrder(x => x.Name);
+        responseBody.Allergens.Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
+                    .Should().BeTrue();
+        responseBody.ProductTags.Should().BeEquivalentTo(body.ProductTags)
+                    .And
+                    .BeInAscendingOrder(x => x.Name);
+        responseBody.ProductTags.Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
+                    .Should().BeTrue();
 
         return responseBody;
     }

@@ -13,7 +13,6 @@ public static class ProductMocks
         IsActive = true,
         Quantity = 3,
         ProductType = ProductType.Main,
-        ExpirationDateTime = DateTimeMocks.Monday20220321T1000Utc.AddDays(1),
         Allergens = new List<AllergenCreateDto>
         {
             new() { Name = "gluten" },
