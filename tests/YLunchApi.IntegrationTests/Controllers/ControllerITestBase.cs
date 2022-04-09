@@ -89,25 +89,26 @@ public abstract class ControllerITestBase : IClassFixture<WebApplicationFactory<
         return responseBody;
     }
 
-    private async Task<DecodedTokens> Login(UserCreateDto userCreateDto)
+    protected async Task<DecodedTokens> LoginUser(string email, string password)
     {
         // Arrange
-        var userLoginRequestBody = new
+        var body = new
         {
-            email = userCreateDto.Email,
-            userCreateDto.Password
+            email,
+            password
         };
 
         // Act
-        var loginResponse = await Client.PostAsJsonAsync("authentication/login", userLoginRequestBody);
+        var loginResponse = await Client.PostAsJsonAsync("authentication/login", body);
 
         // Assert
         loginResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var tokens = await ResponseUtils.DeserializeContentAsync<TokenReadDto>(loginResponse);
         Assert.IsType<string>(tokens.AccessToken);
+        tokens.AccessToken.Should().MatchRegex(GuidUtils.Regex);
         Assert.IsType<string>(tokens.RefreshToken);
         var applicationSecurityToken = new ApplicationSecurityToken(tokens.AccessToken);
-        applicationSecurityToken.UserEmail.Should().Be(userCreateDto.Email);
+        applicationSecurityToken.UserEmail.Should().Be(email);
         return new DecodedTokens(tokens.AccessToken, tokens.RefreshToken);
     }
 
@@ -124,7 +125,7 @@ public abstract class ControllerITestBase : IClassFixture<WebApplicationFactory<
 
         _ = await Client.PostAsJsonAsync("customers", customerCreationRequestBody);
 
-        var decodedTokens = await Login(customerCreateDto);
+        var decodedTokens = await LoginUser(customerCreateDto.Email, customerCreateDto.Password);
         decodedTokens.UserRoles.Should().BeEquivalentTo(new List<string> { Roles.Customer });
         return decodedTokens;
     }
@@ -142,7 +143,7 @@ public abstract class ControllerITestBase : IClassFixture<WebApplicationFactory<
 
         _ = await Client.PostAsJsonAsync("restaurant-admins", restaurantAdminCreationRequestBody);
 
-        var decodedTokens = await Login(restaurantAdminCreateDto);
+        var decodedTokens = await LoginUser(restaurantAdminCreateDto.Email, restaurantAdminCreateDto.Password);
         decodedTokens.UserRoles.Should().BeEquivalentTo(new List<string> { Roles.RestaurantAdmin });
         return decodedTokens;
     }

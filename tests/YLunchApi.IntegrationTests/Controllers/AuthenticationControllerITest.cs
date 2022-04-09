@@ -20,8 +20,11 @@ public class AuthenticationControllerITest : ControllerITestBase
     [Fact]
     public async Task Login_Should_Return_A_200Ok()
     {
-        // Arrange, Act and Assert
-        _ = await CreateAndLoginUser(UserMocks.CustomerCreateDto);
+        // Arrange
+        var user = await CreateUser(UserMocks.CustomerCreateDto);
+
+        // Act and Assert
+        _ = await LoginUser(user.Email, UserMocks.CustomerCreateDto.Password);
     }
 
     [Fact]
