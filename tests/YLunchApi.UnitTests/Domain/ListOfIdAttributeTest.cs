@@ -11,6 +11,13 @@ public class ListOfIdAttributeTest
     private readonly ListOfIdAttribute _attribute = new();
 
     [Fact]
+    public void Null_Should_Be_Valid()
+    {
+        // Arrange & Act & Assert
+        _attribute.IsValid(null).Should().BeTrue();
+    }
+
+    [Fact]
     public void List_Of_Id_Should_Be_Valid()
     {
         // Arrange
@@ -32,6 +39,20 @@ public class ListOfIdAttributeTest
         {
             "BadId",
             Guid.NewGuid().ToString()
+        };
+
+        // Act & Assert
+        _attribute.IsValid(listOfId).Should().BeFalse();
+    }
+
+    [Fact]
+    public void List_Of_NonString_Should_Be_Invalid()
+    {
+        // Arrange
+        var listOfId = new List<int>
+        {
+            1,
+            2
         };
 
         // Act & Assert
