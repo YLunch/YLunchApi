@@ -18,7 +18,7 @@ namespace YLunchApi.IntegrationTests.Controllers;
 [Collection("Sequential")]
 public class ProductsControllerITest : ControllerITestBase
 {
-    #region CreateRestaurantTests
+    #region CreateProductTests
 
     [Fact]
     public async Task CreateProduct_Should_Return_A_201Created()

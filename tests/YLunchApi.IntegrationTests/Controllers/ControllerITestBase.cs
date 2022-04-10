@@ -176,7 +176,6 @@ public abstract class ControllerITestBase : IClassFixture<WebApplicationFactory<
         var response = await Client.PostAsJsonAsync("restaurants", body);
 
         // Assert
-        var responseBody1 = await ResponseUtils.DeserializeContentAsync(response);
         response.StatusCode.Should().Be(HttpStatusCode.Created);
         var responseBody = await ResponseUtils.DeserializeContentAsync<RestaurantReadDto>(response);
 
@@ -220,6 +219,10 @@ public abstract class ControllerITestBase : IClassFixture<WebApplicationFactory<
 
         return responseBody;
     }
+
+    #endregion
+
+    #region ProductUtils
 
     protected async Task<ProductReadDto> CreateProduct(string accessToken, string restaurantId, ProductCreateDto productCreateDto)
     {
@@ -271,6 +274,37 @@ public abstract class ControllerITestBase : IClassFixture<WebApplicationFactory<
                     .BeInAscendingOrder(x => x.Name);
         responseBody.ProductTags.Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
                     .Should().BeTrue();
+
+        return responseBody;
+    }
+
+    #endregion
+
+    #region OrderUtils
+
+    protected async Task<OrderReadDto> CreateOrder(string accessToken, string restaurantId, IEnumerable<ProductReadDto> products)
+    {
+        // Arrange
+        Client.SetAuthorizationHeader(accessToken);
+        var body = new
+        {
+            ProductIds = products.Select(x => x.Id),
+            ReservedForDateTime = DateTime.UtcNow.AddHours(1),
+            CustomerComment = "customer comment"
+        };
+
+        // Act
+        var response = await Client.PostAsJsonAsync($"restaurants/{restaurantId}/orders", body);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        var responseBody = await ResponseUtils.DeserializeContentAsync<OrderReadDto>(response);
+
+        responseBody.Id.Should().MatchRegex(GuidUtils.Regex);
+        responseBody.RestaurantId.Should().Be(restaurantId);
+        responseBody.CustomerComment.Should().Be(body.CustomerComment);
+        responseBody.CreationDateTime.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
+        responseBody.ReservedForDateTime.Should().BeCloseTo(body.ReservedForDateTime, TimeSpan.FromSeconds(5));
 
         return responseBody;
     }
