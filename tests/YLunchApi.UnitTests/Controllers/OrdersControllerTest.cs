@@ -28,10 +28,10 @@ public class OrdersControllerTest : UnitTestFixture
 
     #region Utils
 
-    private OrdersController InitOrdersController(string accessToken, DateTime? customDateTime = null)
+    private OrdersController InitOrdersController(string accessToken, DateTime dateTime)
     {
         var dateTimeProviderMock = new Mock<IDateTimeProvider>();
-        dateTimeProviderMock.Setup(x => x.UtcNow).Returns(customDateTime ?? DateTime.UtcNow);
+        dateTimeProviderMock.Setup(x => x.UtcNow).Returns(dateTime);
         Fixture.InitFixture(configuration =>
         {
             configuration.AccessToken = accessToken;
@@ -255,6 +255,103 @@ public class OrdersControllerTest : UnitTestFixture
         var responseBody = Assert.IsType<ErrorDto>(responseResult.Value);
 
         responseBody.Should().BeEquivalentTo(new ErrorDto(HttpStatusCode.NotFound, $"Product: {notExistingProductId} not found."));
+    }
+
+    #endregion
+
+    #region GetOrderByIdTests
+
+    [Fact]
+    public async Task GetOrderById_Should_Return_A_200Ok()
+    {
+        // Arrange
+        var dateTime = DateTimeMocks.Monday20220321T1000Utc;
+        var restaurantCreateDto = RestaurantMocks.PrepareFullRestaurant(RestaurantMocks.SimpleRestaurantCreateDto.Name, dateTime);
+        var restaurant = await CreateRestaurant(restaurantCreateDto, dateTime);
+
+        var productCreateDto1 = ProductMocks.ProductCreateDto;
+        productCreateDto1.Name = "product1";
+        var product1 = await CreateProduct(restaurant.Id, dateTime, productCreateDto1);
+
+        var productCreateDto2 = ProductMocks.ProductCreateDto;
+        productCreateDto2.Name = "product2";
+        var product2 = await CreateProduct(restaurant.Id, dateTime, productCreateDto2);
+
+        var customerId = new ApplicationSecurityToken(TokenMocks.ValidCustomerAccessToken).UserId;
+
+        var ordersController = InitOrdersController(TokenMocks.ValidCustomerAccessToken, dateTime);
+
+        var orderCreateDto = new OrderCreateDto
+        {
+            ProductIds = new List<string>
+            {
+                product1.Id,
+                product2.Id
+            },
+            ReservedForDateTime = dateTime.AddHours(1),
+            CustomerComment = "Customer comment"
+        };
+        var order = await CreateOrder(TokenMocks.ValidCustomerAccessToken, restaurant.Id, dateTime, orderCreateDto);
+
+        // Act
+        var response = await ordersController.GetOrderById(order.Id);
+
+        // Assert
+        var responseResult = Assert.IsType<OkObjectResult>(response.Result);
+        var responseBody = Assert.IsType<OrderReadDto>(responseResult.Value);
+
+        responseBody.Id.Should().MatchRegex(GuidUtils.Regex);
+        responseBody.OrderStatuses.Count.Should().Be(1);
+        responseBody.UserId.Should().Be(customerId);
+        responseBody.OrderStatuses.Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
+                    .Should().BeTrue();
+        responseBody.OrderStatuses.Should().BeEquivalentTo(new List<OrderStatusReadDto>
+        {
+            new()
+            {
+                OrderId = responseBody.Id,
+                DateTime = dateTime,
+                State = OrderState.Idling
+            }
+        }, options => options.Excluding(x => x.Id));
+        responseBody.CustomerComment.Should().Be("Customer comment");
+        responseBody.RestaurantComment.Should().BeNull();
+        responseBody.IsAccepted.Should().Be(false);
+        responseBody.IsAcknowledged.Should().Be(false);
+        responseBody.CreationDateTime.Should().Be(dateTime);
+        responseBody.ReservedForDateTime.Should().BeCloseTo(dateTime.AddHours(1), TimeSpan.FromSeconds(5));
+        responseBody.OrderedProducts.Count.Should().Be(2);
+        responseBody.OrderedProducts
+                    .Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
+                    .Should().BeTrue();
+        responseBody.OrderedProducts.Should().BeEquivalentTo(
+            new List<ProductReadDto> { product1, product2 }
+                .Select(x =>
+                {
+                    var orderedProductReadDto = new OrderedProductReadDto
+                    {
+                        OrderId = responseBody.Id,
+                        ProductId = x.Id,
+                        UserId = customerId,
+                        RestaurantId = x.RestaurantId,
+                        Name = x.Name,
+                        Description = x.Description,
+                        Price = x.Price,
+                        CreationDateTime = x.CreationDateTime,
+                        Allergens = string.Join(",", x.Allergens.Select(y => y.Name).OrderBy(y => y)),
+                        ProductTags = string.Join(",", x.ProductTags.Select(y => y.Name).OrderBy(y => y))
+                    };
+                    return orderedProductReadDto;
+                })
+                .ToList(), options => options.Excluding(x => x.Id));
+        responseBody.TotalPrice.Should().Be(responseBody.OrderedProducts.Sum(x => x.Price));
+        responseBody.CurrentOrderStatus.Id.Should().MatchRegex(GuidUtils.Regex);
+        responseBody.CurrentOrderStatus.Should().BeEquivalentTo(new OrderStatusReadDto
+        {
+            OrderId = responseBody.Id,
+            DateTime = dateTime,
+            State = OrderState.Idling
+        }, options => options.Excluding(x => x.Id));
     }
 
     #endregion

@@ -89,4 +89,20 @@ public class OrderService : IOrderService
         var orderDb = await _orderRepository.GetById(order.Id);
         return orderDb.Adapt<OrderReadDto>();
     }
+
+    public async Task<OrderReadDto> GetByIdForCustomer(string customerId, string orderId)
+    {
+        var order = await _orderRepository.GetById(orderId);
+        if (order.UserId != customerId)
+        {
+            throw new EntityNotFoundException();
+        }
+
+        return order.Adapt<OrderReadDto>();
+    }
+
+    public async Task<OrderReadDto> GetByIdForRestaurantAdmin(string restaurantAdminId, string orderId)
+    {
+        throw new NotImplementedException();
+    }
 }

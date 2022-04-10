@@ -43,4 +43,20 @@ public class OrdersController : ApplicationControllerBase
             return BadRequest(new ErrorDto(HttpStatusCode.BadRequest, "ReservedForDateTime must be set when the restaurant is open for orders."));
         }
     }
+
+    [HttpGet("orders/{orderId}")]
+    [Authorize]
+    public async Task<ActionResult<OrderReadDto>> GetOrderById(string orderId)
+    {
+        try
+        {
+            return CurrentUserRoles.Contains(Roles.RestaurantAdmin) ?
+                Ok(await _orderService.GetByIdForRestaurantAdmin(CurrentUserId!, orderId)) :
+                Ok(await _orderService.GetByIdForCustomer(CurrentUserId!, orderId));
+        }
+        catch (EntityNotFoundException)
+        {
+            return NotFound(new ErrorDto(HttpStatusCode.NotFound, $"Order: {orderId} not found"));
+        }
+    }
 }

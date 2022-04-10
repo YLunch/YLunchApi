@@ -22,7 +22,8 @@ public class OrderRepository : IOrderRepository
 
     public async Task<Order> GetById(string orderId)
     {
-        var order = await _context.Orders.FirstOrDefaultAsync(x => x.Id == orderId);
+        var order = await OrdersQueryBase
+            .FirstOrDefaultAsync(x => x.Id == orderId);
         if (order == null)
         {
             throw new EntityNotFoundException();
@@ -30,4 +31,9 @@ public class OrderRepository : IOrderRepository
 
         return order;
     }
+
+    private IQueryable<Order> OrdersQueryBase =>
+        _context.Orders
+                .Include(x => x.OrderStatuses)
+                .Include(x => x.OrderedProducts);
 }

@@ -7,6 +7,5 @@ public interface IProductService
 {
     Task<ProductReadDto> Create(ProductCreateDto productCreateDto, string restaurantId);
     Task<ProductReadDto> GetById(string productId);
-
     Task<ICollection<ProductReadDto>> GetProducts(ProductFilter productFilter);
 }
