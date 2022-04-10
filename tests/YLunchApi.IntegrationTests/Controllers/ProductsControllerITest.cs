@@ -124,8 +124,6 @@ public class ProductsControllerITest : ControllerITestBase
         responseBody.Should().MatchRegex(@"ProductTags.*Must be lowercase\.");
     }
 
-
-
     [Fact]
     public async Task CreateProduct_Should_Return_A_401Unauthorized()
     {
