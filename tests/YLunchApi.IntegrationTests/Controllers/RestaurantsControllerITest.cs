@@ -21,72 +21,12 @@ public class RestaurantsControllerITest : ControllerITestBase
 {
     #region Utils
 
-    private async Task<RestaurantReadDto> CreateFullRestaurant(string? name = null)
+    private async Task<RestaurantReadDto> CreateAndLoginRestaurantAdminAndCreateRestaurant(string restaurantAdminEmail, RestaurantCreateDto restaurantCreateDto)
     {
-        var decodedTokens = await CreateAndLoginUser(UserMocks.RestaurantAdminCreateDto);
-        Client.SetAuthorizationHeader(decodedTokens.AccessToken);
-        var utcNow = DateTime.UtcNow;
-        var body = new
-        {
-            Name = name ?? RestaurantMocks.SimpleRestaurantCreateDto.Name,
-            RestaurantMocks.SimpleRestaurantCreateDto.Email,
-            RestaurantMocks.SimpleRestaurantCreateDto.PhoneNumber,
-            RestaurantMocks.SimpleRestaurantCreateDto.Country,
-            RestaurantMocks.SimpleRestaurantCreateDto.City,
-            RestaurantMocks.SimpleRestaurantCreateDto.ZipCode,
-            RestaurantMocks.SimpleRestaurantCreateDto.StreetName,
-            RestaurantMocks.SimpleRestaurantCreateDto.StreetNumber,
-            RestaurantMocks.SimpleRestaurantCreateDto.IsOpen,
-            RestaurantMocks.SimpleRestaurantCreateDto.IsPublic,
-            ClosingDates = new List<dynamic>
-            {
-                new { ClosingDateTime = DateTime.UtcNow.AddYears(1).AddDays(10) },
-                new { ClosingDateTime = DateTime.UtcNow.AddYears(1).AddDays(-10) }
-            },
-            PlaceOpeningTimes = new List<dynamic>
-            {
-                new
-                {
-                    utcNow.AddDays(-1).DayOfWeek,
-                    OffsetInMinutes = 0 * 60,
-                    DurationInMinutes = 23 * 60 + 59
-                },
-                new
-                {
-                    utcNow.DayOfWeek,
-                    OffsetInMinutes = 0 * 60,
-                    DurationInMinutes = 23 * 60 + 59
-                }
-            },
-            OrderOpeningTimes = new List<dynamic>
-            {
-                new
-                {
-                    utcNow.AddDays(-1).DayOfWeek,
-                    OffsetInMinutes = 0 * 60,
-                    DurationInMinutes = 23 * 60 + 59
-                },
-                new
-                {
-                    utcNow.DayOfWeek,
-                    OffsetInMinutes = 0 * 60,
-                    DurationInMinutes = 23 * 60 + 59
-                }
-            }
-        };
-
-        var restaurantCreationResponse = await Client.PostAsJsonAsync("restaurants", body);
-        restaurantCreationResponse.StatusCode.Should().Be(HttpStatusCode.Created);
-        return await ResponseUtils.DeserializeContentAsync<RestaurantReadDto>(restaurantCreationResponse);
-    }
-
-    private async Task<RestaurantReadDto> CreateSimpleRestaurant(RestaurantCreateDto restaurantCreateDto)
-    {
-        var decodedTokens = await CreateAndLoginUser(UserMocks.RestaurantAdminCreateDto);
-        Client.SetAuthorizationHeader(decodedTokens.AccessToken);
-        var restaurantCreationResponse = await Client.PostAsJsonAsync("restaurants", restaurantCreateDto);
-        restaurantCreationResponse.StatusCode.Should().Be(HttpStatusCode.Created);
-        return await ResponseUtils.DeserializeContentAsync<RestaurantReadDto>(restaurantCreationResponse);
+        var restaurantAdminCreateDto = UserMocks.RestaurantAdminCreateDto;
+        restaurantAdminCreateDto.Email = restaurantAdminEmail;
+        var decodedTokens = await CreateAndLoginUser(restaurantAdminCreateDto);
+        return await CreateRestaurant(decodedTokens.AccessToken, restaurantCreateDto);
     }
 
     #endregion
@@ -310,8 +250,8 @@ public class RestaurantsControllerITest : ControllerITestBase
             RestaurantMocks.SimpleRestaurantCreateDto.IsPublic,
             ClosingDates = new List<dynamic>
             {
-                new { ClosingDateTime = DateTime.UtcNow.AddYears(1).AddDays(10) },
-                new { ClosingDateTime = DateTime.UtcNow.AddYears(1).AddDays(-10) }
+                new { ClosingDateTime = DateTime.UtcNow.AddDays(10) },
+                new { ClosingDateTime = DateTime.UtcNow.AddDays(-10) }
             },
             PlaceOpeningTimes = new List<dynamic>
             {
@@ -345,6 +285,7 @@ public class RestaurantsControllerITest : ControllerITestBase
         responseBody.Should()
                     .Contain("Email is invalid. It should be lowercase email format. Example: example@example.com.");
 
+        responseBody.Should().MatchRegex(@"ClosingDates.*DateTime must be in future if present\.");
         responseBody.Should().MatchRegex(@"PlaceOpeningTimes.*Day must be in range 0-6, 0 is sunday, 6 is saturday\.");
         responseBody.Should()
                     .MatchRegex(
@@ -532,7 +473,10 @@ public class RestaurantsControllerITest : ControllerITestBase
     public async Task GetRestaurantById_Should_Return_A_200Ok()
     {
         // Arrange
-        var restaurant = await CreateFullRestaurant();
+        var restaurant = await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            UserMocks.RestaurantAdminCreateDto.Email,
+            RestaurantMocks.PrepareFullRestaurant("restaurant", DateTime.UtcNow)
+        );
 
         // Act
         var response = await Client.GetAsync($"restaurants/{restaurant.Id}");
@@ -590,23 +534,44 @@ public class RestaurantsControllerITest : ControllerITestBase
         // Arrange
         var restaurantCreateDto1 = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurantCreateDto1.Name = "restaurant1";
-        var restaurant1 = await CreateSimpleRestaurant(restaurantCreateDto1);
+        var restaurant1 = await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"1-{UserMocks.RestaurantAdminCreateDto.Email}",
+            restaurantCreateDto1
+        );
 
-        var restaurant2 = await CreateFullRestaurant("restaurant2");
+        var restaurant2 = await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"2-{UserMocks.RestaurantAdminCreateDto.Email}",
+            RestaurantMocks.PrepareFullRestaurant("restaurant2", DateTime.UtcNow)
+        );
 
         var restaurantCreateDto3 = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurantCreateDto3.Name = "restaurant3";
-        var restaurant3 = await CreateSimpleRestaurant(restaurantCreateDto3);
+        var restaurant3 = await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"3-{UserMocks.RestaurantAdminCreateDto.Email}",
+            restaurantCreateDto3
+        );
 
-        var restaurant4 = await CreateFullRestaurant("restaurant4");
+        var restaurant4 = await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"4-{UserMocks.RestaurantAdminCreateDto.Email}",
+            RestaurantMocks.PrepareFullRestaurant("restaurant4", DateTime.UtcNow)
+        );
 
         var restaurantCreateDto5 = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurantCreateDto5.Name = "restaurant5";
-        var restaurant5 = await CreateSimpleRestaurant(restaurantCreateDto5);
+        var restaurant5 = await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"5-{UserMocks.RestaurantAdminCreateDto.Email}",
+            restaurantCreateDto5
+        );
 
-        var restaurant6 = await CreateFullRestaurant("restaurant6");
+        var restaurant6 = await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"6-{UserMocks.RestaurantAdminCreateDto.Email}",
+            RestaurantMocks.PrepareFullRestaurant("restaurant6", DateTime.UtcNow)
+        );
 
-        var restaurant7 = await CreateFullRestaurant("restaurant7");
+        var restaurant7 = await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"7-{UserMocks.RestaurantAdminCreateDto.Email}",
+            RestaurantMocks.PrepareFullRestaurant("restaurant7", DateTime.UtcNow)
+        );
 
         var expectedRestaurants = new List<RestaurantReadDto>
         {
@@ -679,23 +644,44 @@ public class RestaurantsControllerITest : ControllerITestBase
         // Arrange
         var restaurantCreateDto1 = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurantCreateDto1.Name = "restaurant1";
-        await CreateSimpleRestaurant(restaurantCreateDto1);
+        await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"1-{UserMocks.RestaurantAdminCreateDto.Email}",
+            restaurantCreateDto1
+        );
 
-        await CreateFullRestaurant("restaurant2");
+        await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"2-{UserMocks.RestaurantAdminCreateDto.Email}",
+            RestaurantMocks.PrepareFullRestaurant("restaurant2", DateTime.UtcNow)
+        );
 
         var restaurantCreateDto3 = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurantCreateDto3.Name = "restaurant3";
-        await CreateSimpleRestaurant(restaurantCreateDto3);
+        await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"3-{UserMocks.RestaurantAdminCreateDto.Email}",
+            restaurantCreateDto3
+        );
 
-        var restaurant4 = await CreateFullRestaurant("restaurant4");
+        var restaurant4 = await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"4-{UserMocks.RestaurantAdminCreateDto.Email}",
+            RestaurantMocks.PrepareFullRestaurant("restaurant4", DateTime.UtcNow)
+        );
 
         var restaurantCreateDto5 = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurantCreateDto5.Name = "restaurant5";
-        var restaurant5 = await CreateSimpleRestaurant(restaurantCreateDto5);
+        var restaurant5 = await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"5-{UserMocks.RestaurantAdminCreateDto.Email}",
+            restaurantCreateDto5
+        );
 
-        var restaurant6 = await CreateFullRestaurant("restaurant6");
+        var restaurant6 = await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"6-{UserMocks.RestaurantAdminCreateDto.Email}",
+            RestaurantMocks.PrepareFullRestaurant("restaurant6", DateTime.UtcNow)
+        );
 
-        await CreateFullRestaurant("restaurant7");
+        await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"7-{UserMocks.RestaurantAdminCreateDto.Email}",
+            RestaurantMocks.PrepareFullRestaurant("restaurant7", DateTime.UtcNow)
+        );
 
         var expectedRestaurants = new List<RestaurantReadDto>
         {
@@ -764,23 +750,44 @@ public class RestaurantsControllerITest : ControllerITestBase
         // Arrange
         var restaurantCreateDto1 = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurantCreateDto1.Name = "restaurant1";
-        await CreateSimpleRestaurant(restaurantCreateDto1);
+        await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"1-{UserMocks.RestaurantAdminCreateDto.Email}",
+            restaurantCreateDto1
+        );
 
-        var restaurant2 = await CreateFullRestaurant("restaurant2");
+        var restaurant2 = await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"2-{UserMocks.RestaurantAdminCreateDto.Email}",
+            RestaurantMocks.PrepareFullRestaurant("restaurant2", DateTime.UtcNow)
+        );
 
         var restaurantCreateDto3 = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurantCreateDto3.Name = "restaurant3";
-        await CreateSimpleRestaurant(restaurantCreateDto3);
+        await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"3-{UserMocks.RestaurantAdminCreateDto.Email}",
+            restaurantCreateDto3
+        );
 
-        var restaurant4 = await CreateFullRestaurant("restaurant4");
+        var restaurant4 = await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"4-{UserMocks.RestaurantAdminCreateDto.Email}",
+            RestaurantMocks.PrepareFullRestaurant("restaurant4", DateTime.UtcNow)
+        );
 
         var restaurantCreateDto5 = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurantCreateDto5.Name = "restaurant5";
-        await CreateSimpleRestaurant(restaurantCreateDto5);
+        await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"5-{UserMocks.RestaurantAdminCreateDto.Email}",
+            restaurantCreateDto5
+        );
 
-        var restaurant6 = await CreateFullRestaurant("restaurant6");
+        var restaurant6 = await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"6-{UserMocks.RestaurantAdminCreateDto.Email}",
+            RestaurantMocks.PrepareFullRestaurant("restaurant6", DateTime.UtcNow)
+        );
 
-        var restaurant7 = await CreateFullRestaurant("restaurant7");
+        var restaurant7 = await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"7-{UserMocks.RestaurantAdminCreateDto.Email}",
+            RestaurantMocks.PrepareFullRestaurant("restaurant7", DateTime.UtcNow)
+        );
 
         var expectedRestaurants = new List<RestaurantReadDto>
         {
@@ -850,23 +857,44 @@ public class RestaurantsControllerITest : ControllerITestBase
         // Arrange
         var restaurantCreateDto1 = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurantCreateDto1.Name = "restaurant1";
-        var restaurant1 = await CreateSimpleRestaurant(restaurantCreateDto1);
+        var restaurant1 = await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"1-{UserMocks.RestaurantAdminCreateDto.Email}",
+            restaurantCreateDto1
+        );
 
-        await CreateFullRestaurant("restaurant2");
+        await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"2-{UserMocks.RestaurantAdminCreateDto.Email}",
+            RestaurantMocks.PrepareFullRestaurant("restaurant2", DateTime.UtcNow)
+        );
 
         var restaurantCreateDto3 = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurantCreateDto3.Name = "restaurant3";
-        var restaurant3 = await CreateSimpleRestaurant(restaurantCreateDto3);
+        var restaurant3 = await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"3-{UserMocks.RestaurantAdminCreateDto.Email}",
+            restaurantCreateDto3
+        );
 
-        await CreateFullRestaurant("restaurant4");
+        await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"4-{UserMocks.RestaurantAdminCreateDto.Email}",
+            RestaurantMocks.PrepareFullRestaurant("restaurant4", DateTime.UtcNow)
+        );
 
         var restaurantCreateDto5 = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurantCreateDto5.Name = "restaurant5";
-        var restaurant5 = await CreateSimpleRestaurant(restaurantCreateDto5);
+        var restaurant5 = await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"5-{UserMocks.RestaurantAdminCreateDto.Email}",
+            restaurantCreateDto5
+        );
 
-        await CreateFullRestaurant("restaurant6");
+        await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"6-{UserMocks.RestaurantAdminCreateDto.Email}",
+            RestaurantMocks.PrepareFullRestaurant("restaurant6", DateTime.UtcNow)
+        );
 
-        await CreateFullRestaurant("restaurant7");
+        await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"7-{UserMocks.RestaurantAdminCreateDto.Email}",
+            RestaurantMocks.PrepareFullRestaurant("restaurant7", DateTime.UtcNow)
+        );
 
         var expectedRestaurants = new List<RestaurantReadDto>
         {
@@ -919,23 +947,44 @@ public class RestaurantsControllerITest : ControllerITestBase
         // Arrange
         var restaurantCreateDto1 = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurantCreateDto1.Name = "restaurant1";
-        await CreateSimpleRestaurant(restaurantCreateDto1);
+        await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"1-{UserMocks.RestaurantAdminCreateDto.Email}",
+            restaurantCreateDto1
+        );
 
-        var restaurant2 = await CreateFullRestaurant("restaurant2");
+        var restaurant2 = await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"2-{UserMocks.RestaurantAdminCreateDto.Email}",
+            RestaurantMocks.PrepareFullRestaurant("restaurant2", DateTime.UtcNow)
+        );
 
         var restaurantCreateDto3 = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurantCreateDto3.Name = "restaurant3";
-        await CreateSimpleRestaurant(restaurantCreateDto3);
+        await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"3-{UserMocks.RestaurantAdminCreateDto.Email}",
+            restaurantCreateDto3
+        );
 
-        var restaurant4 = await CreateFullRestaurant("restaurant4");
+        var restaurant4 = await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"4-{UserMocks.RestaurantAdminCreateDto.Email}",
+            RestaurantMocks.PrepareFullRestaurant("restaurant4", DateTime.UtcNow)
+        );
 
         var restaurantCreateDto5 = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurantCreateDto5.Name = "restaurant5";
-        await CreateSimpleRestaurant(restaurantCreateDto5);
+        await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"5-{UserMocks.RestaurantAdminCreateDto.Email}",
+            restaurantCreateDto5
+        );
 
-        var restaurant6 = await CreateFullRestaurant("restaurant6");
+        var restaurant6 = await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"6-{UserMocks.RestaurantAdminCreateDto.Email}",
+            RestaurantMocks.PrepareFullRestaurant("restaurant6", DateTime.UtcNow)
+        );
 
-        var restaurant7 = await CreateFullRestaurant("restaurant7");
+        var restaurant7 = await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"7-{UserMocks.RestaurantAdminCreateDto.Email}",
+            RestaurantMocks.PrepareFullRestaurant("restaurant7", DateTime.UtcNow)
+        );
 
         var expectedRestaurants = new List<RestaurantReadDto>
         {
@@ -1005,23 +1054,44 @@ public class RestaurantsControllerITest : ControllerITestBase
         // Arrange
         var restaurantCreateDto1 = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurantCreateDto1.Name = "restaurant1";
-        var restaurant1 = await CreateSimpleRestaurant(restaurantCreateDto1);
+        var restaurant1 = await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"1-{UserMocks.RestaurantAdminCreateDto.Email}",
+            restaurantCreateDto1
+        );
 
-        await CreateFullRestaurant("restaurant2");
+        await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"2-{UserMocks.RestaurantAdminCreateDto.Email}",
+            RestaurantMocks.PrepareFullRestaurant("restaurant2", DateTime.UtcNow)
+        );
 
         var restaurantCreateDto3 = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurantCreateDto3.Name = "restaurant3";
-        var restaurant3 = await CreateSimpleRestaurant(restaurantCreateDto3);
+        var restaurant3 = await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"3-{UserMocks.RestaurantAdminCreateDto.Email}",
+            restaurantCreateDto3
+        );
 
-        await CreateFullRestaurant("restaurant4");
+        await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"4-{UserMocks.RestaurantAdminCreateDto.Email}",
+            RestaurantMocks.PrepareFullRestaurant("restaurant4", DateTime.UtcNow)
+        );
 
         var restaurantCreateDto5 = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurantCreateDto5.Name = "restaurant5";
-        var restaurant5 = await CreateSimpleRestaurant(restaurantCreateDto5);
+        var restaurant5 = await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"5-{UserMocks.RestaurantAdminCreateDto.Email}",
+            restaurantCreateDto5
+        );
 
-        await CreateFullRestaurant("restaurant6");
+        await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"6-{UserMocks.RestaurantAdminCreateDto.Email}",
+            RestaurantMocks.PrepareFullRestaurant("restaurant6", DateTime.UtcNow)
+        );
 
-        await CreateFullRestaurant("restaurant7");
+        await CreateAndLoginRestaurantAdminAndCreateRestaurant(
+            $"7-{UserMocks.RestaurantAdminCreateDto.Email}",
+            RestaurantMocks.PrepareFullRestaurant("restaurant7", DateTime.UtcNow)
+        );
 
         var expectedRestaurants = new List<RestaurantReadDto>
         {

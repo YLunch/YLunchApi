@@ -25,7 +25,7 @@ public static class RestaurantMocks
 
         restaurantCreateDto.ClosingDates = new List<ClosingDateCreateDto>
         {
-            new() { ClosingDateTime = dateTime.AddDays(-1) },
+            new() { ClosingDateTime = dateTime.AddDays(2) },
             new() { ClosingDateTime = dateTime.AddDays(1) }
         };
 

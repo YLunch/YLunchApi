@@ -105,7 +105,6 @@ public abstract class ControllerITestBase : IClassFixture<WebApplicationFactory<
         loginResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var tokens = await ResponseUtils.DeserializeContentAsync<TokenReadDto>(loginResponse);
         Assert.IsType<string>(tokens.AccessToken);
-        tokens.AccessToken.Should().MatchRegex(GuidUtils.Regex);
         Assert.IsType<string>(tokens.RefreshToken);
         var applicationSecurityToken = new ApplicationSecurityToken(tokens.AccessToken);
         applicationSecurityToken.UserEmail.Should().Be(email);
@@ -177,6 +176,7 @@ public abstract class ControllerITestBase : IClassFixture<WebApplicationFactory<
         var response = await Client.PostAsJsonAsync("restaurants", body);
 
         // Assert
+        var responseBody1 = await ResponseUtils.DeserializeContentAsync(response);
         response.StatusCode.Should().Be(HttpStatusCode.Created);
         var responseBody = await ResponseUtils.DeserializeContentAsync<RestaurantReadDto>(response);
 
