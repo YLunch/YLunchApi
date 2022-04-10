@@ -306,6 +306,8 @@ public abstract class ControllerITestBase : IClassFixture<WebApplicationFactory<
         responseBody.CreationDateTime.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
         responseBody.ReservedForDateTime.Should().BeCloseTo(body.ReservedForDateTime, TimeSpan.FromSeconds(5));
 
+        // todo continue assertions
+
         return responseBody;
     }
 

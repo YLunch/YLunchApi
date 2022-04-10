@@ -133,4 +133,47 @@ public class OrdersControllerITest : ControllerITestBase
     }
 
     #endregion
+
+    #region GetOrderByIdTests
+
+    [Fact]
+    public async Task GetOrderById_Should_Return_A_200Ok()
+    {
+        // Arrange
+        var restaurantAdminDecodedTokens = await CreateAndLoginUser(UserMocks.RestaurantAdminCreateDto);
+        var restaurant = await CreateRestaurant(restaurantAdminDecodedTokens.AccessToken, RestaurantMocks.PrepareFullRestaurant("restaurant", DateTime.UtcNow));
+
+        var productCreateDto1 = ProductMocks.ProductCreateDto;
+        productCreateDto1.Name = "product1";
+        var product1 = await CreateProduct(restaurantAdminDecodedTokens.AccessToken, restaurant.Id, productCreateDto1);
+
+        var productCreateDto2 = ProductMocks.ProductCreateDto;
+        productCreateDto2.Name = "product2";
+        var product2 = await CreateProduct(restaurantAdminDecodedTokens.AccessToken, restaurant.Id, productCreateDto2);
+
+        var productCreateDto3 = ProductMocks.ProductCreateDto;
+        productCreateDto3.Name = "product3";
+        var product3 = await CreateProduct(restaurantAdminDecodedTokens.AccessToken, restaurant.Id, productCreateDto3);
+
+        var customerDecodedTokens = await CreateAndLoginUser(UserMocks.CustomerCreateDto);
+
+        var order = await CreateOrder(customerDecodedTokens.AccessToken, restaurant.Id, new List<ProductReadDto> { product1, product2, product3 });
+
+        // Act
+        var response = await Client.GetAsync($"orders/{order.Id}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var responseBody = await ResponseUtils.DeserializeContentAsync<OrderReadDto>(response);
+
+        responseBody.Id.Should().MatchRegex(order.Id);
+        responseBody.RestaurantId.Should().Be(restaurant.Id);
+        responseBody.CustomerComment.Should().Be(order.CustomerComment);
+        responseBody.CreationDateTime.Should().BeCloseTo(order.CreationDateTime, TimeSpan.FromSeconds(5));
+        responseBody.ReservedForDateTime.Should().BeCloseTo(order.ReservedForDateTime, TimeSpan.FromSeconds(5));
+
+        // todo continue assertions
+    }
+
+    #endregion
 }
