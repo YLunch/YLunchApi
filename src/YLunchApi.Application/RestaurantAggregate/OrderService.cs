@@ -2,6 +2,7 @@ using Mapster;
 using YLunchApi.Domain.CommonAggregate.Services;
 using YLunchApi.Domain.Exceptions;
 using YLunchApi.Domain.RestaurantAggregate.Dto;
+using YLunchApi.Domain.RestaurantAggregate.Filters;
 using YLunchApi.Domain.RestaurantAggregate.Models;
 using YLunchApi.Domain.RestaurantAggregate.Models.Enums;
 using YLunchApi.Domain.RestaurantAggregate.Services;
@@ -103,6 +104,18 @@ public class OrderService : IOrderService
 
     public async Task<OrderReadDto> GetByIdForRestaurantAdmin(string restaurantAdminId, string orderId)
     {
-        throw new NotImplementedException();
+        var order = await _orderRepository.GetById(orderId);
+
+        var restaurantsOfAdmin = await _restaurantRepository.GetRestaurants(new RestaurantFilter
+        {
+            RestaurantAdminId = restaurantAdminId
+        });
+
+        if (restaurantsOfAdmin.All(x => x.Id != order.RestaurantId))
+        {
+            throw new EntityNotFoundException();
+        }
+
+        return order.Adapt<OrderReadDto>();
     }
 }

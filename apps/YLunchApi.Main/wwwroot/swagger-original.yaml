@@ -259,7 +259,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageDto'
+                $ref: '#/components/schemas/ErrorDto'
               examples:
                 ValidationError:
                   value:
@@ -315,7 +315,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageDto'
+                $ref: '#/components/schemas/ErrorDto'
               examples:
                 ValidationError:
                   value:
@@ -411,7 +411,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageDto'
+                $ref: '#/components/schemas/ErrorDto'
               examples:
                 ValidationError:
                   value:
@@ -464,7 +464,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageDto'
+                $ref: '#/components/schemas/ErrorDto'
               examples:
                 ValidationError:
                   value:
@@ -519,7 +519,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageDto'
+                $ref: '#/components/schemas/ErrorDto'
               examples:
                 ValidationError:
                   value:
@@ -661,9 +661,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageDto'
+                $ref: '#/components/schemas/ErrorDto'
               example:
-                message: Restaurant not found.
+                title: "NotFound"
+                statusCode: 404
+                errors:
+                  reasons: ["Restaurant: `<ID>` not found."]
   /restaurants/{restaurantId}/products:
     post:
       tags:
@@ -700,7 +703,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageDto'
+                $ref: '#/components/schemas/ErrorDto'
               examples:
                 ValidationError:
                   value:
@@ -720,9 +723,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageDto'
+                $ref: '#/components/schemas/ErrorDto'
               example:
-                message: Restaurant not found.
+                title: "NotFound"
+                statusCode: 404
+                errors:
+                  reasons: ["Restaurant: `<ID>` not found."]
         '409':
           description: |
             Conflict
@@ -796,9 +802,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageDto'
+                $ref: '#/components/schemas/ErrorDto'
               example:
-                message: Restaurant not found.
+                title: "NotFound"
+                statusCode: 404
+                errors:
+                  reasons: ["Restaurant: `<ID>` not found."]
   /products/{productId}:
     get:
       tags:
@@ -841,9 +850,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageDto'
+                $ref: '#/components/schemas/ErrorDto'
               example:
-                message: Product not found.
+                title: "NotFound"
+                statusCode: 404
+                errors:
+                  reasons: ["Product: `<ID>` not found."]
 components:
   schemas:
     MessageDto:

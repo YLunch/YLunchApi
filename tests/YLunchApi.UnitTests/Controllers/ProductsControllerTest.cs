@@ -248,7 +248,7 @@ public class ProductsControllerTest : UnitTestFixture
         var responseBody = Assert.IsType<ErrorDto>(responseResult.Value);
         responseBody.Should()
                     .BeEquivalentTo(new ErrorDto(HttpStatusCode.NotFound,
-                        $"Product {notExistingProductId} not found."));
+                        $"Product: {notExistingProductId} not found."));
     }
 
     #endregion

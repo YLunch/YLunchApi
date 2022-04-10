@@ -56,7 +56,7 @@ public class OrdersController : ApplicationControllerBase
         }
         catch (EntityNotFoundException)
         {
-            return NotFound(new ErrorDto(HttpStatusCode.NotFound, $"Order: {orderId} not found"));
+            return NotFound(new ErrorDto(HttpStatusCode.NotFound, $"Order: {orderId} not found."));
         }
     }
 }

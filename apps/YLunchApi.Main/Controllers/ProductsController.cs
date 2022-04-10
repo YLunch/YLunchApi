@@ -54,7 +54,7 @@ public class ProductsController : ApplicationControllerBase
         }
         catch (EntityNotFoundException)
         {
-            return NotFound(new ErrorDto(HttpStatusCode.NotFound, $"Product {productId} not found."));
+            return NotFound(new ErrorDto(HttpStatusCode.NotFound, $"Product: {productId} not found."));
         }
     }
 
