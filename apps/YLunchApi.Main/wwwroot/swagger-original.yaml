@@ -1514,6 +1514,14 @@ components:
         description:
           type: string
           example: my ingredients
+        allergens:
+          type: string
+          example: "arachide, gluten"
+          description: ordered by name
+        productTags:
+          type: string
+          example: "italienne, pizza"
+          description: ordered by name
         price:
           type: number
           example: 9.8
