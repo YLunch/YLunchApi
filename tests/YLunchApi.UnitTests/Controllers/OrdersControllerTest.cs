@@ -84,6 +84,7 @@ public class OrdersControllerTest : UnitTestFixture
 
         responseBody.Id.Should().MatchRegex(GuidUtils.Regex);
         responseBody.UserId.Should().Be(customerId);
+        responseBody.RestaurantId.Should().Be(restaurant.Id);
         responseBody.OrderStatuses.Count.Should().Be(1);
         responseBody.OrderStatuses.ElementAt(0).Id.Should().MatchRegex(GuidUtils.Regex);
         responseBody.OrderStatuses.ElementAt(0).OrderId.Should().Be(responseBody.Id);
@@ -93,6 +94,7 @@ public class OrdersControllerTest : UnitTestFixture
         responseBody.RestaurantComment.Should().BeNull();
         responseBody.IsAccepted.Should().Be(false);
         responseBody.IsAcknowledged.Should().Be(false);
+        responseBody.IsDeleted.Should().Be(false);
         responseBody.CreationDateTime.Should().BeCloseTo(dateTime, TimeSpan.FromSeconds(5));
         responseBody.ReservedForDateTime.Should().BeCloseTo(dateTime.AddHours(1), TimeSpan.FromSeconds(5));
         responseBody.OrderedProducts.Count.Should().Be(orderCreateDto.ProductIds.Count);
@@ -113,6 +115,9 @@ public class OrdersControllerTest : UnitTestFixture
                         Description = x.Description,
                         Price = x.Price,
                         CreationDateTime = x.CreationDateTime,
+                        ExpirationDateTime = x.ExpirationDateTime,
+                        ProductType = x.ProductType,
+                        Image = x.Image,
                         Allergens = string.Join(",", x.Allergens.Select(y => y.Name).OrderBy(y => y)),
                         ProductTags = string.Join(",", x.ProductTags.Select(y => y.Name).OrderBy(y => y))
                     };
@@ -293,6 +298,7 @@ public class OrdersControllerTest : UnitTestFixture
 
         responseBody.Id.Should().Be(order.Id);
         responseBody.UserId.Should().Be(customerId);
+        responseBody.RestaurantId.Should().Be(restaurant.Id);
         responseBody.OrderStatuses.Count.Should().Be(1);
         responseBody.OrderStatuses.ElementAt(0).Id.Should().MatchRegex(GuidUtils.Regex);
         responseBody.OrderStatuses.ElementAt(0).OrderId.Should().Be(responseBody.Id);
@@ -302,6 +308,7 @@ public class OrdersControllerTest : UnitTestFixture
         responseBody.RestaurantComment.Should().BeNull();
         responseBody.IsAccepted.Should().Be(false);
         responseBody.IsAcknowledged.Should().Be(false);
+        responseBody.IsDeleted.Should().Be(false);
         responseBody.CreationDateTime.Should().BeCloseTo(dateTime, TimeSpan.FromSeconds(5));
         responseBody.ReservedForDateTime.Should().BeCloseTo(dateTime.AddHours(1), TimeSpan.FromSeconds(5));
         responseBody.OrderedProducts.Count.Should().Be(orderCreateDto.ProductIds.Count);
@@ -322,6 +329,9 @@ public class OrdersControllerTest : UnitTestFixture
                         Description = x.Description,
                         Price = x.Price,
                         CreationDateTime = x.CreationDateTime,
+                        ExpirationDateTime = x.ExpirationDateTime,
+                        ProductType = x.ProductType,
+                        Image = x.Image,
                         Allergens = string.Join(",", x.Allergens.Select(y => y.Name).OrderBy(y => y)),
                         ProductTags = string.Join(",", x.ProductTags.Select(y => y.Name).OrderBy(y => y))
                     };
@@ -378,6 +388,7 @@ public class OrdersControllerTest : UnitTestFixture
 
         responseBody.Id.Should().Be(order.Id);
         responseBody.UserId.Should().Be(customerId);
+        responseBody.RestaurantId.Should().Be(restaurant.Id);
         responseBody.OrderStatuses.Count.Should().Be(1);
         responseBody.OrderStatuses.ElementAt(0).Id.Should().MatchRegex(GuidUtils.Regex);
         responseBody.OrderStatuses.ElementAt(0).OrderId.Should().Be(responseBody.Id);
@@ -387,6 +398,7 @@ public class OrdersControllerTest : UnitTestFixture
         responseBody.RestaurantComment.Should().BeNull();
         responseBody.IsAccepted.Should().Be(false);
         responseBody.IsAcknowledged.Should().Be(false);
+        responseBody.IsDeleted.Should().Be(false);
         responseBody.CreationDateTime.Should().BeCloseTo(dateTime, TimeSpan.FromSeconds(5));
         responseBody.ReservedForDateTime.Should().BeCloseTo(dateTime.AddHours(1), TimeSpan.FromSeconds(5));
         responseBody.OrderedProducts.Count.Should().Be(orderCreateDto.ProductIds.Count);
@@ -407,6 +419,9 @@ public class OrdersControllerTest : UnitTestFixture
                         Description = x.Description,
                         Price = x.Price,
                         CreationDateTime = x.CreationDateTime,
+                        ExpirationDateTime = x.ExpirationDateTime,
+                        ProductType = x.ProductType,
+                        Image = x.Image,
                         Allergens = string.Join(",", x.Allergens.Select(y => y.Name).OrderBy(y => y)),
                         ProductTags = string.Join(",", x.ProductTags.Select(y => y.Name).OrderBy(y => y))
                     };

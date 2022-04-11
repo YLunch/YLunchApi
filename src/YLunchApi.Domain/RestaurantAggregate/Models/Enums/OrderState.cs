@@ -10,7 +10,7 @@ namespace YLunchApi.Domain.RestaurantAggregate.Models.Enums
         Ready,
         Delivered,
         Other,
-        Canceled,
+        Cancelled,
         Rejected
     }
 

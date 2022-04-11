@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using YLunchApi.Domain.CommonAggregate.Models;
+using YLunchApi.Domain.RestaurantAggregate.Models.Enums;
 using YLunchApi.Domain.UserAggregate.Models;
 
 namespace YLunchApi.Domain.RestaurantAggregate.Models;
@@ -24,6 +25,9 @@ public class OrderedProduct : Entity
     public string? Description { get; set; } = null!;
     public double Price { get; set; }
     public DateTime CreationDateTime { get; set; }
+    public DateTime? ExpirationDateTime { get; set; }
+
+    public ProductType ProductType { get; set; }
 
     public string Allergens { get; set; } = null!;
     public string ProductTags { get; set; } = null!;
