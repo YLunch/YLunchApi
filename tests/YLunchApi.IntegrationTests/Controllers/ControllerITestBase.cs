@@ -14,6 +14,7 @@ using YLunchApi.Authentication.Models;
 using YLunchApi.Authentication.Models.Dto;
 using YLunchApi.Domain.Core.Utils;
 using YLunchApi.Domain.RestaurantAggregate.Dto;
+using YLunchApi.Domain.RestaurantAggregate.Models.Enums;
 using YLunchApi.Domain.UserAggregate.Dto;
 using YLunchApi.Domain.UserAggregate.Models;
 using YLunchApi.Helpers.Extensions;
@@ -282,7 +283,7 @@ public abstract class ControllerITestBase : IClassFixture<WebApplicationFactory<
 
     #region OrderUtils
 
-    protected async Task<OrderReadDto> CreateOrder(string accessToken, string restaurantId, IEnumerable<ProductReadDto> products)
+    protected async Task<OrderReadDto> CreateOrder(string accessToken, string restaurantId, ICollection<ProductReadDto> products)
     {
         // Arrange
         Client.SetAuthorizationHeader(accessToken);
@@ -290,7 +291,7 @@ public abstract class ControllerITestBase : IClassFixture<WebApplicationFactory<
         {
             ProductIds = products.Select(x => x.Id),
             ReservedForDateTime = DateTime.UtcNow.AddHours(1),
-            CustomerComment = "customer comment"
+            CustomerComment = "Customer comment"
         };
 
         // Act
@@ -300,13 +301,51 @@ public abstract class ControllerITestBase : IClassFixture<WebApplicationFactory<
         response.StatusCode.Should().Be(HttpStatusCode.Created);
         var responseBody = await ResponseUtils.DeserializeContentAsync<OrderReadDto>(response);
 
-        responseBody.Id.Should().MatchRegex(GuidUtils.Regex);
-        responseBody.RestaurantId.Should().Be(restaurantId);
-        responseBody.CustomerComment.Should().Be(body.CustomerComment);
-        responseBody.CreationDateTime.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
-        responseBody.ReservedForDateTime.Should().BeCloseTo(body.ReservedForDateTime, TimeSpan.FromSeconds(5));
+        var dateTime = DateTime.UtcNow;
+        var customerId = new ApplicationSecurityToken(accessToken).UserId;
 
-        // todo continue assertions
+        responseBody.Id.Should().MatchRegex(GuidUtils.Regex);
+        responseBody.UserId.Should().Be(customerId);
+        responseBody.OrderStatuses.Count.Should().Be(1);
+        responseBody.OrderStatuses.ElementAt(0).Id.Should().MatchRegex(GuidUtils.Regex);
+        responseBody.OrderStatuses.ElementAt(0).OrderId.Should().Be(responseBody.Id);
+        responseBody.OrderStatuses.ElementAt(0).DateTime.Should().BeCloseTo(dateTime, TimeSpan.FromSeconds(5));
+        responseBody.OrderStatuses.ElementAt(0).State.Should().Be(OrderState.Idling);
+        responseBody.CustomerComment.Should().Be("Customer comment");
+        responseBody.RestaurantComment.Should().BeNull();
+        responseBody.IsAccepted.Should().Be(false);
+        responseBody.IsAcknowledged.Should().Be(false);
+        responseBody.CreationDateTime.Should().BeCloseTo(dateTime, TimeSpan.FromSeconds(5));
+        responseBody.ReservedForDateTime.Should().BeCloseTo(dateTime.AddHours(1), TimeSpan.FromSeconds(5));
+        responseBody.OrderedProducts.Count.Should().Be(products.Count);
+        responseBody.OrderedProducts
+                    .Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
+                    .Should().BeTrue();
+        responseBody.OrderedProducts.Should().BeEquivalentTo(
+            products
+                .Select(x =>
+                {
+                    var orderedProductReadDto = new OrderedProductReadDto
+                    {
+                        OrderId = responseBody.Id,
+                        ProductId = x.Id,
+                        UserId = customerId,
+                        RestaurantId = x.RestaurantId,
+                        Name = x.Name,
+                        Description = x.Description,
+                        Price = x.Price,
+                        CreationDateTime = x.CreationDateTime,
+                        Allergens = string.Join(",", x.Allergens.Select(y => y.Name).OrderBy(y => y)),
+                        ProductTags = string.Join(",", x.ProductTags.Select(y => y.Name).OrderBy(y => y))
+                    };
+                    return orderedProductReadDto;
+                })
+                .ToList(), options => options.Excluding(x => x.Id));
+        responseBody.TotalPrice.Should().Be(responseBody.OrderedProducts.Sum(x => x.Price));
+        responseBody.CurrentOrderStatus.Id.Should().MatchRegex(GuidUtils.Regex);
+        responseBody.CurrentOrderStatus.OrderId.Should().Be(responseBody.Id);
+        responseBody.CurrentOrderStatus.DateTime.Should().BeCloseTo(dateTime, TimeSpan.FromSeconds(5));
+        responseBody.CurrentOrderStatus.State.Should().Be(OrderState.Idling);
 
         return responseBody;
     }

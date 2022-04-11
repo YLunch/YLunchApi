@@ -1,11 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http.Json;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
+using YLunchApi.Domain.Core.Utils;
 using YLunchApi.Domain.RestaurantAggregate.Dto;
+using YLunchApi.Domain.RestaurantAggregate.Models.Enums;
 using YLunchApi.IntegrationTests.Core.Extensions;
 using YLunchApi.IntegrationTests.Core.Utils;
 using YLunchApi.TestsShared.Mocks;
@@ -166,13 +170,53 @@ public class OrdersControllerITest : ControllerITestBase
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var responseBody = await ResponseUtils.DeserializeContentAsync<OrderReadDto>(response);
 
-        responseBody.Id.Should().MatchRegex(order.Id);
-        responseBody.RestaurantId.Should().Be(restaurant.Id);
-        responseBody.CustomerComment.Should().Be(order.CustomerComment);
-        responseBody.CreationDateTime.Should().BeCloseTo(order.CreationDateTime, TimeSpan.FromSeconds(5));
-        responseBody.ReservedForDateTime.Should().BeCloseTo(order.ReservedForDateTime, TimeSpan.FromSeconds(5));
+        var dateTime = DateTime.UtcNow;
+        var products = new List<ProductReadDto> { product1, product2, product3 };
+        var customerId = customerDecodedTokens.UserId;
 
-        // todo continue assertions
+        responseBody.Id.Should().Be(order.Id);
+        responseBody.Id.Should().MatchRegex(GuidUtils.Regex);
+        responseBody.UserId.Should().Be(customerId);
+        responseBody.OrderStatuses.Count.Should().Be(1);
+        responseBody.OrderStatuses.ElementAt(0).Id.Should().MatchRegex(GuidUtils.Regex);
+        responseBody.OrderStatuses.ElementAt(0).OrderId.Should().Be(responseBody.Id);
+        responseBody.OrderStatuses.ElementAt(0).DateTime.Should().BeCloseTo(dateTime, TimeSpan.FromSeconds(5));
+        responseBody.OrderStatuses.ElementAt(0).State.Should().Be(OrderState.Idling);
+        responseBody.CustomerComment.Should().Be("Customer comment");
+        responseBody.RestaurantComment.Should().BeNull();
+        responseBody.IsAccepted.Should().Be(false);
+        responseBody.IsAcknowledged.Should().Be(false);
+        responseBody.CreationDateTime.Should().BeCloseTo(dateTime, TimeSpan.FromSeconds(5));
+        responseBody.ReservedForDateTime.Should().BeCloseTo(dateTime.AddHours(1), TimeSpan.FromSeconds(5));
+        responseBody.OrderedProducts.Count.Should().Be(products.Count);
+        responseBody.OrderedProducts
+                    .Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
+                    .Should().BeTrue();
+        responseBody.OrderedProducts.Should().BeEquivalentTo(
+            products
+                .Select(x =>
+                {
+                    var orderedProductReadDto = new OrderedProductReadDto
+                    {
+                        OrderId = responseBody.Id,
+                        ProductId = x.Id,
+                        UserId = customerId,
+                        RestaurantId = x.RestaurantId,
+                        Name = x.Name,
+                        Description = x.Description,
+                        Price = x.Price,
+                        CreationDateTime = x.CreationDateTime,
+                        Allergens = string.Join(",", x.Allergens.Select(y => y.Name).OrderBy(y => y)),
+                        ProductTags = string.Join(",", x.ProductTags.Select(y => y.Name).OrderBy(y => y))
+                    };
+                    return orderedProductReadDto;
+                })
+                .ToList(), options => options.Excluding(x => x.Id));
+        responseBody.TotalPrice.Should().Be(responseBody.OrderedProducts.Sum(x => x.Price));
+        responseBody.CurrentOrderStatus.Id.Should().MatchRegex(GuidUtils.Regex);
+        responseBody.CurrentOrderStatus.OrderId.Should().Be(responseBody.Id);
+        responseBody.CurrentOrderStatus.DateTime.Should().BeCloseTo(dateTime, TimeSpan.FromSeconds(5));
+        responseBody.CurrentOrderStatus.State.Should().Be(OrderState.Idling);
     }
 
     #endregion

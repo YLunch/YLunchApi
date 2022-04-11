@@ -8,7 +8,7 @@ public class Product : Entity
 {
     public string RestaurantId { get; set; } = null!;
 
-    public virtual Restaurant? Restaurant { get; [ExcludeFromCodeCoverage] set; }
+    [ExcludeFromCodeCoverage] public virtual Restaurant? Restaurant { get; set; }
 
     public string Name { get; set; } = null!;
     public string? Description { get; set; }
