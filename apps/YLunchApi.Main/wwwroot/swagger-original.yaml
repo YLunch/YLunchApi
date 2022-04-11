@@ -899,13 +899,37 @@ paths:
                     title: "One or more validation errors occurred."
                     statusCode: 400
                     errors:
-                      Name: [ "The Name field is required." ]
+                      Name: [ "The ProductIds field is required." ]
                 Other:
                   value:
                     title: "BadRequest"
                     statusCode: 400
                     errors:
                       reasons: ["Something went wrong, please try again later."]
+        '401':
+          description: |
+            Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "Unauthorized"
+                statusCode: 401
+                errors:
+                  reasons: ["Please login and use provided tokens."]
+        '403':
+          description: |
+            Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "Forbidden"
+                statusCode: 403
+                errors:
+                  reasons: ["User has not granted roles."]
         '404':
           description: |
             Not found:
@@ -926,6 +950,54 @@ paths:
                     statusCode: 404
                     errors:
                       reasons: ["Product: a00000e0-aaa0-000a-0000-00e00aa00e00 not found."]
+  /orders/{orderId}:
+    get:
+      tags:
+        - orders
+      summary: Gets a order by id
+      description: |
+        - Authorization header: **no**
+      operationId: getOrderById
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          description: The id of the order you want to get
+          schema:
+            type: string
+      responses:
+        '200':
+          description: |
+            Success
+            - The order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderReadDto'
+        '400':
+          description: |
+            Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "BadRequest"
+                statusCode: 400
+                errors:
+                  reasons: ["Something went wrong, please try again later."]
+        '404':
+          description: |
+            Not found:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "NotFound"
+                statusCode: 404
+                errors:
+                  reasons: ["Order: a00000e0-aaa0-000a-0000-00e00aa00e00 not found."]
 components:
   schemas:
     MessageDto:
