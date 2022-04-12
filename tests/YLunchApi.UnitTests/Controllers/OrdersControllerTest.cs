@@ -50,15 +50,15 @@ public class OrdersControllerTest : UnitTestFixture
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
         var restaurantCreateDto = RestaurantMocks.PrepareFullRestaurant(RestaurantMocks.SimpleRestaurantCreateDto.Name, dateTime);
-        var restaurant = await CreateRestaurant(restaurantCreateDto, dateTime);
+        var restaurant = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, restaurantCreateDto, dateTime);
 
         var productCreateDto1 = ProductMocks.ProductCreateDto;
         productCreateDto1.Name = "product1";
-        var product1 = await CreateProduct(restaurant.Id, dateTime, productCreateDto1);
+        var product1 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto1, dateTime);
 
         var productCreateDto2 = ProductMocks.ProductCreateDto;
         productCreateDto2.Name = "product2";
-        var product2 = await CreateProduct(restaurant.Id, dateTime, productCreateDto2);
+        var product2 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto2, dateTime);
 
         var customerId = new ApplicationSecurityToken(TokenMocks.ValidCustomerAccessToken).UserId;
 
@@ -137,15 +137,15 @@ public class OrdersControllerTest : UnitTestFixture
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
         var restaurantCreateDto = RestaurantMocks.PrepareFullRestaurant(RestaurantMocks.SimpleRestaurantCreateDto.Name, dateTime);
-        var restaurant = await CreateRestaurant(restaurantCreateDto, dateTime);
+        var restaurant = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, restaurantCreateDto, dateTime);
 
         var productCreateDto1 = ProductMocks.ProductCreateDto;
         productCreateDto1.Name = "product1";
-        var product1 = await CreateProduct(restaurant.Id, dateTime, productCreateDto1);
+        var product1 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto1, dateTime);
 
         var productCreateDto2 = ProductMocks.ProductCreateDto;
         productCreateDto2.Name = "product2";
-        var product2 = await CreateProduct(restaurant.Id, dateTime, productCreateDto2);
+        var product2 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto2, dateTime);
 
         var ordersController = InitOrdersController(TokenMocks.ValidCustomerAccessToken, dateTime);
 
@@ -176,15 +176,15 @@ public class OrdersControllerTest : UnitTestFixture
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
         var restaurantCreateDto = RestaurantMocks.PrepareFullRestaurant(RestaurantMocks.SimpleRestaurantCreateDto.Name, dateTime);
-        var restaurant = await CreateRestaurant(restaurantCreateDto, dateTime);
+        var restaurant = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, restaurantCreateDto, dateTime);
 
         var productCreateDto1 = ProductMocks.ProductCreateDto;
         productCreateDto1.Name = "product1";
-        var product1 = await CreateProduct(restaurant.Id, dateTime, productCreateDto1);
+        var product1 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto1, dateTime);
 
         var productCreateDto2 = ProductMocks.ProductCreateDto;
         productCreateDto2.Name = "product2";
-        var product2 = await CreateProduct(restaurant.Id, dateTime, productCreateDto2);
+        var product2 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto2, dateTime);
 
         var ordersController = InitOrdersController(TokenMocks.ValidCustomerAccessToken, dateTime);
 
@@ -217,15 +217,15 @@ public class OrdersControllerTest : UnitTestFixture
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
         var restaurantCreateDto = RestaurantMocks.PrepareFullRestaurant(RestaurantMocks.SimpleRestaurantCreateDto.Name, dateTime);
-        var restaurant = await CreateRestaurant(restaurantCreateDto, dateTime);
+        var restaurant = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, restaurantCreateDto, dateTime);
 
         var productCreateDto1 = ProductMocks.ProductCreateDto;
         productCreateDto1.Name = "product1";
-        await CreateProduct(restaurant.Id, dateTime, productCreateDto1);
+        await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto1, dateTime);
 
         var productCreateDto2 = ProductMocks.ProductCreateDto;
         productCreateDto2.Name = "product2";
-        var product2 = await CreateProduct(restaurant.Id, dateTime, productCreateDto2);
+        var product2 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto2, dateTime);
 
         var ordersController = InitOrdersController(TokenMocks.ValidCustomerAccessToken, dateTime);
 
@@ -262,15 +262,15 @@ public class OrdersControllerTest : UnitTestFixture
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
         var restaurantCreateDto = RestaurantMocks.PrepareFullRestaurant(RestaurantMocks.SimpleRestaurantCreateDto.Name, dateTime);
-        var restaurant = await CreateRestaurant(restaurantCreateDto, dateTime);
+        var restaurant = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, restaurantCreateDto, dateTime);
 
         var productCreateDto1 = ProductMocks.ProductCreateDto;
         productCreateDto1.Name = "product1";
-        var product1 = await CreateProduct(restaurant.Id, dateTime, productCreateDto1);
+        var product1 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto1, dateTime);
 
         var productCreateDto2 = ProductMocks.ProductCreateDto;
         productCreateDto2.Name = "product2";
-        var product2 = await CreateProduct(restaurant.Id, dateTime, productCreateDto2);
+        var product2 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto2, dateTime);
 
         var customerId = new ApplicationSecurityToken(TokenMocks.ValidCustomerAccessToken).UserId;
 
@@ -351,15 +351,15 @@ public class OrdersControllerTest : UnitTestFixture
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
         var restaurantCreateDto = RestaurantMocks.PrepareFullRestaurant(RestaurantMocks.SimpleRestaurantCreateDto.Name, dateTime);
-        var restaurant = await CreateRestaurant(restaurantCreateDto, dateTime);
+        var restaurant = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, restaurantCreateDto, dateTime);
 
         var productCreateDto1 = ProductMocks.ProductCreateDto;
         productCreateDto1.Name = "product1";
-        var product1 = await CreateProduct(restaurant.Id, dateTime, productCreateDto1);
+        var product1 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto1, dateTime);
 
         var productCreateDto2 = ProductMocks.ProductCreateDto;
         productCreateDto2.Name = "product2";
-        var product2 = await CreateProduct(restaurant.Id, dateTime, productCreateDto2);
+        var product2 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto2, dateTime);
 
         var customerId = new ApplicationSecurityToken(TokenMocks.ValidCustomerAccessToken).UserId;
 
@@ -460,15 +460,15 @@ public class OrdersControllerTest : UnitTestFixture
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
         var restaurantCreateDto = RestaurantMocks.PrepareFullRestaurant(RestaurantMocks.SimpleRestaurantCreateDto.Name, dateTime);
-        var restaurant = await CreateRestaurant(restaurantCreateDto, dateTime);
+        var restaurant = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, restaurantCreateDto, dateTime);
 
         var productCreateDto1 = ProductMocks.ProductCreateDto;
         productCreateDto1.Name = "product1";
-        var product1 = await CreateProduct(restaurant.Id, dateTime, productCreateDto1);
+        var product1 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto1, dateTime);
 
         var productCreateDto2 = ProductMocks.ProductCreateDto;
         productCreateDto2.Name = "product2";
-        var product2 = await CreateProduct(restaurant.Id, dateTime, productCreateDto2);
+        var product2 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto2, dateTime);
 
         var orderCreateDto = new OrderCreateDto
         {
@@ -501,15 +501,15 @@ public class OrdersControllerTest : UnitTestFixture
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
         var restaurantCreateDto = RestaurantMocks.PrepareFullRestaurant(RestaurantMocks.SimpleRestaurantCreateDto.Name, dateTime);
-        var restaurant = await CreateRestaurant(restaurantCreateDto, dateTime);
+        var restaurant = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, restaurantCreateDto, dateTime);
 
         var productCreateDto1 = ProductMocks.ProductCreateDto;
         productCreateDto1.Name = "product1";
-        var product1 = await CreateProduct(restaurant.Id, dateTime, productCreateDto1);
+        var product1 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto1, dateTime);
 
         var productCreateDto2 = ProductMocks.ProductCreateDto;
         productCreateDto2.Name = "product2";
-        var product2 = await CreateProduct(restaurant.Id, dateTime, productCreateDto2);
+        var product2 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto2, dateTime);
 
         var orderCreateDto = new OrderCreateDto
         {
@@ -537,4 +537,26 @@ public class OrdersControllerTest : UnitTestFixture
     }
 
     #endregion
+
+    // #region GetOrdersTests
+    //
+    // [Fact]
+    // public async Task GetOrdersOfRestaurant_Should_Return_A_200Ok_With_Correct_Orders()
+    // {
+    //     // Arrange
+    //     var dateTime = DateTimeMocks.Monday20220321T1000Utc;
+    //     var restaurantCreateDto = RestaurantMocks.PrepareFullRestaurant("restaurant", dateTime);
+    //     var restaurant = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, restaurantCreateDto, dateTime);
+    //
+    //     var productCreateDto1 = ProductMocks.ProductCreateDto;
+    //     productCreateDto1.Name = "product1";
+    //     var product = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto1, dateTime);
+    //
+    //     // Act
+    //
+    //
+    //     // Assert
+    // }
+
+    // #endregion
 }

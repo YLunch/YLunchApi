@@ -48,7 +48,7 @@ public class ProductsControllerTest : UnitTestFixture
     {
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
-        var restaurant = await CreateRestaurant(RestaurantMocks.SimpleRestaurantCreateDto, dateTime);
+        var restaurant = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, RestaurantMocks.SimpleRestaurantCreateDto, dateTime);
         var productsController = InitProductsController(dateTime);
         var productCreateDto = ProductMocks.ProductCreateDto;
         productCreateDto.ExpirationDateTime = dateTime.AddDays(1);
@@ -90,8 +90,8 @@ public class ProductsControllerTest : UnitTestFixture
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
         var restaurantCreateDto = RestaurantMocks.SimpleRestaurantCreateDto;
         restaurantCreateDto.Name = "other restaurant";
-        var otherRestaurant = await CreateRestaurant(restaurantCreateDto, dateTime);
-        var restaurant = await CreateRestaurant(RestaurantMocks.SimpleRestaurantCreateDto, dateTime);
+        var otherRestaurant = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, restaurantCreateDto, dateTime);
+        var restaurant = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, RestaurantMocks.SimpleRestaurantCreateDto, dateTime);
         var productsController = InitProductsController(dateTime);
         var productCreateDto = ProductMocks.ProductCreateDto;
 
@@ -130,7 +130,7 @@ public class ProductsControllerTest : UnitTestFixture
     public async Task CreateProduct_Should_Return_A_409Conflict()
     {
         // Arrange
-        var restaurant = await CreateRestaurant(RestaurantMocks.SimpleRestaurantCreateDto, DateTimeMocks.Monday20220321T1000Utc);
+        var restaurant = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, RestaurantMocks.SimpleRestaurantCreateDto, DateTimeMocks.Monday20220321T1000Utc);
         var productsController = InitProductsController();
         var productCreateDto = ProductMocks.ProductCreateDto;
 
@@ -165,7 +165,7 @@ public class ProductsControllerTest : UnitTestFixture
     {
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
-        var restaurant = await CreateRestaurant(RestaurantMocks.SimpleRestaurantCreateDto, dateTime);
+        var restaurant = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, RestaurantMocks.SimpleRestaurantCreateDto, dateTime);
         var productsController = InitProductsController(dateTime);
         var initialProductCreateDto = ProductMocks.ProductCreateDto;
         initialProductCreateDto.Name = "first pizza";
@@ -199,7 +199,7 @@ public class ProductsControllerTest : UnitTestFixture
     {
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
-        var restaurant = await CreateRestaurant(RestaurantMocks.SimpleRestaurantCreateDto, dateTime);
+        var restaurant = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, RestaurantMocks.SimpleRestaurantCreateDto, dateTime);
         var productsController = InitProductsController(dateTime);
         var productCreateDto = ProductMocks.ProductCreateDto;
         productCreateDto.ExpirationDateTime = dateTime.AddDays(1);
@@ -260,17 +260,17 @@ public class ProductsControllerTest : UnitTestFixture
     {
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
-        var restaurant = await CreateRestaurant(RestaurantMocks.SimpleRestaurantCreateDto, dateTime);
+        var restaurant = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, RestaurantMocks.SimpleRestaurantCreateDto, dateTime);
         var productsController = InitProductsController(dateTime);
 
         var productCreateDto1 = ProductMocks.ProductCreateDto;
         productCreateDto1.Name = "product1";
         productCreateDto1.ExpirationDateTime = dateTime.AddDays(1);
-        var product1 = await CreateProduct(restaurant.Id, dateTime, productCreateDto1);
+        var product1 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto1, dateTime);
 
         var productCreateDto2 = ProductMocks.ProductCreateDto;
         productCreateDto2.Name = "product2";
-        var product2 = await CreateProduct(restaurant.Id, dateTime, productCreateDto2);
+        var product2 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto2, dateTime);
 
         var expectedProducts = new List<ProductReadDto>
         {
@@ -320,28 +320,28 @@ public class ProductsControllerTest : UnitTestFixture
     {
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
-        var restaurant = await CreateRestaurant(RestaurantMocks.SimpleRestaurantCreateDto, dateTime);
+        var restaurant = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, RestaurantMocks.SimpleRestaurantCreateDto, dateTime);
         var productsController = InitProductsController(dateTime);
         var productCreateDto1 = ProductMocks.ProductCreateDto;
         productCreateDto1.Name = "product1";
-        await CreateProduct(restaurant.Id, dateTime, productCreateDto1);
+        await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto1, dateTime);
 
         var productCreateDto2 = ProductMocks.ProductCreateDto;
         productCreateDto2.Name = "product2";
-        await CreateProduct(restaurant.Id, dateTime, productCreateDto2);
+        await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto2, dateTime);
 
         var productCreateDto3 = ProductMocks.ProductCreateDto;
         productCreateDto3.Name = "product3";
-        var product3 = await CreateProduct(restaurant.Id, dateTime, productCreateDto3);
+        var product3 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto3, dateTime);
 
         var productCreateDto4 = ProductMocks.ProductCreateDto;
         productCreateDto4.Name = "product4";
         productCreateDto4.ExpirationDateTime = dateTime.AddDays(1);
-        var product4 = await CreateProduct(restaurant.Id, dateTime, productCreateDto4);
+        var product4 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto4, dateTime);
 
         var productCreateDto5 = ProductMocks.ProductCreateDto;
         productCreateDto5.Name = "product5";
-        await CreateProduct(restaurant.Id, dateTime, productCreateDto5);
+        await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto5, dateTime);
 
         var expectedProducts = new List<ProductReadDto>
         {
@@ -400,32 +400,32 @@ public class ProductsControllerTest : UnitTestFixture
     {
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
-        var restaurant = await CreateRestaurant(RestaurantMocks.SimpleRestaurantCreateDto, dateTime);
+        var restaurant = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, RestaurantMocks.SimpleRestaurantCreateDto, dateTime);
         var productsController = InitProductsController(dateTime);
         var productCreateDto1 = ProductMocks.ProductCreateDto;
         productCreateDto1.Name = "product1";
         productCreateDto1.Quantity = 0;
-        await CreateProduct(restaurant.Id, dateTime, productCreateDto1);
+        await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto1, dateTime);
 
         var productCreateDto2 = ProductMocks.ProductCreateDto;
         productCreateDto2.Name = "product2";
         productCreateDto2.IsActive = false;
-        await CreateProduct(restaurant.Id, dateTime, productCreateDto2);
+        await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto2, dateTime);
 
         var productCreateDto3 = ProductMocks.ProductCreateDto;
         productCreateDto3.Name = "product3";
         productCreateDto1.Quantity = null;
-        var product3 = await CreateProduct(restaurant.Id, dateTime, productCreateDto3);
+        var product3 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto3, dateTime);
 
         var productCreateDto4 = ProductMocks.ProductCreateDto;
         productCreateDto4.Name = "product4";
         productCreateDto4.ExpirationDateTime = dateTime.AddDays(-1);
-        await CreateProduct(restaurant.Id, dateTime, productCreateDto4);
+        await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto4, dateTime);
 
         var productCreateDto5 = ProductMocks.ProductCreateDto;
         productCreateDto5.Name = "product5";
         productCreateDto5.ExpirationDateTime = dateTime.AddDays(1);
-        var product5 = await CreateProduct(restaurant.Id, dateTime, productCreateDto5);
+        var product5 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto5, dateTime);
 
         var expectedProducts = new List<ProductReadDto>
         {
@@ -483,32 +483,32 @@ public class ProductsControllerTest : UnitTestFixture
     {
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
-        var restaurant = await CreateRestaurant(RestaurantMocks.SimpleRestaurantCreateDto, dateTime);
+        var restaurant = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, RestaurantMocks.SimpleRestaurantCreateDto, dateTime);
         var productsController = InitProductsController(dateTime);
         var productCreateDto1 = ProductMocks.ProductCreateDto;
         productCreateDto1.Name = "product1";
         productCreateDto1.Quantity = 0;
-        var product1 = await CreateProduct(restaurant.Id, dateTime, productCreateDto1);
+        var product1 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto1, dateTime);
 
         var productCreateDto2 = ProductMocks.ProductCreateDto;
         productCreateDto2.Name = "product2";
         productCreateDto2.IsActive = false;
-        var product2 = await CreateProduct(restaurant.Id, dateTime, productCreateDto2);
+        var product2 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto2, dateTime);
 
         var productCreateDto3 = ProductMocks.ProductCreateDto;
         productCreateDto3.Name = "product3";
         productCreateDto1.Quantity = null;
-        await CreateProduct(restaurant.Id, dateTime, productCreateDto3);
+        await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto3, dateTime);
 
         var productCreateDto4 = ProductMocks.ProductCreateDto;
         productCreateDto4.Name = "product4";
         productCreateDto4.ExpirationDateTime = dateTime.AddDays(-1);
-        var product4 = await CreateProduct(restaurant.Id, dateTime, productCreateDto4);
+        var product4 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto4, dateTime);
 
         var productCreateDto5 = ProductMocks.ProductCreateDto;
         productCreateDto5.Name = "product5";
         productCreateDto5.ExpirationDateTime = dateTime.AddDays(1);
-        await CreateProduct(restaurant.Id, dateTime, productCreateDto5);
+        await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto5, dateTime);
 
         var expectedProducts = new List<ProductReadDto>
         {

@@ -20,13 +20,13 @@ public class UnitTestFixture : IClassFixture<UnitTestFixtureBase>
         fixture.DatabaseId = Guid.NewGuid().ToString();
     }
 
-    protected async Task<RestaurantReadDto> CreateRestaurant(RestaurantCreateDto restaurantCreateDto, DateTime customDateTime, string? accessToken = null)
+    protected async Task<RestaurantReadDto> CreateRestaurant(string accessToken, RestaurantCreateDto restaurantCreateDto, DateTime customDateTime)
     {
         var dateTimeProviderMock = new Mock<IDateTimeProvider>();
         dateTimeProviderMock.Setup(x => x.UtcNow).Returns(customDateTime);
         Fixture.InitFixture(configuration =>
         {
-            configuration.AccessToken = accessToken ?? TokenMocks.ValidRestaurantAdminAccessToken;
+            configuration.AccessToken = accessToken;
             configuration.DateTimeProvider = dateTimeProviderMock.Object;
         });
         var restaurantsController = Fixture.GetImplementationFromService<RestaurantsController>();
@@ -35,13 +35,13 @@ public class UnitTestFixture : IClassFixture<UnitTestFixtureBase>
         return Assert.IsType<RestaurantReadDto>(restaurantCreationResponseResult.Value);
     }
 
-    protected async Task<ProductReadDto> CreateProduct(string restaurantId, DateTime dateTime, ProductCreateDto productCreateDto)
+    protected async Task<ProductReadDto> CreateProduct(string accessToken, string restaurantId, ProductCreateDto productCreateDto, DateTime dateTime)
     {
         var dateTimeProviderMock = new Mock<IDateTimeProvider>();
         dateTimeProviderMock.Setup(x => x.UtcNow).Returns(dateTime);
         Fixture.InitFixture(configuration =>
         {
-            configuration.AccessToken = TokenMocks.ValidRestaurantAdminAccessToken;
+            configuration.AccessToken = accessToken;
             configuration.DateTimeProvider = dateTimeProviderMock.Object;
         });
         var productsController = Fixture.GetImplementationFromService<ProductsController>();
