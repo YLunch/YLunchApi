@@ -121,4 +121,10 @@ public class OrderService : IOrderService
 
         return order.Adapt<OrderReadDto>();
     }
+
+    public async Task<ICollection<OrderReadDto>> GetOrders(OrderFilter orderFilter)
+    {
+        var orders = await _orderRepository.GetOrders(orderFilter);
+        return orders.Adapt<ICollection<OrderReadDto>>();
+    }
 }

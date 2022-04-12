@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using YLunchApi.Domain.CommonAggregate.Dto;
 using YLunchApi.Domain.Exceptions;
 using YLunchApi.Domain.RestaurantAggregate.Dto;
+using YLunchApi.Domain.RestaurantAggregate.Filters;
 using YLunchApi.Domain.RestaurantAggregate.Services;
 using YLunchApi.Domain.UserAggregate.Models;
 
@@ -14,11 +15,13 @@ namespace YLunchApi.Main.Controllers;
 public class OrdersController : ApplicationControllerBase
 {
     private readonly IOrderService _orderService;
+    private readonly IRestaurantService _restaurantService;
 
-    public OrdersController(IHttpContextAccessor httpContextAccessor, IOrderService orderService) : base(
+    public OrdersController(IHttpContextAccessor httpContextAccessor, IOrderService orderService, IRestaurantService restaurantService) : base(
         httpContextAccessor)
     {
         _orderService = orderService;
+        _restaurantService = restaurantService;
     }
 
     [HttpPost("Restaurants/{restaurantId}/orders")]
@@ -57,6 +60,23 @@ public class OrdersController : ApplicationControllerBase
         catch (EntityNotFoundException)
         {
             return NotFound(new ErrorDto(HttpStatusCode.NotFound, $"Order: {orderId} not found."));
+        }
+    }
+
+    [HttpGet("restaurants/{restaurantId}/orders")]
+    [Authorize(Roles = Roles.RestaurantAdmin)]
+    public async Task<ActionResult<ICollection<OrderReadDto>>> GetOrdersByRestaurantId([FromRoute] string restaurantId, [FromQuery] OrderFilter? orderFilter = null)
+    { try
+        {
+            var restaurant = await _restaurantService.GetById(restaurantId);
+            var filter = orderFilter ?? new OrderFilter();
+            filter.RestaurantId = restaurant.Id;
+            var ordersReadDto = await _orderService.GetOrders(filter);
+            return Ok(ordersReadDto);
+        }
+        catch (EntityNotFoundException)
+        {
+            return NotFound(new ErrorDto(HttpStatusCode.NotFound, $"Restaurant: {restaurantId} not found."));
         }
     }
 }
