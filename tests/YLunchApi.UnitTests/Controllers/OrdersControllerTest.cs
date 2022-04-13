@@ -567,11 +567,11 @@ public class OrdersControllerTest : UnitTestFixture
 
         var productCreateDto4 = ProductMocks.ProductCreateDto;
         productCreateDto4.Name = "product4";
-        var product4 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant2.Id, productCreateDto4, dateTime);
+        var product4 = await CreateProduct(TokenMocks.ValidRestaurantAdmin2AccessToken, restaurant2.Id, productCreateDto4, dateTime);
 
         var productCreateDto5 = ProductMocks.ProductCreateDto;
         productCreateDto5.Name = "product5";
-        var product5 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant2.Id, productCreateDto5, dateTime);
+        var product5 = await CreateProduct(TokenMocks.ValidRestaurantAdmin2AccessToken, restaurant2.Id, productCreateDto5, dateTime);
 
         var order1 = await CreateOrder(TokenMocks.ValidCustomerAccessToken, restaurant1.Id, dateTime, new OrderCreateDto
         {
@@ -621,6 +621,13 @@ public class OrdersControllerTest : UnitTestFixture
         var responseResult = Assert.IsType<OkObjectResult>(response.Result);
         var responseBody = Assert.IsType<List<OrderReadDto>>(responseResult.Value);
         responseBody.Count.Should().Be(2);
+
+        responseBody[0].Should().BeEquivalentTo(order1);
+        responseBody[1].Should().BeEquivalentTo(order3);
+        foreach (var order in responseBody)
+        {
+            order.Should().NotBeEquivalentTo(order2);
+        }
     }
 
     #endregion

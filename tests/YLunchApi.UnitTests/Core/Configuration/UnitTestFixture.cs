@@ -6,7 +6,6 @@ using Xunit;
 using YLunchApi.Domain.CommonAggregate.Services;
 using YLunchApi.Domain.RestaurantAggregate.Dto;
 using YLunchApi.Main.Controllers;
-using YLunchApi.TestsShared.Mocks;
 
 namespace YLunchApi.UnitTests.Core.Configuration;
 

@@ -225,4 +225,89 @@ public class OrdersControllerITest : ControllerITestBase
     }
 
     #endregion
+
+    #region GetOrdersTests
+
+    [Fact]
+    public async Task GetOrdersOfRestaurant_Should_Return_A_200Ok_With_Correct_Orders()
+    {
+        // Arrange
+        var dateTime = DateTime.UtcNow;
+
+        var restaurantAdminCreateDto1 = UserMocks.RestaurantAdminCreateDto;
+        restaurantAdminCreateDto1.Email = $"1{restaurantAdminCreateDto1.Email}";
+        var restaurantAdmin1DecodedTokens = await CreateAndLoginUser(restaurantAdminCreateDto1);
+
+        var restaurantAdminCreateDto2 = UserMocks.RestaurantAdminCreateDto;
+        restaurantAdminCreateDto2.Email = $"2{restaurantAdminCreateDto2.Email}";
+        var restaurantAdmin2DecodedTokens = await CreateAndLoginUser(restaurantAdminCreateDto2);
+
+        var customerDecodedTokens = await CreateAndLoginUser(UserMocks.CustomerCreateDto);
+
+        var restaurantCreateDto1 = RestaurantMocks.PrepareFullRestaurant("restaurant1", dateTime);
+        var restaurant1 = await CreateRestaurant(restaurantAdmin1DecodedTokens.AccessToken, restaurantCreateDto1);
+
+        var restaurantCreateDto2 = RestaurantMocks.PrepareFullRestaurant("restaurant2", dateTime);
+        var restaurant2 = await CreateRestaurant(restaurantAdmin2DecodedTokens.AccessToken, restaurantCreateDto2);
+
+        var productCreateDto1 = ProductMocks.ProductCreateDto;
+        productCreateDto1.Name = "product1";
+        var product1 = await CreateProduct(restaurantAdmin1DecodedTokens.AccessToken, restaurant1.Id, productCreateDto1);
+
+        var productCreateDto2 = ProductMocks.ProductCreateDto;
+        productCreateDto2.Name = "product2";
+        var product2 = await CreateProduct(restaurantAdmin1DecodedTokens.AccessToken, restaurant1.Id, productCreateDto2);
+
+        var productCreateDto3 = ProductMocks.ProductCreateDto;
+        productCreateDto3.Name = "product3";
+        var product3 = await CreateProduct(restaurantAdmin1DecodedTokens.AccessToken, restaurant1.Id, productCreateDto3);
+
+        var productCreateDto4 = ProductMocks.ProductCreateDto;
+        productCreateDto4.Name = "product4";
+        var product4 = await CreateProduct(restaurantAdmin2DecodedTokens.AccessToken, restaurant2.Id, productCreateDto4);
+
+        var productCreateDto5 = ProductMocks.ProductCreateDto;
+        productCreateDto5.Name = "product5";
+        var product5 = await CreateProduct(restaurantAdmin2DecodedTokens.AccessToken, restaurant2.Id, productCreateDto5);
+
+        var order1 = await CreateOrder(customerDecodedTokens.AccessToken, restaurant1.Id, new List<ProductReadDto>
+        {
+            product1,
+            product2,
+            product3
+        });
+
+        var order2 = await CreateOrder(customerDecodedTokens.AccessToken, restaurant2.Id, new List<ProductReadDto>
+        {
+            product4,
+            product5
+        });
+
+        var order3 = await CreateOrder(customerDecodedTokens.AccessToken, restaurant1.Id, new List<ProductReadDto>
+        {
+            product1,
+            product2,
+            product3
+        });
+
+        Client.SetAuthorizationHeader(restaurantAdmin1DecodedTokens.AccessToken);
+
+        // Act
+        var response = await Client.GetAsync($"restaurants/{restaurant1.Id}/orders");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var responseBody = await ResponseUtils.DeserializeContentAsync<List<OrderReadDto>>(response);
+
+        responseBody.Count.Should().Be(2);
+
+        responseBody[0].Should().BeEquivalentTo(order1);
+        responseBody[1].Should().BeEquivalentTo(order3);
+        foreach (var order in responseBody)
+        {
+            order.Should().NotBeEquivalentTo(order2);
+        }
+    }
+
+    #endregion
 }

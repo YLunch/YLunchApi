@@ -42,8 +42,8 @@ public class OrderRepository : IOrderRepository
 
         var orders = await query.ToListAsync();
         return orders.Select(FormatOrder)
-                       .OrderBy(x => x.CreationDateTime)
-                       .ToList();
+                     .OrderBy(x => x.CreationDateTime)
+                     .ToList();
     }
 
     private IQueryable<Order> OrdersQueryBase =>

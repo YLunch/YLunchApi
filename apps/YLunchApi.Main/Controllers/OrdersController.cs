@@ -66,7 +66,8 @@ public class OrdersController : ApplicationControllerBase
     [HttpGet("restaurants/{restaurantId}/orders")]
     [Authorize(Roles = Roles.RestaurantAdmin)]
     public async Task<ActionResult<ICollection<OrderReadDto>>> GetOrdersByRestaurantId([FromRoute] string restaurantId, [FromQuery] OrderFilter? orderFilter = null)
-    { try
+    {
+        try
         {
             var restaurant = await _restaurantService.GetById(restaurantId);
             var filter = orderFilter ?? new OrderFilter();
