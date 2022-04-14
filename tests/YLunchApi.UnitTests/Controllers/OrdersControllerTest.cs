@@ -542,7 +542,7 @@ public class OrdersControllerTest : UnitTestFixture
     #region GetOrdersTests
 
     [Fact]
-    public async Task GetOrdersOfRestaurant_Should_Return_A_200Ok_With_Correct_Orders()
+    public async Task GetOrdersByRestaurantId_Should_Return_A_200Ok_With_Correct_Orders()
     {
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
@@ -628,6 +628,31 @@ public class OrdersControllerTest : UnitTestFixture
         {
             order.Should().NotBeEquivalentTo(order2);
         }
+    }
+
+    [Fact]
+    public async Task GetOrdersByRestaurantId_Should_Return_A_404NotFound_When_Restaurant_Is_Not_Found()
+    {
+        // Arrange
+        var dateTime = DateTimeMocks.Monday20220321T1000Utc;
+
+        var ordersController = InitOrdersController(TokenMocks.ValidRestaurantAdminAccessToken, dateTime);
+
+        var restaurantId = Guid.NewGuid().ToString();
+
+        // Act
+        var response = await ordersController.GetOrdersByRestaurantId(restaurantId, new OrderFilter
+        {
+            FromOrderState = OrderState.Idling,
+            ToOrderState = OrderState.Idling
+        });
+
+        // Assert
+        var responseResult = Assert.IsType<NotFoundObjectResult>(response.Result);
+        var responseBody = Assert.IsType<ErrorDto>(responseResult.Value);
+        responseBody.Should()
+                    .BeEquivalentTo(new ErrorDto(HttpStatusCode.NotFound,
+                        $"Restaurant: {restaurantId} not found."));
     }
 
     #endregion

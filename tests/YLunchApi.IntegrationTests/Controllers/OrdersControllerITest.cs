@@ -229,7 +229,7 @@ public class OrdersControllerITest : ControllerITestBase
     #region GetOrdersTests
 
     [Fact]
-    public async Task GetOrdersOfRestaurant_Should_Return_A_200Ok_With_Correct_Orders()
+    public async Task GetOrdersByRestaurantId_Should_Return_A_200Ok_With_Correct_Orders_When_User_Is_A_RestaurantAdmin()
     {
         // Arrange
         var dateTime = DateTime.UtcNow;
@@ -307,6 +307,92 @@ public class OrdersControllerITest : ControllerITestBase
         {
             order.Should().NotBeEquivalentTo(order2);
         }
+    }
+
+    [Fact]
+    public async Task GetOrdersByRestaurantId_Should_Return_A_401Unauthorized_When_User_Is_Not_Authenticated()
+    {
+        // Arrange
+        var dateTime = DateTime.UtcNow;
+
+        var restaurantAdminCreateDto = UserMocks.RestaurantAdminCreateDto;
+        restaurantAdminCreateDto.Email = $"{restaurantAdminCreateDto.Email}";
+        var restaurantAdminDecodedTokens = await CreateAndLoginUser(restaurantAdminCreateDto);
+
+        var customerDecodedTokens = await CreateAndLoginUser(UserMocks.CustomerCreateDto);
+
+        var restaurantCreateDto = RestaurantMocks.PrepareFullRestaurant("restaurant", dateTime);
+        var restaurant = await CreateRestaurant(restaurantAdminDecodedTokens.AccessToken, restaurantCreateDto);
+
+        var productCreateDto1 = ProductMocks.ProductCreateDto;
+        productCreateDto1.Name = "product1";
+        var product1 = await CreateProduct(restaurantAdminDecodedTokens.AccessToken, restaurant.Id, productCreateDto1);
+
+        var productCreateDto2 = ProductMocks.ProductCreateDto;
+        productCreateDto2.Name = "product2";
+        var product2 = await CreateProduct(restaurantAdminDecodedTokens.AccessToken, restaurant.Id, productCreateDto2);
+
+        var productCreateDto3 = ProductMocks.ProductCreateDto;
+        productCreateDto3.Name = "product3";
+        var product3 = await CreateProduct(restaurantAdminDecodedTokens.AccessToken, restaurant.Id, productCreateDto3);
+
+        await CreateOrder(customerDecodedTokens.AccessToken, restaurant.Id, new List<ProductReadDto>
+        {
+            product1,
+            product2,
+            product3
+        });
+
+        Client.SetAuthorizationHeader("");
+
+        // Act
+        var response = await Client.GetAsync($"restaurants/{restaurant.Id}/orders");
+
+        // Assert
+        await AssertResponseUtils.AssertUnauthorizedResponse(response);
+    }
+
+    [Fact]
+    public async Task GetOrdersByRestaurantId_Should_Return_A_403Forbidden_When_User_Is_A_Customer()
+    {
+        // Arrange
+        var dateTime = DateTime.UtcNow;
+
+        var restaurantAdminCreateDto = UserMocks.RestaurantAdminCreateDto;
+        restaurantAdminCreateDto.Email = $"{restaurantAdminCreateDto.Email}";
+        var restaurantAdminDecodedTokens = await CreateAndLoginUser(restaurantAdminCreateDto);
+
+        var customerDecodedTokens = await CreateAndLoginUser(UserMocks.CustomerCreateDto);
+
+        var restaurantCreateDto = RestaurantMocks.PrepareFullRestaurant("restaurant", dateTime);
+        var restaurant = await CreateRestaurant(restaurantAdminDecodedTokens.AccessToken, restaurantCreateDto);
+
+        var productCreateDto1 = ProductMocks.ProductCreateDto;
+        productCreateDto1.Name = "product1";
+        var product1 = await CreateProduct(restaurantAdminDecodedTokens.AccessToken, restaurant.Id, productCreateDto1);
+
+        var productCreateDto2 = ProductMocks.ProductCreateDto;
+        productCreateDto2.Name = "product2";
+        var product2 = await CreateProduct(restaurantAdminDecodedTokens.AccessToken, restaurant.Id, productCreateDto2);
+
+        var productCreateDto3 = ProductMocks.ProductCreateDto;
+        productCreateDto3.Name = "product3";
+        var product3 = await CreateProduct(restaurantAdminDecodedTokens.AccessToken, restaurant.Id, productCreateDto3);
+
+        await CreateOrder(customerDecodedTokens.AccessToken, restaurant.Id, new List<ProductReadDto>
+        {
+            product1,
+            product2,
+            product3
+        });
+
+        Client.SetAuthorizationHeader(customerDecodedTokens.AccessToken);
+
+        // Act
+        var response = await Client.GetAsync($"restaurants/{restaurant.Id}/orders");
+
+        // Assert
+        await AssertResponseUtils.AssertForbiddenResponse(response);
     }
 
     #endregion
