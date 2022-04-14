@@ -5,6 +5,7 @@ using YLunchApi.Domain.CommonAggregate.Dto;
 using YLunchApi.Domain.Exceptions;
 using YLunchApi.Domain.RestaurantAggregate.Dto;
 using YLunchApi.Domain.RestaurantAggregate.Filters;
+using YLunchApi.Domain.RestaurantAggregate.Models.Enums;
 using YLunchApi.Domain.RestaurantAggregate.Services;
 using YLunchApi.Domain.UserAggregate.Models;
 
@@ -71,6 +72,24 @@ public class OrdersController : ApplicationControllerBase
         {
             var restaurant = await _restaurantService.GetById(restaurantId);
             var filter = orderFilter ?? new OrderFilter();
+            filter.RestaurantId = restaurant.Id;
+            var ordersReadDto = await _orderService.GetOrders(filter);
+            return Ok(ordersReadDto);
+        }
+        catch (EntityNotFoundException)
+        {
+            return NotFound(new ErrorDto(HttpStatusCode.NotFound, $"Restaurant: {restaurantId} not found."));
+        }
+    }
+
+    [HttpPatch("restaurants/{restaurantId}/orders")]
+    [Authorize(Roles = Roles.RestaurantAdmin)]
+    public async Task<ActionResult<ICollection<OrderReadDto>>> UpdateOrdersByRestaurantId([FromRoute] string restaurantId, [FromQuery] SortedSet<string> orderIds, [FromBody] OrderUpdateDto orderState)
+    {
+        try
+        {
+            var restaurant = await _restaurantService.GetById(restaurantId);
+            var filter = new OrderFilter();
             filter.RestaurantId = restaurant.Id;
             var ordersReadDto = await _orderService.GetOrders(filter);
             return Ok(ordersReadDto);
