@@ -12,6 +12,5 @@ public class OrderFilter
     public int Page { get; set; } = 1;
 
     public string? RestaurantId { get; set; }
-    public OrderState FromOrderState { get; set; }
-    public OrderState ToOrderState { get; set; }
+    public SortedSet<OrderState>? OrderStates { get; set; }
 }

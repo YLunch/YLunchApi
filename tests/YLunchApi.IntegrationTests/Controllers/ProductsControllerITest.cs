@@ -369,14 +369,14 @@ public class ProductsControllerITest : ControllerITestBase
         var restaurant = await CreateRestaurant(decodedTokens.AccessToken, RestaurantMocks.SimpleRestaurantCreateDto);
 
         // Act
-        var response = await Client.GetAsync($"restaurants/{restaurant.Id}/products?page=0&size=51&isAvailable=25");
+        var response = await Client.GetAsync($"restaurants/{restaurant.Id}/products?page=0&size=251&isAvailable=25");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         var responseBody = await ResponseUtils.DeserializeContentAsync(response);
 
         responseBody.Should().Contain("Page must be an integer between 1 and 100000.");
-        responseBody.Should().Contain("Size must be an integer between 1 and 50.");
+        responseBody.Should().Contain("Size must be an integer between 1 and 250.");
         responseBody.Should().Contain("The value '25' is not valid for IsAvailable.");
     }
 

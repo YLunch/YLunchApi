@@ -60,7 +60,7 @@ paths:
                 title: "BadRequest"
                 statusCode: 400
                 errors:
-                  reasons: ["Something went wrong, please try again later."]
+                  reasons: [ "Something went wrong, please try again later." ]
   /trials/authenticated:
     get:
       tags:
@@ -93,7 +93,7 @@ paths:
                 title: "BadRequest"
                 statusCode: 400
                 errors:
-                  reasons: ["Something went wrong, please try again later."]
+                  reasons: [ "Something went wrong, please try again later." ]
         '401':
           description: |
             Unauthorized
@@ -105,7 +105,7 @@ paths:
                 title: "Unauthorized"
                 statusCode: 401
                 errors:
-                  reasons: ["Please login and use provided tokens."]
+                  reasons: [ "Please login and use provided tokens." ]
   /trials/authenticated-customer:
     get:
       tags:
@@ -138,7 +138,7 @@ paths:
                 title: "BadRequest"
                 statusCode: 400
                 errors:
-                  reasons: ["Something went wrong, please try again later."]
+                  reasons: [ "Something went wrong, please try again later." ]
         '401':
           description: |
             Unauthorized
@@ -150,7 +150,7 @@ paths:
                 title: "Unauthorized"
                 statusCode: 401
                 errors:
-                  reasons: ["Please login and use provided tokens."]
+                  reasons: [ "Please login and use provided tokens." ]
         '403':
           description: |
             Forbidden
@@ -162,7 +162,7 @@ paths:
                 title: "Forbidden"
                 statusCode: 403
                 errors:
-                  reasons: ["User has not granted roles."]
+                  reasons: [ "User has not granted roles." ]
   /trials/authenticated-restaurant-admin:
     get:
       tags:
@@ -195,7 +195,7 @@ paths:
                 title: "BadRequest"
                 statusCode: 400
                 errors:
-                  reasons: ["Something went wrong, please try again later."]
+                  reasons: [ "Something went wrong, please try again later." ]
         '401':
           description: |
             Unauthorized
@@ -207,7 +207,7 @@ paths:
                 title: "Unauthorized"
                 statusCode: 401
                 errors:
-                  reasons: ["Please login and use provided tokens."]
+                  reasons: [ "Please login and use provided tokens." ]
         '403':
           description: |
             Forbidden
@@ -219,7 +219,7 @@ paths:
                 title: "Forbidden"
                 statusCode: 403
                 errors:
-                  reasons: ["User has not granted roles."]
+                  reasons: [ "User has not granted roles." ]
   /authentication/login:
     post:
       tags:
@@ -272,7 +272,7 @@ paths:
                     title: "BadRequest"
                     statusCode: 400
                     errors:
-                      reasons: ["Something went wrong, please try again later."]
+                      reasons: [ "Something went wrong, please try again later." ]
         '401':
           description: |
             Unauthorized
@@ -284,7 +284,7 @@ paths:
                 title: "Unauthorized"
                 statusCode: 401
                 errors:
-                  reasons: ["Please login and use provided tokens."]
+                  reasons: [ "Please login and use provided tokens." ]
   /authentication/refresh-tokens:
     post:
       tags:
@@ -328,7 +328,7 @@ paths:
                     title: "BadRequest"
                     statusCode: 400
                     errors:
-                      reasons: ["Something went wrong, please try again later."]
+                      reasons: [ "Something went wrong, please try again later." ]
         '401':
           description: |
             Unauthorized
@@ -340,7 +340,7 @@ paths:
                 title: "Unauthorized"
                 statusCode: 401
                 errors:
-                  reasons: ["Invalid tokens, please login to generate new valid tokens."]
+                  reasons: [ "Invalid tokens, please login to generate new valid tokens." ]
   /authentication/current-user:
     get:
       tags:
@@ -371,7 +371,7 @@ paths:
                 title: "BadRequest"
                 statusCode: 400
                 errors:
-                  reasons: ["Something went wrong, please try again later."]
+                  reasons: [ "Something went wrong, please try again later." ]
         '401':
           description: |
             Unauthorized
@@ -383,7 +383,7 @@ paths:
                 title: "Unauthorized"
                 statusCode: 401
                 errors:
-                  reasons: ["Please login and use provided tokens."]
+                  reasons: [ "Please login and use provided tokens." ]
   /restaurant-admins:
     post:
       tags:
@@ -424,7 +424,7 @@ paths:
                     title: "BadRequest"
                     statusCode: 400
                     errors:
-                      reasons: ["Something went wrong, please try again later."]
+                      reasons: [ "Something went wrong, please try again later." ]
         '409':
           description: |
             Conflict
@@ -436,7 +436,7 @@ paths:
                 title: "Conflict"
                 statusCode: 409
                 errors:
-                  reasons: ["User already exists."]
+                  reasons: [ "User already exists." ]
   /customers:
     post:
       tags:
@@ -477,7 +477,7 @@ paths:
                     title: "BadRequest"
                     statusCode: 400
                     errors:
-                      reasons: ["Something went wrong, please try again later."]
+                      reasons: [ "Something went wrong, please try again later." ]
         '409':
           description: |
             Conflict
@@ -489,7 +489,7 @@ paths:
                 title: "Conflict"
                 statusCode: 409
                 errors:
-                  reasons: ["User already exists."]
+                  reasons: [ "User already exists." ]
   /restaurants:
     post:
       tags:
@@ -532,7 +532,7 @@ paths:
                     title: "BadRequest"
                     statusCode: 400
                     errors:
-                      reasons: ["Something went wrong, please try again later."]
+                      reasons: [ "Something went wrong, please try again later." ]
         '409':
           description: |
             Conflict
@@ -544,7 +544,7 @@ paths:
                 title: "Conflict"
                 statusCode: 409
                 errors:
-                  reasons: ["Restaurant already exists."]
+                  reasons: [ "Restaurant already exists." ]
     get:
       tags:
         - restaurants
@@ -606,7 +606,7 @@ paths:
                 title: "BadRequest"
                 statusCode: 400
                 errors:
-                  reasons: ["Something went wrong, please try again later."]
+                  reasons: [ "Something went wrong, please try again later." ]
   /restaurants/{restaurantId}:
     get:
       tags:
@@ -642,7 +642,7 @@ paths:
                 title: "BadRequest"
                 statusCode: 400
                 errors:
-                  reasons: ["Something went wrong, please try again later."]
+                  reasons: [ "Something went wrong, please try again later." ]
         '401':
           description: |
             Unauthorized
@@ -654,7 +654,7 @@ paths:
                 title: "Unauthorized"
                 statusCode: 401
                 errors:
-                  reasons: ["Please login and use provided tokens."]
+                  reasons: [ "Please login and use provided tokens." ]
         '404':
           description: |
             Not found:
@@ -666,7 +666,7 @@ paths:
                 title: "NotFound"
                 statusCode: 404
                 errors:
-                  reasons: ["Restaurant: a00000e0-aaa0-000a-0000-00e00aa00e00 not found."]
+                  reasons: [ "Restaurant: a00000e0-aaa0-000a-0000-00e00aa00e00 not found." ]
   /restaurants/{restaurantId}/products:
     post:
       tags:
@@ -716,7 +716,7 @@ paths:
                     title: "BadRequest"
                     statusCode: 400
                     errors:
-                      reasons: ["Something went wrong, please try again later."]
+                      reasons: [ "Something went wrong, please try again later." ]
         '404':
           description: |
             Not found:
@@ -728,7 +728,7 @@ paths:
                 title: "NotFound"
                 statusCode: 404
                 errors:
-                  reasons: ["Restaurant: a00000e0-aaa0-000a-0000-00e00aa00e00 not found."]
+                  reasons: [ "Restaurant: a00000e0-aaa0-000a-0000-00e00aa00e00 not found." ]
         '409':
           description: |
             Conflict
@@ -740,7 +740,7 @@ paths:
                 title: "Conflict"
                 statusCode: 409
                 errors:
-                  reasons: ["Product already exists."]
+                  reasons: [ "Product already exists." ]
     get:
       tags:
         - products
@@ -764,7 +764,7 @@ paths:
         - in: query
           name: size
           required: false
-          description: The size you want within 1 and 50. Default 50.
+          description: The size you want within 1 and 250. Default 250.
           schema:
             type: number
         - in: query
@@ -795,7 +795,7 @@ paths:
                 title: "BadRequest"
                 statusCode: 400
                 errors:
-                  reasons: ["Something went wrong, please try again later."]
+                  reasons: [ "Something went wrong, please try again later." ]
         '404':
           description: |
             Not found:
@@ -807,7 +807,7 @@ paths:
                 title: "NotFound"
                 statusCode: 404
                 errors:
-                  reasons: ["Restaurant: a00000e0-aaa0-000a-0000-00e00aa00e00 not found."]
+                  reasons: [ "Restaurant: a00000e0-aaa0-000a-0000-00e00aa00e00 not found." ]
   /products/{productId}:
     get:
       tags:
@@ -843,7 +843,7 @@ paths:
                 title: "BadRequest"
                 statusCode: 400
                 errors:
-                  reasons: ["Something went wrong, please try again later."]
+                  reasons: [ "Something went wrong, please try again later." ]
         '404':
           description: |
             Not found:
@@ -855,7 +855,7 @@ paths:
                 title: "NotFound"
                 statusCode: 404
                 errors:
-                  reasons: ["Product: a00000e0-aaa0-000a-0000-00e00aa00e00 not found."]
+                  reasons: [ "Product: a00000e0-aaa0-000a-0000-00e00aa00e00 not found." ]
   /restaurants/{restaurantId}/orders:
     post:
       tags:
@@ -905,7 +905,7 @@ paths:
                     title: "BadRequest"
                     statusCode: 400
                     errors:
-                      reasons: ["Something went wrong, please try again later."]
+                      reasons: [ "Something went wrong, please try again later." ]
         '401':
           description: |
             Unauthorized
@@ -917,7 +917,7 @@ paths:
                 title: "Unauthorized"
                 statusCode: 401
                 errors:
-                  reasons: ["Please login and use provided tokens."]
+                  reasons: [ "Please login and use provided tokens." ]
         '403':
           description: |
             Forbidden
@@ -929,7 +929,7 @@ paths:
                 title: "Forbidden"
                 statusCode: 403
                 errors:
-                  reasons: ["User has not granted roles."]
+                  reasons: [ "User has not granted roles." ]
         '404':
           description: |
             Not found:
@@ -943,13 +943,121 @@ paths:
                     title: "NotFound"
                     statusCode: 404
                     errors:
-                      reasons: ["Restaurant: a00000e0-aaa0-000a-0000-00e00aa00e00 not found."]
+                      reasons: [ "Restaurant: a00000e0-aaa0-000a-0000-00e00aa00e00 not found." ]
                 ProductNotFound:
                   value:
                     title: "NotFound"
                     statusCode: 404
                     errors:
-                      reasons: ["Product: a00000e0-aaa0-000a-0000-00e00aa00e00 not found."]
+                      reasons: [ "Product: a00000e0-aaa0-000a-0000-00e00aa00e00 not found." ]
+    get:
+      tags:
+        - orders
+      summary: Gets orders
+      description: |
+        - Authorization header: **yes**
+        - Granted roles:
+          - RestaurantAdmin
+      operationId: getOrders
+      parameters:
+        - in: path
+          name: restaurantId
+          required: true
+          description: The id of the restaurant you want to get the orders.
+          schema:
+            type: string
+        - in: query
+          name: page
+          required: false
+          description: The page you want within 1 and 10 000. Default 1.
+          schema:
+            type: number
+        - in: query
+          name: size
+          required: false
+          description: The size you want within 1 and 50. Default 50.
+          schema:
+            type: number
+        - in: query
+          name: orderStates
+          required: false
+          explode: true
+          description: |
+            To filter the orders having their current state matching one of this `set` of states.  
+            Repeat this parameter for multiple to filter on multiple states.  
+            Duplicates will be ignored.  
+            One of:
+              - `0`: Idling,
+              - `1`: Acknowledged,
+              - `2`: InPreparation,
+              - `3`: Ready,
+              - `4`: Delivered,
+              - `5`: Other,
+              - `6`: Cancelled,
+              - `7`: Rejected
+          schema:
+            type: array
+            items:
+              type: number
+      responses:
+        '200':
+          description: |
+            Success
+            - The orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderReadDto'
+        '400':
+          description: |
+            Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "BadRequest"
+                statusCode: 400
+                errors:
+                  reasons: [ "Something went wrong, please try again later." ]
+        '401':
+          description: |
+            Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "Unauthorized"
+                statusCode: 401
+                errors:
+                  reasons: [ "Please login and use provided tokens." ]
+        '403':
+          description: |
+            Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "Forbidden"
+                statusCode: 403
+                errors:
+                  reasons: [ "User has not granted roles." ]
+        '404':
+          description: |
+            Not found:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "NotFound"
+                statusCode: 404
+                errors:
+                  reasons: [ "Restaurant: a00000e0-aaa0-000a-0000-00e00aa00e00 not found." ]
   /orders/{orderId}:
     get:
       tags:
@@ -985,7 +1093,7 @@ paths:
                 title: "BadRequest"
                 statusCode: 400
                 errors:
-                  reasons: ["Something went wrong, please try again later."]
+                  reasons: [ "Something went wrong, please try again later." ]
         '404':
           description: |
             Not found:
@@ -997,7 +1105,7 @@ paths:
                 title: "NotFound"
                 statusCode: 404
                 errors:
-                  reasons: ["Order: a00000e0-aaa0-000a-0000-00e00aa00e00 not found."]
+                  reasons: [ "Order: a00000e0-aaa0-000a-0000-00e00aa00e00 not found." ]
 components:
   schemas:
     MessageDto:

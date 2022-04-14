@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using YLunchApi.Domain.Exceptions;
 using YLunchApi.Domain.RestaurantAggregate.Filters;
 using YLunchApi.Domain.RestaurantAggregate.Models;
+using YLunchApi.Domain.RestaurantAggregate.Models.Enums;
 using YLunchApi.Domain.RestaurantAggregate.Services;
 
 namespace YLunchApi.Infrastructure.Database.Repositories;
@@ -39,6 +40,7 @@ public class OrderRepository : IOrderRepository
                     .Skip((orderFilter.Page - 1) * orderFilter.Size)
                     .Take(orderFilter.Size);
         query = FilterByRestaurantId(query, orderFilter.RestaurantId);
+        query = FilterByCurrentOrderState(query, orderFilter.OrderStates);
 
         var orders = await query.ToListAsync();
         return orders.Select(FormatOrder)
@@ -56,6 +58,15 @@ public class OrderRepository : IOrderRepository
         {
             null => query,
             _ => query.Where(x => x.RestaurantId == restaurantId)
+        };
+
+    private static IQueryable<Order> FilterByCurrentOrderState(IQueryable<Order> query, SortedSet<OrderState>? orderStates) =>
+        orderStates switch
+        {
+            null => query,
+            _ => orderStates
+                .Aggregate(query, (acc, x) => acc
+                    .Where(o => x == o.OrderStatuses.Last().State))
         };
 
     private static Order FormatOrder(Order order)

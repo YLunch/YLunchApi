@@ -613,8 +613,7 @@ public class OrdersControllerTest : UnitTestFixture
         // Act
         var response = await ordersController.GetOrdersByRestaurantId(restaurant1.Id, new OrderFilter
         {
-            FromOrderState = OrderState.Idling,
-            ToOrderState = OrderState.Idling
+            OrderStates = new SortedSet<OrderState>{OrderState.Idling}
         });
 
         // Assert
@@ -641,11 +640,7 @@ public class OrdersControllerTest : UnitTestFixture
         var restaurantId = Guid.NewGuid().ToString();
 
         // Act
-        var response = await ordersController.GetOrdersByRestaurantId(restaurantId, new OrderFilter
-        {
-            FromOrderState = OrderState.Idling,
-            ToOrderState = OrderState.Idling
-        });
+        var response = await ordersController.GetOrdersByRestaurantId(restaurantId);
 
         // Assert
         var responseResult = Assert.IsType<NotFoundObjectResult>(response.Result);
