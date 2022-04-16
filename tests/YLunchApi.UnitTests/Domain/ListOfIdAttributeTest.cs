@@ -46,6 +46,16 @@ public class ListOfIdAttributeTest
     }
 
     [Fact]
+    public void Empty_List_Of_Id_Should_Be_Invalid()
+    {
+        // Arrange
+        var listOfId = new List<string>();
+
+        // Act & Assert
+        _attribute.IsValid(listOfId).Should().BeFalse();
+    }
+
+    [Fact]
     public void List_Of_NonString_Should_Be_Invalid()
     {
         // Arrange

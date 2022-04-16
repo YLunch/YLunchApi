@@ -481,5 +481,37 @@ public class OrdersControllerITest : ControllerITestBase
         }
     }
 
+    [Fact]
+    public async Task AddStatusToOrders_Should_Return_A_400BadRequest_When_Invalid_Fields()
+    {
+        // Arrange
+        var dateTime = DateTime.UtcNow;
+
+        var restaurantAdminCreateDto = UserMocks.RestaurantAdminCreateDto;
+        restaurantAdminCreateDto.Email = $"{restaurantAdminCreateDto.Email}";
+        var restaurantAdminDecodedTokens = await CreateAndLoginUser(restaurantAdminCreateDto);
+
+        var restaurantCreateDto = RestaurantMocks.PrepareFullRestaurant("restaurant", dateTime);
+        var restaurant = await CreateRestaurant(restaurantAdminDecodedTokens.AccessToken, restaurantCreateDto);
+
+        Client.SetAuthorizationHeader(restaurantAdminDecodedTokens.AccessToken);
+
+        var body = new
+        {
+            OrderIds = Array.Empty<dynamic>(),
+            OrderState = 10
+        };
+
+        // Act
+        var response = await Client.PostAsJsonAsync($"restaurants/{restaurant.Id}/orders/statuses", body);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        var responseBody = await ResponseUtils.DeserializeContentAsync(response);
+
+        responseBody.Should().MatchRegex(@"OrderIds.*Must be a list of id which match Guid regular expression\.");
+        responseBody.Should().Contain($"The field OrderState must be between 0 and {OrderStateUtils.Count - 1}.");
+    }
+
     #endregion
 }

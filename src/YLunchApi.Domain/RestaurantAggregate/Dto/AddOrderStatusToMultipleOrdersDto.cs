@@ -7,5 +7,8 @@ namespace YLunchApi.Domain.RestaurantAggregate.Dto;
 public class AddOrderStatusToMultipleOrdersDto
 {
     [Required] [ListOfId] public SortedSet<string>? OrderIds { get; set; }
-    [Required] public OrderState? OrderState { get; set; }
+
+    [Required]
+    [Range(0, OrderStateUtils.Count - 1)]
+    public OrderState? OrderState { get; set; }
 }

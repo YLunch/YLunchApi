@@ -9,17 +9,13 @@ public class ListOfIdAttribute : ValidationAttribute
 {
     public override bool IsValid(object? value)
     {
-        if (value == null)
+        return value switch
         {
-            return true;
-        }
-
-        if (value is ICollection<string> list)
-        {
-            return list.All(x => new Regex(GuidUtils.Regex).IsMatch(x));
-        }
-
-        return false;
+            null => true,
+            ICollection<string> { Count: 0 } => false,
+            ICollection<string> collection => collection.All(x => new Regex(GuidUtils.Regex).IsMatch(x)),
+            _ => false
+        };
     }
 
     public override string FormatErrorMessage(string name)
