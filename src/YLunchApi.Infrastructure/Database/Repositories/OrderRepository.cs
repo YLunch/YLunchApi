@@ -59,7 +59,8 @@ public class OrderRepository : IOrderRepository
 
         if (orders.Count < orderIds.Count)
         {
-            throw new EntityNotFoundException("Order");
+            var notFoundOrderIds = orderIds.Except(orders.Select(x => x.Id));
+            throw new EntityNotFoundException($"Orders: {string.Join(" and ", notFoundOrderIds)} not found.");
         }
 
         foreach (var order in orders)

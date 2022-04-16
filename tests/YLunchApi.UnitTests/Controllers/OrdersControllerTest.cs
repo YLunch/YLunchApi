@@ -230,13 +230,15 @@ public class OrdersControllerTest : UnitTestFixture
 
         var ordersController = InitOrdersController(TokenMocks.ValidCustomerAccessToken, dateTime);
 
-        var notExistingProductId = Guid.NewGuid().ToString();
+        var notExistingProductId1 = Guid.NewGuid().ToString();
+        var notExistingProductId2 = Guid.NewGuid().ToString();
         var orderCreateDto = new OrderCreateDto
         {
             ProductIds = new List<string>
             {
-                notExistingProductId,
-                product2.Id
+                notExistingProductId1,
+                product2.Id,
+                notExistingProductId2
             },
             ReservedForDateTime = dateTime.AddHours(1),
             CustomerComment = "Customer comment"
@@ -250,7 +252,7 @@ public class OrdersControllerTest : UnitTestFixture
         var responseResult = Assert.IsType<NotFoundObjectResult>(response.Result);
         var responseBody = Assert.IsType<ErrorDto>(responseResult.Value);
 
-        responseBody.Should().BeEquivalentTo(new ErrorDto(HttpStatusCode.NotFound, $"Product: {notExistingProductId} not found."));
+        responseBody.Should().BeEquivalentTo(new ErrorDto(HttpStatusCode.NotFound, $"Products: {notExistingProductId1} and {notExistingProductId2} not found."));
     }
 
     #endregion
@@ -652,10 +654,10 @@ public class OrdersControllerTest : UnitTestFixture
 
     #endregion
 
-    #region UpdateOrdersTests
+    #region AddStatusToOrdersTests
 
     [Fact]
-    public async Task UpdateOrders_Should_Return_A_204NoContent_Adding_An_OrderStatus()
+    public async Task AddStatusToOrders_Should_Return_A_200Ok_With_Updated_Orders()
     {
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
@@ -740,6 +742,157 @@ public class OrdersControllerTest : UnitTestFixture
                                                                                responseBody[i].CurrentOrderStatus
                                                                            }));
         }
+    }
+
+    [Fact]
+    public async Task AddStatusToOrders_Should_Return_A_404NotFound_When_Restaurant_Is_Not_Found()
+    {
+        // Arrange
+        var dateTime = DateTimeMocks.Monday20220321T1000Utc;
+
+        var restaurantCreateDto = RestaurantMocks.PrepareFullRestaurant("restaurant", dateTime);
+        var restaurant = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, restaurantCreateDto, dateTime);
+
+        var productCreateDto1 = ProductMocks.ProductCreateDto;
+        productCreateDto1.Name = "product1";
+        var product1 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto1, dateTime);
+
+        var productCreateDto2 = ProductMocks.ProductCreateDto;
+        productCreateDto2.Name = "product2";
+        var product2 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto2, dateTime);
+
+        var productCreateDto3 = ProductMocks.ProductCreateDto;
+        productCreateDto3.Name = "product3";
+        var product3 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto3, dateTime);
+
+        var order1 = await CreateOrder(TokenMocks.ValidCustomerAccessToken, restaurant.Id, dateTime, new OrderCreateDto
+        {
+            CustomerComment = "Customer comment1",
+            ReservedForDateTime = dateTime.AddHours(1),
+            ProductIds = new List<string>
+            {
+                product1.Id,
+                product2.Id,
+                product3.Id
+            }
+        });
+
+        await CreateOrder(TokenMocks.ValidCustomerAccessToken, restaurant.Id, dateTime, new OrderCreateDto
+        {
+            CustomerComment = "Customer comment2",
+            ReservedForDateTime = dateTime.AddHours(1),
+            ProductIds = new List<string>
+            {
+                product1.Id,
+                product2.Id,
+                product3.Id
+            }
+        });
+
+        var order3 = await CreateOrder(TokenMocks.ValidCustomerAccessToken, restaurant.Id, dateTime, new OrderCreateDto
+        {
+            CustomerComment = "Customer comment3",
+            ReservedForDateTime = dateTime.AddHours(1),
+            ProductIds = new List<string>
+            {
+                product1.Id,
+                product2.Id,
+                product3.Id
+            }
+        });
+
+        var ordersController = InitOrdersController(TokenMocks.ValidRestaurantAdminAccessToken, dateTime);
+
+        var notExistingRestaurantId = Guid.NewGuid().ToString();
+
+        // Act
+        var response = await ordersController.AddStatusToOrders(notExistingRestaurantId, new AddOrderStatusToMultipleOrdersDto
+        {
+            OrderIds = new SortedSet<string> { order1.Id, order3.Id },
+            OrderState = OrderState.Acknowledged
+        });
+
+        // Assert
+        var responseResult = Assert.IsType<NotFoundObjectResult>(response.Result);
+        var responseBody = Assert.IsType<ErrorDto>(responseResult.Value);
+
+        responseBody.Should().BeEquivalentTo(new ErrorDto(HttpStatusCode.NotFound, $"Restaurant: {notExistingRestaurantId} not found."));
+    }
+
+    [Fact]
+    public async Task AddStatusToOrders_Should_Return_A_404NotFound_When_An_Order_Is_Not_Found()
+    {
+        // Arrange
+        var dateTime = DateTimeMocks.Monday20220321T1000Utc;
+
+        var restaurantCreateDto = RestaurantMocks.PrepareFullRestaurant("restaurant", dateTime);
+        var restaurant = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, restaurantCreateDto, dateTime);
+
+        var productCreateDto1 = ProductMocks.ProductCreateDto;
+        productCreateDto1.Name = "product1";
+        var product1 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto1, dateTime);
+
+        var productCreateDto2 = ProductMocks.ProductCreateDto;
+        productCreateDto2.Name = "product2";
+        var product2 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto2, dateTime);
+
+        var productCreateDto3 = ProductMocks.ProductCreateDto;
+        productCreateDto3.Name = "product3";
+        var product3 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto3, dateTime);
+
+        var order1 = await CreateOrder(TokenMocks.ValidCustomerAccessToken, restaurant.Id, dateTime, new OrderCreateDto
+        {
+            CustomerComment = "Customer comment1",
+            ReservedForDateTime = dateTime.AddHours(1),
+            ProductIds = new List<string>
+            {
+                product1.Id,
+                product2.Id,
+                product3.Id
+            }
+        });
+
+        await CreateOrder(TokenMocks.ValidCustomerAccessToken, restaurant.Id, dateTime, new OrderCreateDto
+        {
+            CustomerComment = "Customer comment2",
+            ReservedForDateTime = dateTime.AddHours(1),
+            ProductIds = new List<string>
+            {
+                product1.Id,
+                product2.Id,
+                product3.Id
+            }
+        });
+
+        var order3 = await CreateOrder(TokenMocks.ValidCustomerAccessToken, restaurant.Id, dateTime, new OrderCreateDto
+        {
+            CustomerComment = "Customer comment3",
+            ReservedForDateTime = dateTime.AddHours(1),
+            ProductIds = new List<string>
+            {
+                product1.Id,
+                product2.Id,
+                product3.Id
+            }
+        });
+
+        var ordersController = InitOrdersController(TokenMocks.ValidRestaurantAdminAccessToken, dateTime);
+
+        var notExistingOrderId1 = Guid.NewGuid().ToString();
+        var notExistingOrderId2 = Guid.NewGuid().ToString();
+
+        // Act
+        var response = await ordersController.AddStatusToOrders(restaurant.Id, new AddOrderStatusToMultipleOrdersDto
+        {
+            OrderIds = new SortedSet<string> { order1.Id, notExistingOrderId1, order3.Id, notExistingOrderId2 },
+            OrderState = OrderState.Acknowledged
+        });
+
+        // Assert
+        var responseResult = Assert.IsType<NotFoundObjectResult>(response.Result);
+        var responseBody = Assert.IsType<ErrorDto>(responseResult.Value);
+
+        responseBody.Should().BeEquivalentTo(new ErrorDto(HttpStatusCode.NotFound, $"Orders: {notExistingOrderId1} and {notExistingOrderId2} not found."));
     }
 
     #endregion

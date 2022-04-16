@@ -37,7 +37,7 @@ public class OrdersController : ApplicationControllerBase
         {
             return exception.Message switch
             {
-                { } m when m.Contains("Product") => NotFound(new ErrorDto(HttpStatusCode.NotFound, $"{exception.Message} not found.")),
+                { } m when m.Contains("Product") => NotFound(new ErrorDto(HttpStatusCode.NotFound, exception.Message)),
                 _ => NotFound(new ErrorDto(HttpStatusCode.NotFound, $"Restaurant: {restaurantId} not found."))
             };
         }
@@ -95,7 +95,7 @@ public class OrdersController : ApplicationControllerBase
         {
             return exception.Message switch
             {
-                { } m when m.Contains("Order") => NotFound(new ErrorDto(HttpStatusCode.NotFound, $"{exception.Message} not found.")),
+                { } m when m.Contains("Orders") => NotFound(new ErrorDto(HttpStatusCode.NotFound, exception.Message)),
                 _ => NotFound(new ErrorDto(HttpStatusCode.NotFound, $"Restaurant: {restaurantId} not found."))
             };
         }

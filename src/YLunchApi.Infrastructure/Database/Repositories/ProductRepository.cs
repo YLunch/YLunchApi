@@ -67,7 +67,7 @@ public class ProductRepository : IProductRepository
             false => query.Where(x =>
                 !x.IsActive ||
                 x.Quantity == 0 ||
-                (x.ExpirationDateTime != null && x.ExpirationDateTime < _dateTimeProvider.UtcNow)),
+                x.ExpirationDateTime != null && x.ExpirationDateTime < _dateTimeProvider.UtcNow),
             null => query
         };
 

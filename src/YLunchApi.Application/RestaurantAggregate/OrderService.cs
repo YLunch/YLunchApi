@@ -34,6 +34,8 @@ public class OrderService : IOrderService
             throw new ReservedForDateTimeOutOfOpenToOrderOpeningTimesException();
         }
 
+        var notFoundProductIds = new List<string>();
+
         var products = orderCreateDto.ProductIds!
                                      .Select(productId =>
                                      {
@@ -43,12 +45,16 @@ public class OrderService : IOrderService
                                                        .FirstOrDefault(x => x.Id == productId);
                                          if (product == null)
                                          {
-                                             throw new EntityNotFoundException($"Product: {productId}");
+                                             notFoundProductIds.Add(productId);
                                          }
 
                                          return product;
                                      })
                                      .ToList();
+        if (notFoundProductIds.Count > 0)
+        {
+            throw new EntityNotFoundException($"Products: {string.Join(" and ", notFoundProductIds)} not found.");
+        }
 
         var totalPrice = products.Sum(x => x.Price);
         var order = orderCreateDto.Adapt<Order>();
