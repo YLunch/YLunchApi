@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 using YLunchApi.Domain.Core.Utils;

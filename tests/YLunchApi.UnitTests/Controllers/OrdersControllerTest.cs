@@ -892,7 +892,7 @@ public class OrdersControllerTest : UnitTestFixture
         var responseResult = Assert.IsType<NotFoundObjectResult>(response.Result);
         var responseBody = Assert.IsType<ErrorDto>(responseResult.Value);
 
-        responseBody.Should().BeEquivalentTo(new ErrorDto(HttpStatusCode.NotFound, $"Orders: {notExistingOrderId1} and {notExistingOrderId2} not found."));
+        responseBody.Should().BeEquivalentTo(new ErrorDto(HttpStatusCode.NotFound, $"Orders: {string.Join(" and ", new SortedSet<string> { notExistingOrderId1, notExistingOrderId2 })} not found."));
     }
 
     #endregion

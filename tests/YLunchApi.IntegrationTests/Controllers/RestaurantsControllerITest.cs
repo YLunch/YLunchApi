@@ -52,12 +52,12 @@ public class RestaurantsControllerITest : ControllerITestBase
             RestaurantMocks.SimpleRestaurantCreateDto.StreetNumber,
             RestaurantMocks.SimpleRestaurantCreateDto.IsOpen,
             RestaurantMocks.SimpleRestaurantCreateDto.IsPublic,
-            ClosingDates = new List<dynamic>
+            ClosingDates = new[]
             {
                 new { ClosingDateTime = DateTime.UtcNow.AddYears(1).AddDays(10) },
                 new { ClosingDateTime = DateTime.UtcNow.AddYears(1).AddDays(-10) }
             },
-            PlaceOpeningTimes = new List<dynamic>
+            PlaceOpeningTimes = new[]
             {
                 new
                 {
@@ -72,7 +72,7 @@ public class RestaurantsControllerITest : ControllerITestBase
                     DurationInMinutes = 23 * 60 + 59
                 }
             },
-            OrderOpeningTimes = new List<dynamic>
+            OrderOpeningTimes = new[]
             {
                 new
                 {
@@ -188,11 +188,11 @@ public class RestaurantsControllerITest : ControllerITestBase
         var body = new
         {
             Name = "",
-            PlaceOpeningTimes = new List<dynamic>
+            PlaceOpeningTimes = new[]
             {
                 new { }
             },
-            OrderOpeningTimes = new List<dynamic>
+            OrderOpeningTimes = new[]
             {
                 new { }
             }
@@ -248,12 +248,12 @@ public class RestaurantsControllerITest : ControllerITestBase
             RestaurantMocks.SimpleRestaurantCreateDto.StreetNumber,
             RestaurantMocks.SimpleRestaurantCreateDto.IsOpen,
             RestaurantMocks.SimpleRestaurantCreateDto.IsPublic,
-            ClosingDates = new List<dynamic>
+            ClosingDates = new[]
             {
                 new { ClosingDateTime = DateTime.UtcNow.AddDays(10) },
                 new { ClosingDateTime = DateTime.UtcNow.AddDays(-10) }
             },
-            PlaceOpeningTimes = new List<dynamic>
+            PlaceOpeningTimes = new[]
             {
                 new
                 {
@@ -262,7 +262,7 @@ public class RestaurantsControllerITest : ControllerITestBase
                     DurationInMinutes = 7 * 24 * 60
                 }
             },
-            OrderOpeningTimes = new List<dynamic>
+            OrderOpeningTimes = new[]
             {
                 new
                 {
@@ -321,7 +321,7 @@ public class RestaurantsControllerITest : ControllerITestBase
             RestaurantMocks.SimpleRestaurantCreateDto.StreetNumber,
             RestaurantMocks.SimpleRestaurantCreateDto.IsOpen,
             RestaurantMocks.SimpleRestaurantCreateDto.IsPublic,
-            PlaceOpeningTimes = new List<dynamic>
+            PlaceOpeningTimes = new[]
             {
                 new
                 {
@@ -336,7 +336,7 @@ public class RestaurantsControllerITest : ControllerITestBase
                     DurationInMinutes = 120
                 }
             },
-            OrderOpeningTimes = new List<dynamic>
+            OrderOpeningTimes = new[]
             {
                 new
                 {

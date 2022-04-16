@@ -37,7 +37,7 @@ public class OrderService : IOrderService
         var notFoundProductIds = new List<string>();
 
         var products = orderCreateDto.ProductIds!
-                                     .Select(productId =>
+                                     .Aggregate(new List<Product>(), (acc, productId) =>
                                      {
                                          var product = _productRepository
                                                        .ProductsQueryBase
@@ -47,8 +47,12 @@ public class OrderService : IOrderService
                                          {
                                              notFoundProductIds.Add(productId);
                                          }
+                                         else
+                                         {
+                                             acc.Add(product);
+                                         }
 
-                                         return product;
+                                         return acc;
                                      })
                                      .ToList();
         if (notFoundProductIds.Count > 0)

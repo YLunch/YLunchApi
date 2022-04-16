@@ -89,7 +89,7 @@ public class OrdersControllerITest : ControllerITestBase
 
         var body = new
         {
-            ProductIds = new List<dynamic> { product1.Id, product2.Id, "badIdFormat" },
+            ProductIds = new[] { product1.Id, product2.Id, "badIdFormat" },
             ReservedForDateTime = DateTime.UtcNow.AddHours(-2)
         };
 
@@ -453,7 +453,7 @@ public class OrdersControllerITest : ControllerITestBase
 
         var body = new
         {
-            OrderIds = new List<dynamic> { order1.Id, order3.Id },
+            OrderIds = new[] { order1.Id, order3.Id },
             OrderState = OrderState.Acknowledged
         };
 

@@ -66,11 +66,11 @@ public class ProductsControllerITest : ControllerITestBase
             Description = "An invalid Description",
             Quantity = 0,
             ExpirationDateTime = DateTime.UtcNow.AddDays(-1),
-            Allergens = new List<dynamic>
+            Allergens = new[]
             {
                 new { BadFieldName = "wrong value" }
             },
-            ProductTags = new List<dynamic>
+            ProductTags = new[]
             {
                 new { BadFieldName = "wrong value" }
             }
@@ -101,11 +101,11 @@ public class ProductsControllerITest : ControllerITestBase
         {
             Name = "An invalid Name",
             Description = "An invalid Description",
-            Allergens = new List<dynamic>
+            Allergens = new[]
             {
                 new { Name = "An invalid Name" }
             },
-            ProductTags = new List<dynamic>
+            ProductTags = new[]
             {
                 new { Name = "An invalid Name" }
             }
