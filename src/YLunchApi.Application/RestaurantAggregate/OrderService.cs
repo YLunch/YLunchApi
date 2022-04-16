@@ -128,9 +128,9 @@ public class OrderService : IOrderService
         return orders.Adapt<ICollection<OrderReadDto>>();
     }
 
-    public async Task<ICollection<OrderReadDto>> AddStatusToOrders(BulkOrderStatusCreateDto bulkOrderStatusCreateDto)
+    public async Task<ICollection<OrderReadDto>> AddStatusToOrders(string restaurantId, AddOrderStatusToMultipleOrdersDto addOrderStatusToMultipleOrdersDto)
     {
-        var orders = await _orderRepository.AddStatusToOrders(bulkOrderStatusCreateDto);
+        var orders = await _orderRepository.AddStatusToOrders(restaurantId, addOrderStatusToMultipleOrdersDto.OrderIds!, (OrderState)addOrderStatusToMultipleOrdersDto.OrderState!);
         return orders.Adapt<ICollection<OrderReadDto>>();
     }
 }

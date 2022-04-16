@@ -5,7 +5,6 @@ using YLunchApi.Domain.CommonAggregate.Dto;
 using YLunchApi.Domain.Exceptions;
 using YLunchApi.Domain.RestaurantAggregate.Dto;
 using YLunchApi.Domain.RestaurantAggregate.Filters;
-using YLunchApi.Domain.RestaurantAggregate.Models.Enums;
 using YLunchApi.Domain.RestaurantAggregate.Services;
 using YLunchApi.Domain.UserAggregate.Models;
 
@@ -82,14 +81,14 @@ public class OrdersController : ApplicationControllerBase
         }
     }
 
-    [HttpPost("order-statuses")]
+    [HttpPost("restaurants/{restaurantId}/orders/order-statuses")]
     [Authorize(Roles = Roles.RestaurantAdmin)]
-    public async Task<ActionResult<ICollection<OrderReadDto>>> AddStatusToOrders([FromBody] BulkOrderStatusCreateDto bulkOrderStatusCreateDto)
+    public async Task<ActionResult<ICollection<OrderReadDto>>> AddStatusToOrders([FromRoute] string restaurantId, [FromBody] AddOrderStatusToMultipleOrdersDto addOrderStatusToMultipleOrdersDto)
     {
         try
         {
-            await _restaurantService.GetRestaurantById(bulkOrderStatusCreateDto.RestaurantId);
-            var ordersReadDto = await _orderService.AddStatusToOrders(bulkOrderStatusCreateDto);
+            await _restaurantService.GetRestaurantById(restaurantId);
+            var ordersReadDto = await _orderService.AddStatusToOrders(restaurantId, addOrderStatusToMultipleOrdersDto);
             return Ok(ordersReadDto);
         }
         catch (EntityNotFoundException exception)
@@ -97,7 +96,7 @@ public class OrdersController : ApplicationControllerBase
             return exception.Message switch
             {
                 { } m when m.Contains("Order") => NotFound(new ErrorDto(HttpStatusCode.NotFound, $"{exception.Message} not found.")),
-                _ => NotFound(new ErrorDto(HttpStatusCode.NotFound, $"Restaurant: {bulkOrderStatusCreateDto.RestaurantId} not found."))
+                _ => NotFound(new ErrorDto(HttpStatusCode.NotFound, $"Restaurant: {restaurantId} not found."))
             };
         }
     }

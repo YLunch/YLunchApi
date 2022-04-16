@@ -716,9 +716,8 @@ public class OrdersControllerTest : UnitTestFixture
         var ordersController = InitOrdersController(TokenMocks.ValidRestaurantAdminAccessToken, dateTime);
 
         // Act
-        var response = await ordersController.AddStatusToOrders(new BulkOrderStatusCreateDto
+        var response = await ordersController.AddStatusToOrders(restaurant.Id, new AddOrderStatusToMultipleOrdersDto
         {
-            RestaurantId = restaurant.Id,
             OrderIds = new SortedSet<string> { order1.Id, order3.Id },
             OrderState = OrderState.Acknowledged
         });

@@ -1,8 +1,6 @@
-using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using YLunchApi.Domain.CommonAggregate.Services;
 using YLunchApi.Domain.Exceptions;
-using YLunchApi.Domain.RestaurantAggregate.Dto;
 using YLunchApi.Domain.RestaurantAggregate.Filters;
 using YLunchApi.Domain.RestaurantAggregate.Models;
 using YLunchApi.Domain.RestaurantAggregate.Models.Enums;
@@ -53,12 +51,13 @@ public class OrderRepository : IOrderRepository
                      .ToList();
     }
 
-    public async Task<ICollection<Order>> AddStatusToOrders(BulkOrderStatusCreateDto bulkOrderStatusCreateDto)
+    public async Task<ICollection<Order>> AddStatusToOrders(string restaurantId, SortedSet<string> orderIds, OrderState orderState)
     {
         var orders = await OrdersQueryBase
-                           .Where(x => bulkOrderStatusCreateDto.OrderIds!.Contains(x.Id)).ToListAsync();
+                           .Where(x => x.RestaurantId == restaurantId)
+                           .Where(x => orderIds.Contains(x.Id)).ToListAsync();
 
-        if (orders.Count < bulkOrderStatusCreateDto.OrderIds!.Count)
+        if (orders.Count < orderIds.Count)
         {
             throw new EntityNotFoundException("Order");
         }
@@ -69,7 +68,7 @@ public class OrderRepository : IOrderRepository
             {
                 OrderId = order.Id,
                 DateTime = _dateTimeProvider.UtcNow,
-                State = (OrderState)bulkOrderStatusCreateDto.OrderState!
+                State = orderState
             });
         }
 
