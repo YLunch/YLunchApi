@@ -396,4 +396,90 @@ public class OrdersControllerITest : ControllerITestBase
     }
 
     #endregion
+
+    #region AddStatusToOrders
+
+    [Fact]
+    public async Task AddStatusToOrders_Should_Return_A_200Ok_With_Updated_Orders()
+    {
+        // Arrange
+        var dateTime = DateTime.UtcNow;
+
+        var restaurantAdminCreateDto = UserMocks.RestaurantAdminCreateDto;
+        restaurantAdminCreateDto.Email = $"{restaurantAdminCreateDto.Email}";
+        var restaurantAdminDecodedTokens = await CreateAndLoginUser(restaurantAdminCreateDto);
+
+        var customerDecodedTokens = await CreateAndLoginUser(UserMocks.CustomerCreateDto);
+
+        var restaurantCreateDto = RestaurantMocks.PrepareFullRestaurant("restaurant", dateTime);
+        var restaurant = await CreateRestaurant(restaurantAdminDecodedTokens.AccessToken, restaurantCreateDto);
+
+        var productCreateDto1 = ProductMocks.ProductCreateDto;
+        productCreateDto1.Name = "product1";
+        var product1 = await CreateProduct(restaurantAdminDecodedTokens.AccessToken, restaurant.Id, productCreateDto1);
+
+        var productCreateDto2 = ProductMocks.ProductCreateDto;
+        productCreateDto2.Name = "product2";
+        var product2 = await CreateProduct(restaurantAdminDecodedTokens.AccessToken, restaurant.Id, productCreateDto2);
+
+        var productCreateDto3 = ProductMocks.ProductCreateDto;
+        productCreateDto3.Name = "product3";
+        var product3 = await CreateProduct(restaurantAdminDecodedTokens.AccessToken, restaurant.Id, productCreateDto3);
+
+        var order1 = await CreateOrder(customerDecodedTokens.AccessToken, restaurant.Id, new List<ProductReadDto>
+        {
+            product1,
+            product2,
+            product3
+        });
+
+        await CreateOrder(customerDecodedTokens.AccessToken, restaurant.Id, new List<ProductReadDto>
+        {
+            product1,
+            product2,
+            product3
+        });
+
+        var order3 = await CreateOrder(customerDecodedTokens.AccessToken, restaurant.Id, new List<ProductReadDto>
+        {
+            product1,
+            product2,
+            product3
+        });
+
+        var orders = new List<OrderReadDto> { order1, order3 };
+
+        Client.SetAuthorizationHeader(restaurantAdminDecodedTokens.AccessToken);
+
+        var body = new
+        {
+            OrderIds = new List<dynamic> { order1.Id, order3.Id },
+            OrderState = OrderState.Acknowledged
+        };
+
+        // Act
+        var response = await Client.PostAsJsonAsync($"restaurants/{restaurant.Id}/orders/statuses", body);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var responseBody = await ResponseUtils.DeserializeContentAsync<List<OrderReadDto>>(response);
+
+        responseBody.Count.Should().Be(2);
+
+        for (var i = 0; i < responseBody.Count; i++)
+        {
+            responseBody[i].CurrentOrderStatus.Id.Should().MatchRegex(GuidUtils.Regex);
+            responseBody[i].CurrentOrderStatus.OrderId.Should().Be(orders[i].Id);
+            responseBody[i].CurrentOrderStatus.State.Should().Be(OrderState.Acknowledged);
+            responseBody[i].CurrentOrderStatus.DateTime.Should().BeCloseTo(dateTime, TimeSpan.FromSeconds(5));
+
+            responseBody[i].OrderStatuses.Should().BeEquivalentTo(orders[i].OrderStatuses
+                                                                           .Concat(new List<OrderStatusReadDto>
+                                                                           {
+                                                                               responseBody[i].CurrentOrderStatus
+                                                                           }));
+        }
+    }
+
+    #endregion
 }

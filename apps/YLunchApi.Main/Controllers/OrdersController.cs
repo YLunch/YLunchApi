@@ -81,7 +81,7 @@ public class OrdersController : ApplicationControllerBase
         }
     }
 
-    [HttpPost("restaurants/{restaurantId}/orders/order-statuses")]
+    [HttpPost("restaurants/{restaurantId}/orders/statuses")]
     [Authorize(Roles = Roles.RestaurantAdmin)]
     public async Task<ActionResult<ICollection<OrderReadDto>>> AddStatusToOrders([FromRoute] string restaurantId, [FromBody] AddOrderStatusToMultipleOrdersDto addOrderStatusToMultipleOrdersDto)
     {

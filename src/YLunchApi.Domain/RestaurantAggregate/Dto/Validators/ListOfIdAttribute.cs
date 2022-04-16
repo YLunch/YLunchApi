@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 using YLunchApi.Domain.Core.Utils;
@@ -14,9 +15,9 @@ public class ListOfIdAttribute : ValidationAttribute
             return true;
         }
 
-        if (value is List<string> list)
+        if (value is ICollection<string> list)
         {
-            return list.TrueForAll(x => new Regex(GuidUtils.Regex).IsMatch(x));
+            return list.All(x => new Regex(GuidUtils.Regex).IsMatch(x));
         }
 
         return false;
