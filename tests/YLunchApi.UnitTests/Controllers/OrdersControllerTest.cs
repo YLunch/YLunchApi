@@ -687,7 +687,7 @@ public class OrdersControllerTest : UnitTestFixture
             }
         });
 
-        var order2 = await CreateOrder(TokenMocks.ValidCustomerAccessToken, restaurant.Id, dateTime, new OrderCreateDto
+        await CreateOrder(TokenMocks.ValidCustomerAccessToken, restaurant.Id, dateTime, new OrderCreateDto
         {
             CustomerComment = "Customer comment2",
             ReservedForDateTime = dateTime.AddHours(1),
@@ -711,13 +711,36 @@ public class OrdersControllerTest : UnitTestFixture
             }
         });
 
+        var orders = new List<OrderReadDto> { order1, order3 };
+
         var ordersController = InitOrdersController(TokenMocks.ValidRestaurantAdminAccessToken, dateTime);
 
         // Act
-        var response = await ordersController.UpdateOrdersByRestaurantId(restaurant.Id, new SortedSet<string> { order1.Id, order3.Id }, new OrderUpdateDto
+        var response = await ordersController.AddStatusToOrders(new BulkOrderStatusCreateDto
         {
-            OrderState = OrderState.Idling
+            RestaurantId = restaurant.Id,
+            OrderIds = new SortedSet<string> { order1.Id, order3.Id },
+            OrderState = OrderState.Acknowledged
         });
+
+        // Assert
+        var responseResult = Assert.IsType<OkObjectResult>(response.Result);
+        var responseBody = Assert.IsType<List<OrderReadDto>>(responseResult.Value);
+        responseBody.Count.Should().Be(2);
+
+        for (var i = 0; i < responseBody.Count; i++)
+        {
+            responseBody[i].CurrentOrderStatus.Id.Should().MatchRegex(GuidUtils.Regex);
+            responseBody[i].CurrentOrderStatus.OrderId.Should().Be(orders[i].Id);
+            responseBody[i].CurrentOrderStatus.State.Should().Be(OrderState.Acknowledged);
+            responseBody[i].CurrentOrderStatus.DateTime.Should().BeCloseTo(dateTime, TimeSpan.FromSeconds(5));
+
+            responseBody[i].OrderStatuses.Should().BeEquivalentTo(orders[i].OrderStatuses
+                                                                           .Concat(new List<OrderStatusReadDto>
+                                                                           {
+                                                                               responseBody[i].CurrentOrderStatus
+                                                                           }));
+        }
     }
 
     #endregion

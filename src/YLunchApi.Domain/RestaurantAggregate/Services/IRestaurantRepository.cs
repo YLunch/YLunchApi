@@ -5,7 +5,7 @@ namespace YLunchApi.Domain.RestaurantAggregate.Services;
 
 public interface IRestaurantRepository
 {
-    Task Create(Restaurant restaurant);
-    Task<Restaurant> GetById(string id);
+    Task CreateRestaurant(Restaurant restaurant);
+    Task<Restaurant> GetRestaurantById(string id);
     Task<ICollection<Restaurant>> GetRestaurants(RestaurantFilter restaurantFilter);
 }

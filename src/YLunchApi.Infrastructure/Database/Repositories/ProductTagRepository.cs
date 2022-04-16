@@ -14,7 +14,7 @@ public class ProductTagRepository : IProductTagRepository
         _context = context;
     }
 
-    public async Task<ProductTag> GetByName(string name)
+    public async Task<ProductTag> GetProductTagByName(string name)
     {
         var productTag = await _context.ProductTags.FirstOrDefaultAsync(x => x.Name == name);
         if (productTag == null)

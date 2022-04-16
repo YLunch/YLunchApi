@@ -14,7 +14,7 @@ public class AllergenRepository : IAllergenRepository
         _context = context;
     }
 
-    public async Task<Allergen> GetByName(string name)
+    public async Task<Allergen> GetAllergenByName(string name)
     {
         var allergen = await _context.Allergens.FirstOrDefaultAsync(x => x.Name == name);
         if (allergen == null)

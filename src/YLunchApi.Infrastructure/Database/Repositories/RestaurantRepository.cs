@@ -19,7 +19,7 @@ public class RestaurantRepository : IRestaurantRepository
         _dateTimeProvider = dateTimeProvider;
     }
 
-    public async Task Create(Restaurant restaurant)
+    public async Task CreateRestaurant(Restaurant restaurant)
     {
         var existingRestaurant = await _context.Restaurants.FirstOrDefaultAsync(x =>
             x.Name == restaurant.Name &&
@@ -45,7 +45,7 @@ public class RestaurantRepository : IRestaurantRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task<Restaurant> GetById(string id)
+    public async Task<Restaurant> GetRestaurantById(string id)
     {
         var restaurant = await RestaurantsQueryBase
             .FirstOrDefaultAsync(x => x.Id == id);

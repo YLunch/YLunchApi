@@ -93,7 +93,7 @@ public class JwtService : IJwtService
         await _refreshTokenRepository.Update(storedToken);
 
         // Create new access and refresh tokens
-        var userDb = await _userRepository.GetById(storedToken.UserId);
+        var userDb = await _userRepository.GetUserById(storedToken.UserId);
         var userRoles = await _userRepository.GetUserRoles(userDb!);
         var authenticatedUser = new AuthenticatedUser(userDb!, userRoles);
         return await GenerateJwtToken(authenticatedUser);

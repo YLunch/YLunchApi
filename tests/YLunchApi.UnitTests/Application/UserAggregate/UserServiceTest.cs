@@ -29,7 +29,7 @@ public class UserServiceTest : UnitTestFixture
         var userService = Fixture.GetImplementationFromService<IUserService>();
 
         // Act
-        var actual = await userService.Create(userCreateDto, Roles.RestaurantAdmin);
+        var actual = await userService.CreateUser(userCreateDto, Roles.RestaurantAdmin);
 
         // Assert
         actual = Assert.IsType<UserReadDto>(actual);
@@ -46,7 +46,7 @@ public class UserServiceTest : UnitTestFixture
         var userService = Fixture.GetImplementationFromService<IUserService>();
 
         // Act
-        var actual = await userService.Create(userCreateDto, Roles.Customer);
+        var actual = await userService.CreateUser(userCreateDto, Roles.Customer);
 
         // Assert
         actual = Assert.IsType<UserReadDto>(actual);
@@ -61,10 +61,10 @@ public class UserServiceTest : UnitTestFixture
         var userCreateDto = UserMocks.CustomerCreateDto;
         Fixture.InitFixture();
         var userService = Fixture.GetImplementationFromService<IUserService>();
-        await userService.Create(userCreateDto, Roles.Customer);
+        await userService.CreateUser(userCreateDto, Roles.Customer);
 
         // Act
-        async Task Act() => await userService.Create(userCreateDto, Roles.Customer);
+        async Task Act() => await userService.CreateUser(userCreateDto, Roles.Customer);
 
         // Assert
         await Assert.ThrowsAsync<EntityAlreadyExistsException>(Act);
@@ -75,14 +75,14 @@ public class UserServiceTest : UnitTestFixture
     {
         // Arrange
         var userRepositoryMock = new Mock<IUserRepository>();
-        userRepositoryMock.Setup(x => x.GetByEmail(It.IsAny<string>()))
+        userRepositoryMock.Setup(x => x.GetUserByEmail(It.IsAny<string>()))
                           .ReturnsAsync(() => null);
         Fixture.InitFixture(configuration => configuration.UserRepository = userRepositoryMock.Object);
         var userService = Fixture.GetImplementationFromService<IUserService>();
         var userCreateDto = UserMocks.CustomerCreateDto;
 
         // Act
-        async Task Act() => await userService.Create(userCreateDto, Roles.Customer);
+        async Task Act() => await userService.CreateUser(userCreateDto, Roles.Customer);
 
         // Assert
         await Assert.ThrowsAsync<EntityNotFoundException>(Act);
@@ -97,7 +97,7 @@ public class UserServiceTest : UnitTestFixture
         var userService = Fixture.GetImplementationFromService<IUserService>();
 
         // Act
-        async Task Act() => await userService.Create(userCreateDto, "UnknownRole");
+        async Task Act() => await userService.CreateUser(userCreateDto, "UnknownRole");
 
         // Assert
         await Assert.ThrowsAsync<EntityNotFoundException>(Act);
@@ -120,7 +120,7 @@ public class UserServiceTest : UnitTestFixture
         var userCreateDto = UserMocks.CustomerCreateDto;
 
         // Act
-        async Task Act() => await userService.Create(userCreateDto, Roles.Customer);
+        async Task Act() => await userService.CreateUser(userCreateDto, Roles.Customer);
 
         // Assert
         await Assert.ThrowsAsync<UserRegistrationException>(Act);

@@ -18,7 +18,7 @@ public class ProductRepository : IProductRepository
         _dateTimeProvider = dateTimeProvider;
     }
 
-    public async Task Create(Product product)
+    public async Task CreateProduct(Product product)
     {
         await _context.Products.AddAsync(product);
         var existingProduct = await _context.Products
@@ -32,7 +32,7 @@ public class ProductRepository : IProductRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task<Product> GetById(string productId)
+    public async Task<Product> GetProductById(string productId)
     {
         var product = await ProductsQueryBase.FirstOrDefaultAsync(x => x.Id == productId);
         if (product == null)

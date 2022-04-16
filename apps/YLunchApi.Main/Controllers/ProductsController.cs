@@ -30,8 +30,8 @@ public class ProductsController : ApplicationControllerBase
     {
         try
         {
-            var restaurant = await _restaurantService.GetById(restaurantId);
-            var productReadDto = await _productService.Create(productCreateDto, restaurant.Id);
+            var restaurant = await _restaurantService.GetRestaurantById(restaurantId);
+            var productReadDto = await _productService.CreateProduct(productCreateDto, restaurant.Id);
             return Created("", productReadDto);
         }
         catch (EntityNotFoundException)
@@ -49,7 +49,7 @@ public class ProductsController : ApplicationControllerBase
     {
         try
         {
-            var productReadDto = await _productService.GetById(productId);
+            var productReadDto = await _productService.GetProductById(productId);
             return Ok(productReadDto);
         }
         catch (EntityNotFoundException)
@@ -63,7 +63,7 @@ public class ProductsController : ApplicationControllerBase
     {
         try
         {
-            var restaurant = await _restaurantService.GetById(restaurantId);
+            var restaurant = await _restaurantService.GetRestaurantById(restaurantId);
             var filter = productFilter ?? new ProductFilter();
             filter.RestaurantId = restaurant.Id;
             var productsReadDto = await _productService.GetProducts(filter);

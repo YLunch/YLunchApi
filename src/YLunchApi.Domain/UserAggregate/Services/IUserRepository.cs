@@ -4,9 +4,9 @@ namespace YLunchApi.Domain.UserAggregate.Services;
 
 public interface IUserRepository
 {
-    Task Create(User user, string password, string role);
-    Task<User?> GetByEmail(string email);
-    Task<User?> GetByEmailAndPassword(string email, string password);
+    Task CreateUser(User user, string password, string role);
+    Task<User?> GetUserByEmail(string email);
+    Task<User?> GetUserByEmailAndPassword(string email, string password);
     Task<List<string>> GetUserRoles(User user);
-    Task<User?> GetById(string id);
+    Task<User?> GetUserById(string id);
 }

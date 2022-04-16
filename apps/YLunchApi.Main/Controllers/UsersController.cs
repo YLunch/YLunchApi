@@ -36,7 +36,7 @@ public class UsersController : ApplicationControllerBase
     {
         try
         {
-            var userReadDto = await _userService.Create(userCreateDto, role);
+            var userReadDto = await _userService.CreateUser(userCreateDto, role);
             return Created("", userReadDto);
         }
         catch (EntityAlreadyExistsException)

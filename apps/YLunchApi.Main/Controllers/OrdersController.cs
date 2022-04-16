@@ -31,7 +31,7 @@ public class OrdersController : ApplicationControllerBase
     {
         try
         {
-            var orderReadDto = await _orderService.Create(CurrentUserId!, restaurantId, orderCreateDto);
+            var orderReadDto = await _orderService.CreateOrder(CurrentUserId!, restaurantId, orderCreateDto);
             return Created("", orderReadDto);
         }
         catch (EntityNotFoundException exception)
@@ -55,8 +55,8 @@ public class OrdersController : ApplicationControllerBase
         try
         {
             return CurrentUserRoles.Contains(Roles.RestaurantAdmin) ?
-                Ok(await _orderService.GetByIdForRestaurantAdmin(CurrentUserId!, orderId)) :
-                Ok(await _orderService.GetByIdForCustomer(CurrentUserId!, orderId));
+                Ok(await _orderService.GetOrderByIdForRestaurantAdmin(CurrentUserId!, orderId)) :
+                Ok(await _orderService.GetOrderByIdForCustomer(CurrentUserId!, orderId));
         }
         catch (EntityNotFoundException)
         {
@@ -70,7 +70,7 @@ public class OrdersController : ApplicationControllerBase
     {
         try
         {
-            var restaurant = await _restaurantService.GetById(restaurantId);
+            var restaurant = await _restaurantService.GetRestaurantById(restaurantId);
             var filter = orderFilter ?? new OrderFilter();
             filter.RestaurantId = restaurant.Id;
             var ordersReadDto = await _orderService.GetOrders(filter);
@@ -82,21 +82,23 @@ public class OrdersController : ApplicationControllerBase
         }
     }
 
-    [HttpPatch("restaurants/{restaurantId}/orders")]
+    [HttpPost("order-statuses")]
     [Authorize(Roles = Roles.RestaurantAdmin)]
-    public async Task<ActionResult<ICollection<OrderReadDto>>> UpdateOrdersByRestaurantId([FromRoute] string restaurantId, [FromQuery] SortedSet<string> orderIds, [FromBody] OrderUpdateDto orderState)
+    public async Task<ActionResult<ICollection<OrderReadDto>>> AddStatusToOrders([FromBody] BulkOrderStatusCreateDto bulkOrderStatusCreateDto)
     {
         try
         {
-            var restaurant = await _restaurantService.GetById(restaurantId);
-            var filter = new OrderFilter();
-            filter.RestaurantId = restaurant.Id;
-            var ordersReadDto = await _orderService.GetOrders(filter);
+            await _restaurantService.GetRestaurantById(bulkOrderStatusCreateDto.RestaurantId);
+            var ordersReadDto = await _orderService.AddStatusToOrders(bulkOrderStatusCreateDto);
             return Ok(ordersReadDto);
         }
-        catch (EntityNotFoundException)
+        catch (EntityNotFoundException exception)
         {
-            return NotFound(new ErrorDto(HttpStatusCode.NotFound, $"Restaurant: {restaurantId} not found."));
+            return exception.Message switch
+            {
+                { } m when m.Contains("Order") => NotFound(new ErrorDto(HttpStatusCode.NotFound, $"{exception.Message} not found.")),
+                _ => NotFound(new ErrorDto(HttpStatusCode.NotFound, $"Restaurant: {bulkOrderStatusCreateDto.RestaurantId} not found."))
+            };
         }
     }
 }

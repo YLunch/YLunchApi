@@ -29,7 +29,7 @@ public class RestaurantsController : ApplicationControllerBase
     {
         try
         {
-            var restaurantReadDto = await _restaurantService.Create(restaurantCreateDto, CurrentUserId!);
+            var restaurantReadDto = await _restaurantService.CreateRestaurant(restaurantCreateDto, CurrentUserId!);
             return Created("", restaurantReadDto);
         }
         catch (EntityAlreadyExistsException)
@@ -43,7 +43,7 @@ public class RestaurantsController : ApplicationControllerBase
     {
         try
         {
-            var restaurantReadDto = await _restaurantService.GetById(restaurantId);
+            var restaurantReadDto = await _restaurantService.GetRestaurantById(restaurantId);
             return Ok(restaurantReadDto);
         }
         catch (EntityNotFoundException)

@@ -5,9 +5,9 @@ namespace YLunchApi.Domain.UserAggregate.Services;
 
 public interface IUserService
 {
-    Task<UserReadDto?> Create(UserCreateDto userCreateDto, string role);
+    Task<UserReadDto?> CreateUser(UserCreateDto userCreateDto, string role);
 
     Task<AuthenticatedUser> GetAuthenticatedUser(LoginRequestDto loginRequestDto);
 
-    Task<UserReadDto> GetById(string id);
+    Task<UserReadDto> GetUserById(string id);
 }

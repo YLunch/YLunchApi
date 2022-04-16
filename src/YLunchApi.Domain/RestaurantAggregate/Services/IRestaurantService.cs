@@ -6,8 +6,8 @@ namespace YLunchApi.Domain.RestaurantAggregate.Services;
 
 public interface IRestaurantService
 {
-    Task<RestaurantReadDto> Create(RestaurantCreateDto restaurantCreateDto, string restaurantAdminId);
-    Task<RestaurantReadDto> GetById(string restaurantId);
+    Task<RestaurantReadDto> CreateRestaurant(RestaurantCreateDto restaurantCreateDto, string restaurantAdminId);
+    Task<RestaurantReadDto> GetRestaurantById(string restaurantId);
     Task<ICollection<RestaurantReadDto>> GetRestaurants(RestaurantFilter restaurantFilter);
     bool IsOpenToOrder(Restaurant restaurant, DateTime dateTime);
     bool IsOpenInPlace(Restaurant restaurant, DateTime dateTime);

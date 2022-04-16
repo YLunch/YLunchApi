@@ -5,7 +5,7 @@ namespace YLunchApi.Domain.RestaurantAggregate.Services;
 
 public interface IProductService
 {
-    Task<ProductReadDto> Create(ProductCreateDto productCreateDto, string restaurantId);
-    Task<ProductReadDto> GetById(string productId);
+    Task<ProductReadDto> CreateProduct(ProductCreateDto productCreateDto, string restaurantId);
+    Task<ProductReadDto> GetProductById(string productId);
     Task<ICollection<ProductReadDto>> GetProducts(ProductFilter productFilter);
 }

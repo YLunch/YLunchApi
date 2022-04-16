@@ -31,8 +31,8 @@ public class AuthenticationControllerTest : UnitTestFixture
         var userService = Fixture.GetImplementationFromService<IUserService>();
         var userRepository = Fixture.GetImplementationFromService<IUserRepository>();
 
-        await userService.Create(user, role);
-        var userDb = await userRepository.GetByEmail(user.Email);
+        await userService.CreateUser(user, role);
+        var userDb = await userRepository.GetUserByEmail(user.Email);
         userDb = Assert.IsType<User>(userDb);
 
         var loginRequestDto = new LoginRequestDto

@@ -58,21 +58,21 @@ public class RestaurantService : IRestaurantService
         // && Products.Any(x => x.IsActive); //NOSONAR
     }
 
-    public async Task<RestaurantReadDto> Create(RestaurantCreateDto restaurantCreateDto, string restaurantAdminId)
+    public async Task<RestaurantReadDto> CreateRestaurant(RestaurantCreateDto restaurantCreateDto, string restaurantAdminId)
     {
         var restaurant = restaurantCreateDto.Adapt<Restaurant>();
         restaurant.AdminId = restaurantAdminId;
         restaurant.CreationDateTime = _dateTimeProvider.UtcNow;
         restaurant.IsPublished = CanPublish(restaurant);
 
-        await _restaurantRepository.Create(restaurant);
-        var restaurantDb = await _restaurantRepository.GetById(restaurant.Id);
+        await _restaurantRepository.CreateRestaurant(restaurant);
+        var restaurantDb = await _restaurantRepository.GetRestaurantById(restaurant.Id);
         return CreateRestaurantReadDto(restaurantDb);
     }
 
-    public async Task<RestaurantReadDto> GetById(string restaurantId)
+    public async Task<RestaurantReadDto> GetRestaurantById(string restaurantId)
     {
-        var restaurant = await _restaurantRepository.GetById(restaurantId);
+        var restaurant = await _restaurantRepository.GetRestaurantById(restaurantId);
         return CreateRestaurantReadDto(restaurant);
     }
 

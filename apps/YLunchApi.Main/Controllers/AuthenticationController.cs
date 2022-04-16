@@ -63,7 +63,7 @@ public class AuthenticationController : ApplicationControllerBase
     {
         try
         {
-            return Ok(await _userService.GetById(CurrentUserId!));
+            return Ok(await _userService.GetUserById(CurrentUserId!));
         }
         catch (EntityNotFoundException)
         {

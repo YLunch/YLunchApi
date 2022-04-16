@@ -26,9 +26,9 @@ public class OrderService : IOrderService
         _restaurantService = restaurantService;
     }
 
-    public async Task<OrderReadDto> Create(string customerId, string restaurantId, OrderCreateDto orderCreateDto)
+    public async Task<OrderReadDto> CreateOrder(string customerId, string restaurantId, OrderCreateDto orderCreateDto)
     {
-        var restaurant = await _restaurantRepository.GetById(restaurantId);
+        var restaurant = await _restaurantRepository.GetRestaurantById(restaurantId);
         if (!_restaurantService.IsOpenToOrder(restaurant, (DateTime)orderCreateDto.ReservedForDateTime!))
         {
             throw new ReservedForDateTimeOutOfOpenToOrderOpeningTimesException();
@@ -89,14 +89,14 @@ public class OrderService : IOrderService
                                         })
                                         .ToList();
 
-        await _orderRepository.Create(order);
-        var orderDb = await _orderRepository.GetById(order.Id);
+        await _orderRepository.CreateOrder(order);
+        var orderDb = await _orderRepository.GetOrderById(order.Id);
         return orderDb.Adapt<OrderReadDto>();
     }
 
-    public async Task<OrderReadDto> GetByIdForCustomer(string customerId, string orderId)
+    public async Task<OrderReadDto> GetOrderByIdForCustomer(string customerId, string orderId)
     {
-        var order = await _orderRepository.GetById(orderId);
+        var order = await _orderRepository.GetOrderById(orderId);
         if (order.UserId != customerId)
         {
             throw new EntityNotFoundException();
@@ -105,9 +105,9 @@ public class OrderService : IOrderService
         return order.Adapt<OrderReadDto>();
     }
 
-    public async Task<OrderReadDto> GetByIdForRestaurantAdmin(string restaurantAdminId, string orderId)
+    public async Task<OrderReadDto> GetOrderByIdForRestaurantAdmin(string restaurantAdminId, string orderId)
     {
-        var order = await _orderRepository.GetById(orderId);
+        var order = await _orderRepository.GetOrderById(orderId);
 
         var restaurantsOfAdmin = await _restaurantRepository.GetRestaurants(new RestaurantFilter
         {
@@ -125,6 +125,12 @@ public class OrderService : IOrderService
     public async Task<ICollection<OrderReadDto>> GetOrders(OrderFilter orderFilter)
     {
         var orders = await _orderRepository.GetOrders(orderFilter);
+        return orders.Adapt<ICollection<OrderReadDto>>();
+    }
+
+    public async Task<ICollection<OrderReadDto>> AddStatusToOrders(BulkOrderStatusCreateDto bulkOrderStatusCreateDto)
+    {
+        var orders = await _orderRepository.AddStatusToOrders(bulkOrderStatusCreateDto);
         return orders.Adapt<ICollection<OrderReadDto>>();
     }
 }

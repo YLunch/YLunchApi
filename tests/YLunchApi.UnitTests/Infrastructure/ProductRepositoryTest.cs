@@ -33,19 +33,19 @@ public class ProductRepositoryTest : UnitTestFixture
         product1.Name = "product1";
         product1.CreationDateTime = dateTimeProvider.UtcNow;
         product1.RestaurantId = "restaurantId1";
-        await productRepository.Create(product1);
+        await productRepository.CreateProduct(product1);
 
         var product2 = ProductMocks.ProductCreateDto.Adapt<Product>();
         product2.Name = "product2";
         product2.CreationDateTime = dateTimeProvider.UtcNow;
         product2.RestaurantId = "restaurantId1";
-        await productRepository.Create(product2);
+        await productRepository.CreateProduct(product2);
 
         var product3 = ProductMocks.ProductCreateDto.Adapt<Product>();
         product3.Name = "product3";
         product3.CreationDateTime = dateTimeProvider.UtcNow;
         product3.RestaurantId = "restaurantId2";
-        await productRepository.Create(product3);
+        await productRepository.CreateProduct(product3);
 
         // Act
         var products = await productRepository.GetProducts(new ProductFilter { RestaurantId = null });

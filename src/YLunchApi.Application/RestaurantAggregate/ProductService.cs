@@ -26,7 +26,7 @@ public class ProductService : IProductService
         _productTagRepository = productTagRepository;
     }
 
-    public async Task<ProductReadDto> Create(ProductCreateDto productCreateDto, string restaurantId)
+    public async Task<ProductReadDto> CreateProduct(ProductCreateDto productCreateDto, string restaurantId)
     {
         var product = productCreateDto.Adapt<Product>();
         product.RestaurantId = restaurantId;
@@ -37,7 +37,7 @@ public class ProductService : IProductService
                                    {
                                        try
                                        {
-                                           return await _allergenRepository.GetByName(x.Name);
+                                           return await _allergenRepository.GetAllergenByName(x.Name);
                                        }
                                        catch (EntityNotFoundException)
                                        {
@@ -52,7 +52,7 @@ public class ProductService : IProductService
                                      {
                                          try
                                          {
-                                             return await _productTagRepository.GetByName(x.Name);
+                                             return await _productTagRepository.GetProductTagByName(x.Name);
                                          }
                                          catch (EntityNotFoundException)
                                          {
@@ -62,15 +62,15 @@ public class ProductService : IProductService
                                      .Select(t => t.Result)
                                      .ToList();
 
-        await _productRepository.Create(product);
-        var productDb = await _productRepository.GetById(product.Id);
+        await _productRepository.CreateProduct(product);
+        var productDb = await _productRepository.GetProductById(product.Id);
 
         return productDb.Adapt<ProductReadDto>();
     }
 
-    public async Task<ProductReadDto> GetById(string productId)
+    public async Task<ProductReadDto> GetProductById(string productId)
     {
-        var product = await _productRepository.GetById(productId);
+        var product = await _productRepository.GetProductById(productId);
         return product.Adapt<ProductReadDto>();
     }
 

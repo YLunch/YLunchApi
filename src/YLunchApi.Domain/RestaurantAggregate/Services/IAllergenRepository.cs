@@ -4,5 +4,5 @@ namespace YLunchApi.Domain.RestaurantAggregate.Services;
 
 public interface IAllergenRepository
 {
-    Task<Allergen> GetByName(string name);
+    Task<Allergen> GetAllergenByName(string name);
 }

@@ -23,7 +23,7 @@ public class UserRepository : IUserRepository
         _roleManager = roleManager;
     }
 
-    public async Task Create(User user, string password, string role)
+    public async Task CreateUser(User user, string password, string role)
     {
         var result = await _userManager.CreateAsync(user, password);
         var success = result.Succeeded;
@@ -44,14 +44,14 @@ public class UserRepository : IUserRepository
         if (!success) throw new UserRegistrationException();
     }
 
-    public async Task<User?> GetByEmail(string email)
+    public async Task<User?> GetUserByEmail(string email)
     {
         return await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
     }
 
-    public async Task<User?> GetByEmailAndPassword(string email, string password)
+    public async Task<User?> GetUserByEmailAndPassword(string email, string password)
     {
-        var user = await GetByEmail(email);
+        var user = await GetUserByEmail(email);
         if (user == null || !await _userManager.CheckPasswordAsync(user, password)) return null;
 
         return user;
@@ -63,7 +63,7 @@ public class UserRepository : IUserRepository
         return iListRoles.ToList();
     }
 
-    public async Task<User?> GetById(string id)
+    public async Task<User?> GetUserById(string id)
     {
         return await _context.Users.FindAsync(id);
     }
