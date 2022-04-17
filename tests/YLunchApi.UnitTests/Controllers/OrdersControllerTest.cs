@@ -895,5 +895,99 @@ public class OrdersControllerTest : UnitTestFixture
         responseBody.Should().BeEquivalentTo(new ErrorDto(HttpStatusCode.NotFound, $"Orders: {string.Join(" and ", new SortedSet<string> { notExistingOrderId1, notExistingOrderId2 })} not found."));
     }
 
+    [Fact]
+    public async Task AddStatusToOrders_Should_Return_A_404NotFound_When_An_Order_Is_Not_For_The_Restaurant()
+    {
+        // Arrange
+        var dateTime = DateTimeMocks.Monday20220321T1000Utc;
+
+        var restaurantCreateDto1 = RestaurantMocks.PrepareFullRestaurant("restaurant1", dateTime);
+        var restaurant1 = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, restaurantCreateDto1, dateTime);
+
+        var restaurantCreateDto2 = RestaurantMocks.PrepareFullRestaurant("restaurant2", dateTime);
+        var restaurant2 = await CreateRestaurant(TokenMocks.ValidRestaurantAdmin2AccessToken, restaurantCreateDto2, dateTime);
+
+        var productCreateDto1 = ProductMocks.ProductCreateDto;
+        productCreateDto1.Name = "product1";
+        var product1 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant1.Id, productCreateDto1, dateTime);
+
+        var productCreateDto2 = ProductMocks.ProductCreateDto;
+        productCreateDto2.Name = "product2";
+        var product2 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant1.Id, productCreateDto2, dateTime);
+
+        var productCreateDto3 = ProductMocks.ProductCreateDto;
+        productCreateDto3.Name = "product3";
+        var product3 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant1.Id, productCreateDto3, dateTime);
+
+        var productCreateDto4 = ProductMocks.ProductCreateDto;
+        productCreateDto4.Name = "product4";
+        var product4 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant2.Id, productCreateDto4, dateTime);
+
+        var productCreateDto5 = ProductMocks.ProductCreateDto;
+        productCreateDto5.Name = "product5";
+        var product5 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant2.Id, productCreateDto5, dateTime);
+
+        var order1 = await CreateOrder(TokenMocks.ValidCustomerAccessToken, restaurant1.Id, dateTime, new OrderCreateDto
+        {
+            CustomerComment = "Customer comment1",
+            ReservedForDateTime = dateTime.AddHours(1),
+            ProductIds = new List<string>
+            {
+                product1.Id,
+                product2.Id,
+                product3.Id
+            }
+        });
+
+        var order2 = await CreateOrder(TokenMocks.ValidCustomerAccessToken, restaurant2.Id, dateTime, new OrderCreateDto
+        {
+            CustomerComment = "Customer comment2",
+            ReservedForDateTime = dateTime.AddHours(1),
+            ProductIds = new List<string>
+            {
+                product4.Id,
+                product5.Id,
+            }
+        });
+
+        var order3 = await CreateOrder(TokenMocks.ValidCustomerAccessToken, restaurant1.Id, dateTime, new OrderCreateDto
+        {
+            CustomerComment = "Customer comment3",
+            ReservedForDateTime = dateTime.AddHours(1),
+            ProductIds = new List<string>
+            {
+                product1.Id,
+                product2.Id,
+                product3.Id
+            }
+        });
+
+        var order4 = await CreateOrder(TokenMocks.ValidCustomerAccessToken, restaurant2.Id, dateTime, new OrderCreateDto
+        {
+            CustomerComment = "Customer comment4",
+            ReservedForDateTime = dateTime.AddHours(1),
+            ProductIds = new List<string>
+            {
+                product4.Id,
+                product5.Id,
+            }
+        });
+
+        var ordersController = InitOrdersController(TokenMocks.ValidRestaurantAdminAccessToken, dateTime);
+
+        // Act
+        var response = await ordersController.AddStatusToOrders(restaurant1.Id, new AddOrderStatusToMultipleOrdersDto
+        {
+            OrderIds = new SortedSet<string> { order1.Id, order2.Id, order3.Id, order4.Id },
+            OrderState = OrderState.Acknowledged
+        });
+
+        // Assert
+        var responseResult = Assert.IsType<NotFoundObjectResult>(response.Result);
+        var responseBody = Assert.IsType<ErrorDto>(responseResult.Value);
+
+        responseBody.Should().BeEquivalentTo(new ErrorDto(HttpStatusCode.NotFound, $"Orders: {string.Join(" and ", new SortedSet<string> { order2.Id, order4.Id })} not found."));
+    }
+
     #endregion
 }
