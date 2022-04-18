@@ -4,7 +4,7 @@ using YLunchApi.Domain.RestaurantAggregate.Models.Enums;
 
 namespace YLunchApi.Domain.RestaurantAggregate.Dto;
 
-public class AddOrderStatusToMultipleOrdersDto
+public class AddStatusToOrdersDto
 {
     [Required] [ListOfId] public SortedSet<string>? OrderIds { get; set; }
 

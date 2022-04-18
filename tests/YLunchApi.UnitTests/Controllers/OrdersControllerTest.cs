@@ -718,7 +718,7 @@ public class OrdersControllerTest : UnitTestFixture
         var ordersController = InitOrdersController(TokenMocks.ValidRestaurantAdminAccessToken, dateTime);
 
         // Act
-        var response = await ordersController.AddStatusToOrders(restaurant.Id, new AddOrderStatusToMultipleOrdersDto
+        var response = await ordersController.AddStatusToOrders(restaurant.Id, new AddStatusToOrdersDto
         {
             OrderIds = new SortedSet<string> { order1.Id, order3.Id },
             OrderState = OrderState.Acknowledged
@@ -806,7 +806,7 @@ public class OrdersControllerTest : UnitTestFixture
         var notExistingRestaurantId = Guid.NewGuid().ToString();
 
         // Act
-        var response = await ordersController.AddStatusToOrders(notExistingRestaurantId, new AddOrderStatusToMultipleOrdersDto
+        var response = await ordersController.AddStatusToOrders(notExistingRestaurantId, new AddStatusToOrdersDto
         {
             OrderIds = new SortedSet<string> { order1.Id, order3.Id },
             OrderState = OrderState.Acknowledged
@@ -882,7 +882,7 @@ public class OrdersControllerTest : UnitTestFixture
         var notExistingOrderId2 = Guid.NewGuid().ToString();
 
         // Act
-        var response = await ordersController.AddStatusToOrders(restaurant.Id, new AddOrderStatusToMultipleOrdersDto
+        var response = await ordersController.AddStatusToOrders(restaurant.Id, new AddStatusToOrdersDto
         {
             OrderIds = new SortedSet<string> { order1.Id, notExistingOrderId1, order3.Id, notExistingOrderId2 },
             OrderState = OrderState.Acknowledged
@@ -976,7 +976,7 @@ public class OrdersControllerTest : UnitTestFixture
         var ordersController = InitOrdersController(TokenMocks.ValidRestaurantAdminAccessToken, dateTime);
 
         // Act
-        var response = await ordersController.AddStatusToOrders(restaurant1.Id, new AddOrderStatusToMultipleOrdersDto
+        var response = await ordersController.AddStatusToOrders(restaurant1.Id, new AddStatusToOrdersDto
         {
             OrderIds = new SortedSet<string> { order1.Id, order2.Id, order3.Id, order4.Id },
             OrderState = OrderState.Acknowledged

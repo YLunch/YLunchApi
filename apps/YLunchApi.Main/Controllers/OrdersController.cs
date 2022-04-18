@@ -83,12 +83,12 @@ public class OrdersController : ApplicationControllerBase
 
     [HttpPost("restaurants/{restaurantId}/orders/statuses")]
     [Authorize(Roles = Roles.RestaurantAdmin)]
-    public async Task<ActionResult<ICollection<OrderReadDto>>> AddStatusToOrders([FromRoute] string restaurantId, [FromBody] AddOrderStatusToMultipleOrdersDto addOrderStatusToMultipleOrdersDto)
+    public async Task<ActionResult<ICollection<OrderReadDto>>> AddStatusToOrders([FromRoute] string restaurantId, [FromBody] AddStatusToOrdersDto addStatusToOrdersDto)
     {
         try
         {
             await _restaurantService.GetRestaurantById(restaurantId);
-            var ordersReadDto = await _orderService.AddStatusToOrders(restaurantId, addOrderStatusToMultipleOrdersDto);
+            var ordersReadDto = await _orderService.AddStatusToOrders(restaurantId, addStatusToOrdersDto);
             return Ok(ordersReadDto);
         }
         catch (EntityNotFoundException exception)

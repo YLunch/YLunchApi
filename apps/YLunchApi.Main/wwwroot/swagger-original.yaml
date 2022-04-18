@@ -899,7 +899,7 @@ paths:
                     title: "One or more validation errors occurred."
                     statusCode: 400
                     errors:
-                      Name: [ "The ProductIds field is required." ]
+                      ProductIds: [ "The ProductIds field is required." ]
                 Other:
                   value:
                     title: "BadRequest"
@@ -944,12 +944,12 @@ paths:
                     statusCode: 404
                     errors:
                       reasons: [ "Restaurant: a00000e0-aaa0-000a-0000-00e00aa00e00 not found." ]
-                ProductNotFound:
+                ProductsNotFound:
                   value:
                     title: "NotFound"
                     statusCode: 404
                     errors:
-                      reasons: [ "Product: a00000e0-aaa0-000a-0000-00e00aa00e00 not found." ]
+                      reasons: [ "Products: a00000e0-aaa0-000a-0000-00e00aa00e00 and b11111f1-bbb1-111b-1111-11f11bb11f11 not found." ]
     get:
       tags:
         - orders
@@ -1106,6 +1106,102 @@ paths:
                 statusCode: 404
                 errors:
                   reasons: [ "Order: a00000e0-aaa0-000a-0000-00e00aa00e00 not found." ]
+  /restaurants/{restaurantId}/orders/statuses:
+    post:
+      tags:
+        - orders
+      summary: Add status to multiple ordeers
+      description: |
+        - Authorization header: **yes**
+        - Granted roles:
+          - RestaurantAdmin
+      operationId: addStatusToOrders
+      parameters:
+        - in: path
+          name: restaurantId
+          required: true
+          description: The id of the restaurant to which belong the orders you want to add a status
+          schema:
+            type: string
+      requestBody:
+        description: Array of id of orders plus the state you want to add to them
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddStatusToOrdersDto'
+      responses:
+        '201':
+          description: updated orders with the new status as the current one
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderReadDto'
+        '400':
+          description: |
+            Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              examples:
+                ValidationError:
+                  value:
+                    title: "One or more validation errors occurred."
+                    statusCode: 400
+                    errors:
+                      OrderIds: [ "The OrderIds field is required." ]
+                Other:
+                  value:
+                    title: "BadRequest"
+                    statusCode: 400
+                    errors:
+                      reasons: [ "Something went wrong, please try again later." ]
+        '401':
+          description: |
+            Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "Unauthorized"
+                statusCode: 401
+                errors:
+                  reasons: [ "Please login and use provided tokens." ]
+        '403':
+          description: |
+            Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "Forbidden"
+                statusCode: 403
+                errors:
+                  reasons: [ "User has not granted roles." ]
+        '404':
+          description: |
+            Not found:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              examples:
+                RestaurantNotFound:
+                  value:
+                    title: "NotFound"
+                    statusCode: 404
+                    errors:
+                      reasons: [ "Restaurant: a00000e0-aaa0-000a-0000-00e00aa00e00 not found." ]
+                OrdersNotFound:
+                  value:
+                    title: "NotFound"
+                    statusCode: 404
+                    errors:
+                      reasons: [ "Orders: a00000e0-aaa0-000a-0000-00e00aa00e00 and b11111f1-bbb1-111b-1111-11f11bb11f11 not found." ]
 components:
   schemas:
     MessageDto:
@@ -1756,6 +1852,30 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/OrderedProductReadDto'
+    AddStatusToOrdersDto:
+      type: object
+      properties:
+        OrderIds:
+          type: array
+          items:
+            type: string
+          example: [ a00000e0-aaa0-000a-0000-00e00aa00e00, b11111f1-bbb1-111b-1111-11f11bb11f11 ]
+        OrderState:
+          type: number
+          example: 1
+          description: |
+            One of:
+            - `0`: Idling,
+            - `1`: Acknowledged,
+            - `2`: InPreparation,
+            - `3`: Ready,
+            - `4`: Delivered,
+            - `5`: Other,
+            - `6`: Cancelled,
+            - `7`: Rejected
+      required:
+        - OrderIds
+        - OrderState
   securitySchemes:
     Bearer:
       type: http

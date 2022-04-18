@@ -138,9 +138,9 @@ public class OrderService : IOrderService
         return orders.Adapt<ICollection<OrderReadDto>>();
     }
 
-    public async Task<ICollection<OrderReadDto>> AddStatusToOrders(string restaurantId, AddOrderStatusToMultipleOrdersDto addOrderStatusToMultipleOrdersDto)
+    public async Task<ICollection<OrderReadDto>> AddStatusToOrders(string restaurantId, AddStatusToOrdersDto addStatusToOrdersDto)
     {
-        var orders = await _orderRepository.AddStatusToOrders(restaurantId, addOrderStatusToMultipleOrdersDto.OrderIds!, (OrderState)addOrderStatusToMultipleOrdersDto.OrderState!);
+        var orders = await _orderRepository.AddStatusToOrders(restaurantId, addStatusToOrdersDto.OrderIds!, (OrderState)addStatusToOrdersDto.OrderState!);
         return orders.Adapt<ICollection<OrderReadDto>>();
     }
 }
