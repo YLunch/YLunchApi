@@ -979,6 +979,20 @@ paths:
           schema:
             type: number
         - in: query
+          name: minCreationDateTime
+          required: false
+          schema:
+            type: string
+            example: "2021-12-31T00:00:00.000000"
+          description: The minimum date of filtered orders creation date time.
+        - in: query
+          name: maxCreationDateTime
+          required: false
+          schema:
+            type: string
+            example: "2021-12-31T00:00:00.000000"
+          description: The maximum date of filtered orders creation date time.
+        - in: query
           name: orderStates
           required: false
           explode: true

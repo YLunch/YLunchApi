@@ -115,7 +115,7 @@ public class OrderRepository : IOrderRepository
         return order;
     }
 
-    private ICollection<Order> FormatOrders(List<Order> orders) =>
+    private static ICollection<Order> FormatOrders(List<Order> orders) =>
         orders.Select(FormatOrder)
               .OrderBy(x => x.CreationDateTime)
               .ToList();
