@@ -43,12 +43,11 @@ public class OrderRepository : IOrderRepository
                     .Skip((orderFilter.Page - 1) * orderFilter.Size)
                     .Take(orderFilter.Size);
         query = FilterByRestaurantId(query, orderFilter.RestaurantId);
+        query = FilterByDate(query, orderFilter.MinCreationDateTime, orderFilter.MaxCreationDateTime);
         query = FilterByCurrentOrderState(query, orderFilter.OrderStates);
 
         var orders = await query.ToListAsync();
-        return orders.Select(FormatOrder)
-                     .OrderBy(x => x.CreationDateTime)
-                     .ToList();
+        return FormatOrders(orders);
     }
 
     public async Task<ICollection<Order>> AddStatusToOrders(string restaurantId, SortedSet<string> orderIds, OrderState orderState)
@@ -74,7 +73,7 @@ public class OrderRepository : IOrderRepository
         }
 
         await _context.SaveChangesAsync();
-        return orders;
+        return FormatOrders(orders);
     }
 
     private IQueryable<Order> OrdersQueryBase =>
@@ -87,6 +86,17 @@ public class OrderRepository : IOrderRepository
         {
             null => query,
             _ => query.Where(x => x.RestaurantId == restaurantId)
+        };
+
+    private static IQueryable<Order> FilterByDate(IQueryable<Order> query, DateTime? minCreationDateTime, DateTime? maxCreationDateTime) =>
+        (minDateTime: minCreationDateTime, maxDateTime: maxCreationDateTime) switch
+        {
+            (null, null) => query,
+            ({ }, null) => query.Where(x => x.CreationDateTime.Date >= ((DateTime)minCreationDateTime).Date),
+            (null, { }) => query.Where(x => x.CreationDateTime.Date <= ((DateTime)maxCreationDateTime).Date),
+            ({ }, { }) => query.Where(x =>
+                x.CreationDateTime.Date >= ((DateTime)minCreationDateTime).Date &&
+                x.CreationDateTime.Date <= ((DateTime)maxCreationDateTime).Date)
         };
 
     private static IQueryable<Order> FilterByCurrentOrderState(IQueryable<Order> query, SortedSet<OrderState>? orderStates) =>
@@ -104,4 +114,9 @@ public class OrderRepository : IOrderRepository
         order.OrderedProducts = order.OrderedProducts.OrderBy(x => x.ProductType).ToList();
         return order;
     }
+
+    private ICollection<Order> FormatOrders(List<Order> orders) =>
+        orders.Select(FormatOrder)
+              .OrderBy(x => x.CreationDateTime)
+              .ToList();
 }

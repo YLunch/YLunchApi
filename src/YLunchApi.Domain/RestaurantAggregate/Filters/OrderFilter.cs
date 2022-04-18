@@ -13,4 +13,6 @@ public class OrderFilter
 
     public string? RestaurantId { get; set; }
     public SortedSet<OrderState>? OrderStates { get; set; }
+    public DateTime? MinCreationDateTime { get; set; }
+    public DateTime? MaxCreationDateTime { get; set; }
 }
