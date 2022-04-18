@@ -958,11 +958,140 @@ paths:
         - Authorization header: **yes**
         - Granted roles:
           - RestaurantAdmin
-      operationId: getOrders
+      operationId: getOrdersOfRestaurant
       parameters:
         - in: path
           name: restaurantId
           required: true
+          description: The id of the restaurant you want to get the orders.
+          schema:
+            type: string
+        - in: query
+          name: customerId
+          required: false
+          description: The id of the customer you want to get the orders.
+          schema:
+            type: string
+        - in: query
+          name: page
+          required: false
+          description: The page you want within 1 and 10 000. Default 1.
+          schema:
+            type: number
+        - in: query
+          name: size
+          required: false
+          description: The size you want within 1 and 50. Default 50.
+          schema:
+            type: number
+        - in: query
+          name: minCreationDateTime
+          required: false
+          schema:
+            type: string
+            example: "2021-12-31T00:00:00.000000"
+          description: The minimum date of filtered orders creation date time.
+        - in: query
+          name: maxCreationDateTime
+          required: false
+          schema:
+            type: string
+            example: "2021-12-31T00:00:00.000000"
+          description: The maximum date of filtered orders creation date time.
+        - in: query
+          name: orderStates
+          required: false
+          explode: true
+          description: |
+            To filter the orders having their current state matching one of this `set` of states.  
+            Repeat this parameter for multiple to filter on multiple states.  
+            Duplicates will be ignored.  
+            One of:
+              - `0`: Idling,
+              - `1`: Acknowledged,
+              - `2`: InPreparation,
+              - `3`: Ready,
+              - `4`: Delivered,
+              - `5`: Other,
+              - `6`: Cancelled,
+              - `7`: Rejected
+          schema:
+            type: array
+            items:
+              type: number
+      responses:
+        '200':
+          description: |
+            Success
+            - The orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderReadDto'
+        '400':
+          description: |
+            Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "BadRequest"
+                statusCode: 400
+                errors:
+                  reasons: [ "Something went wrong, please try again later." ]
+        '401':
+          description: |
+            Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "Unauthorized"
+                statusCode: 401
+                errors:
+                  reasons: [ "Please login and use provided tokens." ]
+        '403':
+          description: |
+            Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "Forbidden"
+                statusCode: 403
+                errors:
+                  reasons: [ "User has not granted roles." ]
+        '404':
+          description: |
+            Not found:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "NotFound"
+                statusCode: 404
+                errors:
+                  reasons: [ "Restaurant: a00000e0-aaa0-000a-0000-00e00aa00e00 not found." ]
+  /orders:
+    get:
+      tags:
+        - orders
+      summary: Gets orders
+      description: |
+        - Authorization header: **yes**
+        - Granted roles:
+          - Customer
+      operationId: getOrdersOfCurrentCustomer
+      parameters:
+        - in: query
+          name: restaurantId
+          required: false
           description: The id of the restaurant you want to get the orders.
           schema:
             type: string

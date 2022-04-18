@@ -43,6 +43,7 @@ public class OrderRepository : IOrderRepository
                     .Skip((orderFilter.Page - 1) * orderFilter.Size)
                     .Take(orderFilter.Size);
         query = FilterByRestaurantId(query, orderFilter.RestaurantId);
+        query = FilterByCustomerId(query, orderFilter.CustomerId);
         query = FilterByDate(query, orderFilter.MinCreationDateTime, orderFilter.MaxCreationDateTime);
         query = FilterByCurrentOrderState(query, orderFilter.OrderStates);
 
@@ -86,6 +87,13 @@ public class OrderRepository : IOrderRepository
         {
             null => query,
             _ => query.Where(x => x.RestaurantId == restaurantId)
+        };
+
+    private static IQueryable<Order> FilterByCustomerId(IQueryable<Order> query, string? customerId) =>
+        customerId switch
+        {
+            null => query,
+            _ => query.Where(x => x.UserId == customerId)
         };
 
     private static IQueryable<Order> FilterByDate(IQueryable<Order> query, DateTime? minCreationDateTime, DateTime? maxCreationDateTime) =>

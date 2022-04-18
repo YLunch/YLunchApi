@@ -544,7 +544,7 @@ public class OrdersControllerTest : UnitTestFixture
     #region GetOrdersTests
 
     [Fact]
-    public async Task GetOrdersByRestaurantId_Should_Return_A_200Ok_With_Correct_Orders()
+    public async Task GetOrdersOfRestaurant_Should_Return_A_200Ok_With_Correct_Orders()
     {
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
@@ -639,7 +639,7 @@ public class OrdersControllerTest : UnitTestFixture
         orders.Add(order4);
 
         // Act
-        var response = await ordersController.GetOrdersByRestaurantId(restaurant1.Id);
+        var response = await ordersController.GetOrdersOfRestaurant(restaurant1.Id);
 
         // Assert
         var responseResult = Assert.IsType<OkObjectResult>(response.Result);
@@ -658,7 +658,7 @@ public class OrdersControllerTest : UnitTestFixture
     }
 
     [Fact]
-    public async Task GetOrdersByRestaurantId_Should_Return_A_200Ok_With_Correct_Filtered_By_State_Orders()
+    public async Task GetOrdersOfRestaurant_Should_Return_A_200Ok_With_Correct_Filtered_By_State_Orders()
     {
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
@@ -765,7 +765,7 @@ public class OrdersControllerTest : UnitTestFixture
         var orders = Assert.IsType<List<OrderReadDto>>(addStatusToOrdersResponseResult.Value);
 
         // Act
-        var response = await ordersController.GetOrdersByRestaurantId(restaurant1.Id, new OrderFilter
+        var response = await ordersController.GetOrdersOfRestaurant(restaurant1.Id, new OrderFilter
         {
             OrderStates = new SortedSet<OrderState> { OrderState.Acknowledged }
         });
@@ -787,7 +787,7 @@ public class OrdersControllerTest : UnitTestFixture
     }
 
     [Fact]
-    public async Task GetOrdersByRestaurantId_Should_Return_A_200Ok_With_Correct_Filtered_By_MinCreationDateTime_Orders()
+    public async Task GetOrdersOfRestaurant_Should_Return_A_200Ok_With_Correct_Filtered_By_MinCreationDateTime_Orders()
     {
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
@@ -900,7 +900,7 @@ public class OrdersControllerTest : UnitTestFixture
         };
 
         // Act
-        var response = await ordersController.GetOrdersByRestaurantId(restaurant1.Id, new OrderFilter
+        var response = await ordersController.GetOrdersOfRestaurant(restaurant1.Id, new OrderFilter
         {
             OrderStates = new SortedSet<OrderState> { OrderState.Acknowledged },
             MinCreationDateTime = dateTime
@@ -923,7 +923,7 @@ public class OrdersControllerTest : UnitTestFixture
     }
 
     [Fact]
-    public async Task GetOrdersByRestaurantId_Should_Return_A_200Ok_With_Correct_Filtered_By_MaxCreationDateTime_Orders()
+    public async Task GetOrdersOfRestaurant_Should_Return_A_200Ok_With_Correct_Filtered_By_MaxCreationDateTime_Orders()
     {
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
@@ -1030,7 +1030,7 @@ public class OrdersControllerTest : UnitTestFixture
         var orders = Assert.IsType<List<OrderReadDto>>(addStatusToOrdersResponseResult.Value);
 
         // Act
-        var response = await ordersController.GetOrdersByRestaurantId(restaurant1.Id, new OrderFilter
+        var response = await ordersController.GetOrdersOfRestaurant(restaurant1.Id, new OrderFilter
         {
             OrderStates = new SortedSet<OrderState> { OrderState.Acknowledged },
             MaxCreationDateTime = dateTime.AddDays(-1)
@@ -1053,7 +1053,7 @@ public class OrdersControllerTest : UnitTestFixture
     }
 
     [Fact]
-    public async Task GetOrdersByRestaurantId_Should_Return_A_200Ok_With_Correct_Filtered_By_MinCreationDateTime_And_MaxCreationDateTime_Orders()
+    public async Task GetOrdersOfRestaurant_Should_Return_A_200Ok_With_Correct_Filtered_By_MinCreationDateTime_And_MaxCreationDateTime_Orders()
     {
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
@@ -1160,7 +1160,7 @@ public class OrdersControllerTest : UnitTestFixture
         var orders = Assert.IsType<List<OrderReadDto>>(addStatusToOrdersResponseResult.Value);
 
         // Act
-        var response = await ordersController.GetOrdersByRestaurantId(restaurant1.Id, new OrderFilter
+        var response = await ordersController.GetOrdersOfRestaurant(restaurant1.Id, new OrderFilter
         {
             OrderStates = new SortedSet<OrderState> { OrderState.Acknowledged },
             MinCreationDateTime = dateTime.AddDays(-1),
@@ -1184,7 +1184,173 @@ public class OrdersControllerTest : UnitTestFixture
     }
 
     [Fact]
-    public async Task GetOrdersByRestaurantId_Should_Return_A_404NotFound_When_Restaurant_Is_Not_Found()
+    public async Task GetOrdersOfRestaurant_Should_Return_A_200Ok_With_Correct_Filtered_By_Customer_Orders()
+    {
+        // Arrange
+        var dateTime = DateTimeMocks.Monday20220321T1000Utc;
+
+        var restaurantCreateDto1 = RestaurantMocks.PrepareFullRestaurant("restaurant1", dateTime);
+        var restaurant1 = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, restaurantCreateDto1, dateTime);
+
+        var restaurantCreateDto2 = RestaurantMocks.PrepareFullRestaurant("restaurant2", dateTime);
+        var restaurant2 = await CreateRestaurant(TokenMocks.ValidRestaurantAdmin2AccessToken, restaurantCreateDto2, dateTime);
+
+        var productCreateDto1 = ProductMocks.ProductCreateDto;
+        productCreateDto1.Name = "product1";
+        var product1 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant1.Id, productCreateDto1, dateTime);
+
+        var productCreateDto2 = ProductMocks.ProductCreateDto;
+        productCreateDto2.Name = "product2";
+        var product2 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant1.Id, productCreateDto2, dateTime);
+
+        var productCreateDto3 = ProductMocks.ProductCreateDto;
+        productCreateDto3.Name = "product3";
+        var product3 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant1.Id, productCreateDto3, dateTime);
+
+        var productCreateDto4 = ProductMocks.ProductCreateDto;
+        productCreateDto4.Name = "product4";
+        var product4 = await CreateProduct(TokenMocks.ValidRestaurantAdmin2AccessToken, restaurant2.Id, productCreateDto4, dateTime);
+
+        var productCreateDto5 = ProductMocks.ProductCreateDto;
+        productCreateDto5.Name = "product5";
+        var product5 = await CreateProduct(TokenMocks.ValidRestaurantAdmin2AccessToken, restaurant2.Id, productCreateDto5, dateTime);
+
+        await CreateOrder(TokenMocks.ValidCustomerAccessToken, restaurant1.Id, dateTime, new OrderCreateDto
+        {
+            CustomerComment = "Customer comment1",
+            ReservedForDateTime = dateTime.AddHours(1),
+            ProductIds = new List<string>
+            {
+                product1.Id,
+                product2.Id,
+                product3.Id
+            }
+        });
+
+        await CreateOrder(TokenMocks.ValidCustomerAccessToken, restaurant2.Id, dateTime, new OrderCreateDto
+        {
+            CustomerComment = "Customer comment2",
+            ReservedForDateTime = dateTime.AddHours(1),
+            ProductIds = new List<string>
+            {
+                product4.Id,
+                product5.Id,
+            }
+        });
+
+        await CreateOrder(TokenMocks.ValidCustomerAccessToken, restaurant1.Id, dateTime, new OrderCreateDto
+        {
+            CustomerComment = "Customer comment3",
+            ReservedForDateTime = dateTime.AddHours(1),
+            ProductIds = new List<string>
+            {
+                product1.Id,
+                product2.Id,
+                product3.Id
+            }
+        });
+
+        await CreateOrder(TokenMocks.ValidCustomerAccessToken, restaurant1.Id, dateTime, new OrderCreateDto
+        {
+            CustomerComment = "Customer comment4",
+            ReservedForDateTime = dateTime.AddDays(-1).AddHours(1),
+            ProductIds = new List<string>
+            {
+                product1.Id,
+                product2.Id,
+                product3.Id
+            }
+        });
+
+        var order5 = await CreateOrder(TokenMocks.ValidCustomer2AccessToken, restaurant1.Id, dateTime, new OrderCreateDto
+        {
+            CustomerComment = "Customer comment5",
+            ReservedForDateTime = dateTime.AddHours(1),
+            ProductIds = new List<string>
+            {
+                product1.Id,
+                product2.Id,
+                product3.Id
+            }
+        });
+
+        await CreateOrder(TokenMocks.ValidCustomer2AccessToken, restaurant2.Id, dateTime, new OrderCreateDto
+        {
+            CustomerComment = "Customer comment6",
+            ReservedForDateTime = dateTime.AddHours(1),
+            ProductIds = new List<string>
+            {
+                product4.Id,
+                product5.Id,
+            }
+        });
+
+        var order7 = await CreateOrder(TokenMocks.ValidCustomer2AccessToken, restaurant1.Id, dateTime, new OrderCreateDto
+        {
+            CustomerComment = "Customer comment7",
+            ReservedForDateTime = dateTime.AddHours(1),
+            ProductIds = new List<string>
+            {
+                product1.Id,
+                product2.Id,
+                product3.Id
+            }
+        });
+
+        await CreateOrder(TokenMocks.ValidCustomer2AccessToken, restaurant1.Id, dateTime, new OrderCreateDto
+        {
+            CustomerComment = "Customer comment8",
+            ReservedForDateTime = dateTime.AddHours(1),
+            ProductIds = new List<string>
+            {
+                product1.Id,
+                product2.Id,
+                product3.Id
+            }
+        });
+
+        var ordersController = InitOrdersController(TokenMocks.ValidRestaurantAdminAccessToken, dateTime);
+
+        var addStatusToOrdersResponse = await ordersController.AddStatusToOrders(restaurant1.Id, new AddStatusToOrdersDto
+        {
+            OrderIds = new SortedSet<string>
+            {
+                order5.Id,
+                order7.Id
+            },
+            OrderState = OrderState.Acknowledged
+        });
+
+        var addStatusToOrdersResponseResult = Assert.IsType<OkObjectResult>(addStatusToOrdersResponse.Result);
+        var orders = Assert.IsType<List<OrderReadDto>>(addStatusToOrdersResponseResult.Value);
+
+        // Act
+        var response = await ordersController.GetOrdersOfRestaurant(restaurant1.Id, new OrderFilter
+        {
+            OrderStates = new SortedSet<OrderState> { OrderState.Acknowledged },
+            MinCreationDateTime = dateTime,
+            MaxCreationDateTime = dateTime,
+            CustomerId = new ApplicationSecurityToken(TokenMocks.ValidCustomer2AccessToken).UserId
+        });
+
+        // Assert
+        var responseResult = Assert.IsType<OkObjectResult>(response.Result);
+        var responseBody = Assert.IsType<List<OrderReadDto>>(responseResult.Value);
+        responseBody.Count.Should().Be(2);
+
+        for (var i = 0; i < responseBody.Count; i++)
+        {
+            responseBody[i].CurrentOrderStatus.Id.Should().MatchRegex(GuidUtils.Regex);
+            responseBody[i].CurrentOrderStatus.OrderId.Should().Be(orders[i].Id);
+            responseBody[i].CurrentOrderStatus.State.Should().Be(orders[i].OrderStatuses.Last().State);
+            responseBody[i].CurrentOrderStatus.DateTime.Should().BeCloseTo(dateTime, TimeSpan.FromSeconds(5));
+
+            responseBody[i].OrderStatuses.Should().BeEquivalentTo(orders[i].OrderStatuses);
+        }
+    }
+
+    [Fact]
+    public async Task GetOrdersOfRestaurant_Should_Return_A_404NotFound_When_Restaurant_Is_Not_Found()
     {
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
@@ -1194,7 +1360,210 @@ public class OrdersControllerTest : UnitTestFixture
         var restaurantId = Guid.NewGuid().ToString();
 
         // Act
-        var response = await ordersController.GetOrdersByRestaurantId(restaurantId);
+        var response = await ordersController.GetOrdersOfRestaurant(restaurantId);
+
+        // Assert
+        var responseResult = Assert.IsType<NotFoundObjectResult>(response.Result);
+        var responseBody = Assert.IsType<ErrorDto>(responseResult.Value);
+        responseBody.Should()
+                    .BeEquivalentTo(new ErrorDto(HttpStatusCode.NotFound,
+                        $"Restaurant: {restaurantId} not found."));
+    }
+
+    [Fact]
+    public async Task GetOrdersOfCurrentCustomer_Should_Return_A_200Ok_With_Correct_Filtered_Orders()
+    {
+        // Arrange
+        var dateTime = DateTimeMocks.Monday20220321T1000Utc;
+
+        var restaurantCreateDto1 = RestaurantMocks.PrepareFullRestaurant("restaurant1", dateTime);
+        var restaurant1 = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, restaurantCreateDto1, dateTime);
+
+        var restaurantCreateDto2 = RestaurantMocks.PrepareFullRestaurant("restaurant2", dateTime);
+        var restaurant2 = await CreateRestaurant(TokenMocks.ValidRestaurantAdmin2AccessToken, restaurantCreateDto2, dateTime);
+
+        var productCreateDto1 = ProductMocks.ProductCreateDto;
+        productCreateDto1.Name = "product1";
+        var product1 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant1.Id, productCreateDto1, dateTime);
+
+        var productCreateDto2 = ProductMocks.ProductCreateDto;
+        productCreateDto2.Name = "product2";
+        var product2 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant1.Id, productCreateDto2, dateTime);
+
+        var productCreateDto3 = ProductMocks.ProductCreateDto;
+        productCreateDto3.Name = "product3";
+        var product3 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant1.Id, productCreateDto3, dateTime);
+
+        var productCreateDto4 = ProductMocks.ProductCreateDto;
+        productCreateDto4.Name = "product4";
+        var product4 = await CreateProduct(TokenMocks.ValidRestaurantAdmin2AccessToken, restaurant2.Id, productCreateDto4, dateTime);
+
+        var productCreateDto5 = ProductMocks.ProductCreateDto;
+        productCreateDto5.Name = "product5";
+        var product5 = await CreateProduct(TokenMocks.ValidRestaurantAdmin2AccessToken, restaurant2.Id, productCreateDto5, dateTime);
+
+        var order1 = await CreateOrder(TokenMocks.ValidCustomerAccessToken, restaurant1.Id, dateTime, new OrderCreateDto
+        {
+            CustomerComment = "Customer comment1",
+            ReservedForDateTime = dateTime.AddHours(1),
+            ProductIds = new List<string>
+            {
+                product1.Id,
+                product2.Id,
+                product3.Id
+            }
+        });
+
+        var order2 = await CreateOrder(TokenMocks.ValidCustomerAccessToken, restaurant2.Id, dateTime, new OrderCreateDto
+        {
+            CustomerComment = "Customer comment2",
+            ReservedForDateTime = dateTime.AddHours(1),
+            ProductIds = new List<string>
+            {
+                product4.Id,
+                product5.Id,
+            }
+        });
+
+        var order3 = await CreateOrder(TokenMocks.ValidCustomerAccessToken, restaurant1.Id, dateTime, new OrderCreateDto
+        {
+            CustomerComment = "Customer comment3",
+            ReservedForDateTime = dateTime.AddHours(1),
+            ProductIds = new List<string>
+            {
+                product1.Id,
+                product2.Id,
+                product3.Id
+            }
+        });
+
+        await CreateOrder(TokenMocks.ValidCustomerAccessToken, restaurant1.Id, dateTime, new OrderCreateDto
+        {
+            CustomerComment = "Customer comment4",
+            ReservedForDateTime = dateTime.AddDays(-1).AddHours(1),
+            ProductIds = new List<string>
+            {
+                product1.Id,
+                product2.Id,
+                product3.Id
+            }
+        });
+
+        await CreateOrder(TokenMocks.ValidCustomer2AccessToken, restaurant1.Id, dateTime, new OrderCreateDto
+        {
+            CustomerComment = "Customer comment5",
+            ReservedForDateTime = dateTime.AddHours(1),
+            ProductIds = new List<string>
+            {
+                product1.Id,
+                product2.Id,
+                product3.Id
+            }
+        });
+
+        await CreateOrder(TokenMocks.ValidCustomer2AccessToken, restaurant2.Id, dateTime, new OrderCreateDto
+        {
+            CustomerComment = "Customer comment6",
+            ReservedForDateTime = dateTime.AddHours(1),
+            ProductIds = new List<string>
+            {
+                product4.Id,
+                product5.Id,
+            }
+        });
+
+        await CreateOrder(TokenMocks.ValidCustomer2AccessToken, restaurant1.Id, dateTime, new OrderCreateDto
+        {
+            CustomerComment = "Customer comment7",
+            ReservedForDateTime = dateTime.AddHours(1),
+            ProductIds = new List<string>
+            {
+                product1.Id,
+                product2.Id,
+                product3.Id
+            }
+        });
+
+        await CreateOrder(TokenMocks.ValidCustomer2AccessToken, restaurant1.Id, dateTime, new OrderCreateDto
+        {
+            CustomerComment = "Customer comment8",
+            ReservedForDateTime = dateTime.AddHours(1),
+            ProductIds = new List<string>
+            {
+                product1.Id,
+                product2.Id,
+                product3.Id
+            }
+        });
+
+        await InitOrdersController(TokenMocks.ValidRestaurantAdmin2AccessToken, dateTime)
+            .AddStatusToOrders(restaurant2.Id, new AddStatusToOrdersDto
+            {
+                OrderIds = new SortedSet<string>
+                {
+                    order2.Id,
+                },
+                OrderState = OrderState.Acknowledged
+            });
+
+        var addStatusToOrdersResponse = await InitOrdersController(TokenMocks.ValidRestaurantAdminAccessToken, dateTime)
+            .AddStatusToOrders(restaurant1.Id, new AddStatusToOrdersDto
+            {
+                OrderIds = new SortedSet<string>
+                {
+                    order1.Id,
+                    order3.Id
+                },
+                OrderState = OrderState.Acknowledged
+            });
+
+        var addStatusToOrdersResponseResult = Assert.IsType<OkObjectResult>(addStatusToOrdersResponse.Result);
+        var orders = Assert.IsType<List<OrderReadDto>>(addStatusToOrdersResponseResult.Value);
+
+        var ordersController = InitOrdersController(TokenMocks.ValidCustomerAccessToken, dateTime);
+
+        // Act
+        var response = await ordersController.GetOrdersOfCurrentCustomer(new OrderFilter
+        {
+            OrderStates = new SortedSet<OrderState> { OrderState.Acknowledged },
+            MinCreationDateTime = dateTime,
+            MaxCreationDateTime = dateTime,
+            RestaurantId = restaurant1.Id,
+            // Random id. Useless since it's set in the endpoint with the current user id
+            CustomerId = Guid.NewGuid().ToString()
+        });
+
+        // Assert
+        var responseResult = Assert.IsType<OkObjectResult>(response.Result);
+        var responseBody = Assert.IsType<List<OrderReadDto>>(responseResult.Value);
+        responseBody.Count.Should().Be(2);
+
+        for (var i = 0; i < responseBody.Count; i++)
+        {
+            responseBody[i].CurrentOrderStatus.Id.Should().MatchRegex(GuidUtils.Regex);
+            responseBody[i].CurrentOrderStatus.OrderId.Should().Be(orders[i].Id);
+            responseBody[i].CurrentOrderStatus.State.Should().Be(orders[i].OrderStatuses.Last().State);
+            responseBody[i].CurrentOrderStatus.DateTime.Should().BeCloseTo(dateTime, TimeSpan.FromSeconds(5));
+
+            responseBody[i].OrderStatuses.Should().BeEquivalentTo(orders[i].OrderStatuses);
+        }
+    }
+
+    [Fact]
+    public async Task GetOrdersOfCurrentCustomer_Should_Return_A_404NotFound_When_Restaurant_Is_Not_Found()
+    {
+        // Arrange
+        var dateTime = DateTimeMocks.Monday20220321T1000Utc;
+
+        var ordersController = InitOrdersController(TokenMocks.ValidRestaurantAdminAccessToken, dateTime);
+
+        var restaurantId = Guid.NewGuid().ToString();
+
+        // Act
+        var response = await ordersController.GetOrdersOfCurrentCustomer(new OrderFilter
+        {
+            RestaurantId = restaurantId
+        });
 
         // Assert
         var responseResult = Assert.IsType<NotFoundObjectResult>(response.Result);

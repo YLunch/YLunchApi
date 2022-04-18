@@ -12,6 +12,7 @@ public class OrderFilter
     public int Page { get; set; } = 1;
 
     public string? RestaurantId { get; set; }
+    public string? CustomerId { get; set; }
     public SortedSet<OrderState>? OrderStates { get; set; }
     public DateTime? MinCreationDateTime { get; set; }
     public DateTime? MaxCreationDateTime { get; set; }
