@@ -1369,6 +1369,7 @@ public class OrdersControllerTest : UnitTestFixture
                     .BeEquivalentTo(new ErrorDto(HttpStatusCode.NotFound,
                         $"Restaurant: {restaurantId} not found."));
     }
+
     [Fact]
     public async Task GetOrdersOfCurrentCustomer_Should_Return_A_200Ok_With_Correct_Orders()
     {
@@ -1436,7 +1437,7 @@ public class OrdersControllerTest : UnitTestFixture
             }
         });
 
-        var order4 = await CreateOrder(TokenMocks.ValidCustomerAccessToken, restaurant1.Id, dateTime, new OrderCreateDto
+        var order4 = await CreateOrder(TokenMocks.ValidCustomerAccessToken, restaurant1.Id, dateTime.AddDays(-1), new OrderCreateDto
         {
             CustomerComment = "Customer comment4",
             ReservedForDateTime = dateTime.AddDays(-1).AddHours(1),
@@ -1495,17 +1496,7 @@ public class OrdersControllerTest : UnitTestFixture
             }
         });
 
-        await InitOrdersController(TokenMocks.ValidRestaurantAdmin2AccessToken, dateTime)
-            .AddStatusToOrders(restaurant2.Id, new AddStatusToOrdersDto
-            {
-                OrderIds = new SortedSet<string>
-                {
-                    order2.Id
-                },
-                OrderState = OrderState.Acknowledged
-            });
-
-        var addStatusToOrdersResponse = await InitOrdersController(TokenMocks.ValidRestaurantAdminAccessToken, dateTime)
+        var addStatusToOrders1Response = await InitOrdersController(TokenMocks.ValidRestaurantAdminAccessToken, dateTime)
             .AddStatusToOrders(restaurant1.Id, new AddStatusToOrdersDto
             {
                 OrderIds = new SortedSet<string>
@@ -1515,12 +1506,27 @@ public class OrdersControllerTest : UnitTestFixture
                 },
                 OrderState = OrderState.Acknowledged
             });
+        var addStatusToOrders1ResponseResult = Assert.IsType<OkObjectResult>(addStatusToOrders1Response.Result);
+        var orders = Assert.IsType<List<OrderReadDto>>(addStatusToOrders1ResponseResult.Value);
 
-        var addStatusToOrdersResponseResult = Assert.IsType<OkObjectResult>(addStatusToOrdersResponse.Result);
-        var orders = Assert.IsType<List<OrderReadDto>>(addStatusToOrdersResponseResult.Value);
+        var addStatusToOrders2Response = await InitOrdersController(TokenMocks.ValidRestaurantAdmin2AccessToken, dateTime.AddSeconds(1))
+            .AddStatusToOrders(restaurant2.Id, new AddStatusToOrdersDto
+            {
+                OrderIds = new SortedSet<string>
+                {
+                    order2.Id
+                },
+                OrderState = OrderState.Acknowledged
+            });
+        var addStatusToOrders2ResponseResult = Assert.IsType<OkObjectResult>(addStatusToOrders2Response.Result);
+        order2 = Assert.IsType<List<OrderReadDto>>(addStatusToOrders2ResponseResult.Value)[0];
+
         orders.Add(order2);
         orders.Add(order4);
-        orders = orders.OrderBy(x => x.CreationDateTime).ToList();
+        orders = orders
+                 .OrderBy(x => x.CreationDateTime)
+                 .ThenBy(x => x.CurrentOrderStatus.DateTime)
+                 .ToList();
 
         var ordersController = InitOrdersController(TokenMocks.ValidCustomerAccessToken, dateTime);
 
@@ -1537,7 +1543,7 @@ public class OrdersControllerTest : UnitTestFixture
             responseBody[i].CurrentOrderStatus.Id.Should().MatchRegex(GuidUtils.Regex);
             responseBody[i].CurrentOrderStatus.OrderId.Should().Be(orders[i].Id);
             responseBody[i].CurrentOrderStatus.State.Should().Be(orders[i].OrderStatuses.Last().State);
-            responseBody[i].CurrentOrderStatus.DateTime.Should().BeCloseTo(dateTime, TimeSpan.FromSeconds(5));
+            responseBody[i].CurrentOrderStatus.DateTime.Should().BeCloseTo(orders[i].OrderStatuses.Last().DateTime, TimeSpan.FromSeconds(5));
 
             responseBody[i].OrderStatuses.Should().BeEquivalentTo(orders[i].OrderStatuses);
         }
@@ -1669,17 +1675,7 @@ public class OrdersControllerTest : UnitTestFixture
             }
         });
 
-        await InitOrdersController(TokenMocks.ValidRestaurantAdmin2AccessToken, dateTime)
-            .AddStatusToOrders(restaurant2.Id, new AddStatusToOrdersDto
-            {
-                OrderIds = new SortedSet<string>
-                {
-                    order2.Id
-                },
-                OrderState = OrderState.Acknowledged
-            });
-
-        var addStatusToOrdersResponse = await InitOrdersController(TokenMocks.ValidRestaurantAdminAccessToken, dateTime)
+        var addStatusToOrders1Response = await InitOrdersController(TokenMocks.ValidRestaurantAdminAccessToken, dateTime)
             .AddStatusToOrders(restaurant1.Id, new AddStatusToOrdersDto
             {
                 OrderIds = new SortedSet<string>
@@ -1689,11 +1685,26 @@ public class OrdersControllerTest : UnitTestFixture
                 },
                 OrderState = OrderState.Acknowledged
             });
+        var addStatusToOrders1ResponseResult = Assert.IsType<OkObjectResult>(addStatusToOrders1Response.Result);
+        var orders = Assert.IsType<List<OrderReadDto>>(addStatusToOrders1ResponseResult.Value);
 
-        var addStatusToOrdersResponseResult = Assert.IsType<OkObjectResult>(addStatusToOrdersResponse.Result);
-        var orders = Assert.IsType<List<OrderReadDto>>(addStatusToOrdersResponseResult.Value);
+        var addStatusToOrders2Response = await InitOrdersController(TokenMocks.ValidRestaurantAdmin2AccessToken, dateTime.AddSeconds(1))
+            .AddStatusToOrders(restaurant2.Id, new AddStatusToOrdersDto
+            {
+                OrderIds = new SortedSet<string>
+                {
+                    order2.Id
+                },
+                OrderState = OrderState.Acknowledged
+            });
+        var addStatusToOrders2ResponseResult = Assert.IsType<OkObjectResult>(addStatusToOrders2Response.Result);
+        order2 = Assert.IsType<List<OrderReadDto>>(addStatusToOrders2ResponseResult.Value)[0];
+
         orders.Add(order2);
-        orders = orders.OrderBy(x => x.CreationDateTime).ToList();
+        orders = orders
+                 .OrderBy(x => x.CreationDateTime)
+                 .ThenBy(x => x.CurrentOrderStatus.DateTime)
+                 .ToList();
 
         var ordersController = InitOrdersController(TokenMocks.ValidCustomerAccessToken, dateTime);
 

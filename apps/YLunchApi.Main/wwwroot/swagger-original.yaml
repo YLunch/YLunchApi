@@ -953,7 +953,7 @@ paths:
     get:
       tags:
         - orders
-      summary: Gets orders
+      summary: Gets orders ordered by creationDateTime
       description: |
         - Authorization header: **yes**
         - Granted roles:
@@ -1082,7 +1082,7 @@ paths:
     get:
       tags:
         - orders
-      summary: Gets orders
+      summary: Gets orders ordered by creationDateTime
       description: |
         - Authorization header: **yes**
         - Granted roles:
