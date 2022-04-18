@@ -8,6 +8,7 @@ using YLunchApi.Authentication.Exceptions;
 using YLunchApi.Authentication.Models;
 using YLunchApi.Authentication.Models.Dto;
 using YLunchApi.Authentication.Repositories;
+using YLunchApi.Authentication.Services;
 using YLunchApi.Domain.CommonAggregate.Dto;
 using YLunchApi.Domain.UserAggregate.Dto;
 using YLunchApi.Domain.UserAggregate.Models;
@@ -232,7 +233,31 @@ public class AuthenticationControllerTest : UnitTestFixture
     }
 
     [Fact]
-    public async Task Logout_Should_Return_A_204NoContent()
+    public async Task Logout_Should_Return_A_204NoContent_And_Logout_Current_User_RestaurantAdmin()
+    {
+        // Arrange
+        var (applicationSecurityToken, refreshToken) = await Login(UserMocks.RestaurantAdminCreateDto, Roles.RestaurantAdmin);
+        Fixture.InitFixture(configuration => configuration.AccessToken = applicationSecurityToken.AccessToken);
+        var controller = Fixture.GetImplementationFromService<AuthenticationController>();
+
+        // Act
+        var response = await controller.Logout();
+
+        // Assert
+        Assert.IsType<NoContentResult>(response);
+
+        async Task RefreshTokensAction() => await Fixture.GetImplementationFromService<IJwtService>()
+                                                         .RefreshJwtToken(new TokenUpdateDto
+                                                         {
+                                                             AccessToken = applicationSecurityToken.AccessToken,
+                                                             RefreshToken = refreshToken
+                                                         });
+
+        await Assert.ThrowsAsync<RefreshTokenRevokedException>(RefreshTokensAction);
+    }
+
+    [Fact]
+    public async Task Logout_Should_Return_A_204NoContent_And_Logout_Current_User_Customer()
     {
         // Arrange
         var (applicationSecurityToken, refreshToken) = await Login(UserMocks.CustomerCreateDto, Roles.Customer);
@@ -244,16 +269,14 @@ public class AuthenticationControllerTest : UnitTestFixture
 
         // Assert
         Assert.IsType<NoContentResult>(response);
-        var refreshTokensResponse = await controller.RefreshTokens(new TokenUpdateDto
-        {
-            AccessToken = applicationSecurityToken.AccessToken,
-            RefreshToken = refreshToken
-        });
 
-        var refreshTokensResponseResult = Assert.IsType<UnauthorizedObjectResult>(refreshTokensResponse.Result);
-        var refreshTokensResponseBody = Assert.IsType<ErrorDto>(refreshTokensResponseResult.Value);
-        refreshTokensResponseBody.Should()
-                                 .BeEquivalentTo(new ErrorDto(HttpStatusCode.Unauthorized,
-                                     "Invalid tokens, please login to generate new valid tokens."));
+        async Task RefreshTokensAction() => await Fixture.GetImplementationFromService<IJwtService>()
+                                                         .RefreshJwtToken(new TokenUpdateDto
+                                                         {
+                                                             AccessToken = applicationSecurityToken.AccessToken,
+                                                             RefreshToken = refreshToken
+                                                         });
+
+        await Assert.ThrowsAsync<RefreshTokenRevokedException>(RefreshTokensAction);
     }
 }

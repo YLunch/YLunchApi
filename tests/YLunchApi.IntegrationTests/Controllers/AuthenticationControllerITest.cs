@@ -71,6 +71,64 @@ public class AuthenticationControllerITest : ControllerITestBase
 
     #endregion
 
+    #region LogoutTests
+
+    [Fact]
+    public async Task Logout_Should_Return_A_204NoContent_And_Logout_Current_User_RestaurantAdmin()
+    {
+        // Arrange
+        var decodedTokens = await CreateAndLoginUser(UserMocks.RestaurantAdminCreateDto);
+
+        Client.SetAuthorizationHeader(decodedTokens.AccessToken);
+
+        // Act
+        var response = await Client.GetAsync("authentication/logout");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+
+        var body = new
+        {
+            decodedTokens.AccessToken,
+            decodedTokens.RefreshToken
+        };
+        var refreshTokensResponse = await Client.PostAsJsonAsync("authentication/refresh-tokens", body);
+
+        refreshTokensResponse.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        var content = await ResponseUtils.DeserializeContentAsync<ErrorDto>(refreshTokensResponse);
+        content.Should().BeEquivalentTo(new ErrorDto(HttpStatusCode.Unauthorized,
+            "Invalid tokens, please login to generate new valid tokens."));
+    }
+
+    [Fact]
+    public async Task Logout_Should_Return_A_204NoContent_And_Logout_Current_User_Customer()
+    {
+        // Arrange
+        var decodedTokens = await CreateAndLoginUser(UserMocks.CustomerCreateDto);
+
+        Client.SetAuthorizationHeader(decodedTokens.AccessToken);
+
+        // Act
+        var response = await Client.GetAsync("authentication/logout");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+
+        var body = new
+        {
+            decodedTokens.AccessToken,
+            decodedTokens.RefreshToken
+        };
+        var refreshTokensResponse = await Client.PostAsJsonAsync("authentication/refresh-tokens", body);
+
+        refreshTokensResponse.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        var content = await ResponseUtils.DeserializeContentAsync<ErrorDto>(refreshTokensResponse);
+        content.Should().BeEquivalentTo(new ErrorDto(HttpStatusCode.Unauthorized,
+            "Invalid tokens, please login to generate new valid tokens."));
+    }
+
+    #endregion
+
     #region RefreshTokensTests
 
     [Fact]
