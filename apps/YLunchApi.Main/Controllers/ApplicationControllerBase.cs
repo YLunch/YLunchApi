@@ -19,11 +19,13 @@ public abstract class ApplicationControllerBase : ControllerBase
         var accessToken = authorizationHeaderValue.ToString().Replace("Bearer ", "");
         var applicationSecurityToken = new ApplicationSecurityToken(accessToken);
 
+        CurrentAccessTokenId = applicationSecurityToken.Id;
         CurrentUserId = applicationSecurityToken.UserId;
         CurrentUserEmail = applicationSecurityToken.UserEmail;
         CurrentUserRoles = applicationSecurityToken.UserRoles;
     }
 
+    protected string? CurrentAccessTokenId { get; set; }
     protected string? CurrentUserId { get; }
     protected string? CurrentUserEmail { get; }
     protected IEnumerable<string> CurrentUserRoles { get; } = new List<string>();

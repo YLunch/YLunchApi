@@ -71,4 +71,20 @@ public class AuthenticationController : ApplicationControllerBase
                 "Invalid tokens, please login to generate new valid tokens."));
         }
     }
+
+    [HttpGet("logout")]
+    [Authorize]
+    public async Task<ActionResult> Logout()
+    {
+        try
+        {
+            await _jwtService.RevokeRefreshToken(CurrentAccessTokenId!);
+            return NoContent();
+        }
+        catch (EntityNotFoundException)
+        {
+            return Unauthorized(new ErrorDto(HttpStatusCode.Unauthorized,
+                "Invalid tokens, please login to generate new valid tokens."));
+        }
+    }
 }

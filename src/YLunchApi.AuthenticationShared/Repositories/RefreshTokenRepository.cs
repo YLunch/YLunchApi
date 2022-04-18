@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using YLunchApi.Authentication.Models;
 using YLunchApi.Authentication.Repositories;
+using YLunchApi.Domain.Exceptions;
 using YLunchApi.Infrastructure.Database;
 
 namespace YLunchApi.AuthenticationShared.Repositories;
@@ -28,6 +29,25 @@ public class RefreshTokenRepository : IRefreshTokenRepository
     public async Task Update(RefreshToken refreshToken)
     {
         _context.RefreshTokens.Update(refreshToken);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task Revoke(string accessTokenId)
+    {
+        var notRevokedRefreshTokens = await _context.RefreshTokens
+                                         .Where(x => x.JwtId == accessTokenId)
+                                         .Where(x => !x.IsRevoked)
+                                         .ToListAsync();
+        if (notRevokedRefreshTokens.Count == 0)
+        {
+            throw new EntityNotFoundException();
+        }
+
+        foreach (var refreshToken in notRevokedRefreshTokens)
+        {
+            refreshToken.IsRevoked = true;
+        }
+
         await _context.SaveChangesAsync();
     }
 }

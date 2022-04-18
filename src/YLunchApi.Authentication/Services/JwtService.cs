@@ -99,6 +99,11 @@ public class JwtService : IJwtService
         return await GenerateJwtToken(authenticatedUser);
     }
 
+    public async Task RevokeRefreshToken(string accessTokenId)
+    {
+        await _refreshTokenRepository.Revoke(accessTokenId);
+    }
+
     private Token CreateToken(AuthenticatedUser authenticatedUser)
     {
         var jwtTokenHandler = new JwtSecurityTokenHandler();

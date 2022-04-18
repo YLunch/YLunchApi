@@ -230,4 +230,30 @@ public class AuthenticationControllerTest : UnitTestFixture
                     .BeEquivalentTo(new ErrorDto(HttpStatusCode.Unauthorized,
                         "Invalid tokens, please login to generate new valid tokens."));
     }
+
+    [Fact]
+    public async Task Logout_Should_Return_A_204NoContent()
+    {
+        // Arrange
+        var (applicationSecurityToken, refreshToken) = await Login(UserMocks.CustomerCreateDto, Roles.Customer);
+        Fixture.InitFixture(configuration => configuration.AccessToken = applicationSecurityToken.AccessToken);
+        var controller = Fixture.GetImplementationFromService<AuthenticationController>();
+
+        // Act
+        var response = await controller.Logout();
+
+        // Assert
+        Assert.IsType<NoContentResult>(response);
+        var refreshTokensResponse = await controller.RefreshTokens(new TokenUpdateDto
+        {
+            AccessToken = applicationSecurityToken.AccessToken,
+            RefreshToken = refreshToken
+        });
+
+        var refreshTokensResponseResult = Assert.IsType<UnauthorizedObjectResult>(refreshTokensResponse.Result);
+        var refreshTokensResponseBody = Assert.IsType<ErrorDto>(refreshTokensResponseResult.Value);
+        refreshTokensResponseBody.Should()
+                                 .BeEquivalentTo(new ErrorDto(HttpStatusCode.Unauthorized,
+                                     "Invalid tokens, please login to generate new valid tokens."));
+    }
 }

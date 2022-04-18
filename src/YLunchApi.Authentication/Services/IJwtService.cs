@@ -7,4 +7,5 @@ public interface IJwtService
 {
     Task<TokenReadDto> GenerateJwtToken(AuthenticatedUser authenticatedUser);
     Task<TokenReadDto> RefreshJwtToken(TokenUpdateDto tokenUpdateDto);
+    Task RevokeRefreshToken(string accessTokenId);
 }

@@ -384,6 +384,44 @@ paths:
                 statusCode: 401
                 errors:
                   reasons: [ "Please login and use provided tokens." ]
+  /authentication/logout:
+    get:
+      tags:
+        - authentication
+      summary: Logs out the current user
+      description: |
+        - Authorization header: **yes**
+        - Granted roles: 
+          - All
+      operationId: logout
+      responses:
+        '204':
+          description: |
+            NoContent
+        '400':
+          description: |
+            Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "BadRequest"
+                statusCode: 400
+                errors:
+                  reasons: [ "Something went wrong, please try again later." ]
+        '401':
+          description: |
+            Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                title: "Unauthorized"
+                statusCode: 401
+                errors:
+                  reasons: [ "Please login and use provided tokens." ]
   /restaurant-admins:
     post:
       tags:
