@@ -113,7 +113,7 @@ public class OrderRepository : IOrderRepository
             null => query,
             _ => orderStates
                 .Aggregate(query, (acc, x) => acc
-                    .Where(o => x == o.OrderStatuses.Last().State))
+                    .Where(o => x == o.OrderStatuses.OrderBy(y => y.DateTime).Last().State))
         };
 
     private static Order FormatOrder(Order order)
