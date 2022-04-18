@@ -548,7 +548,7 @@ paths:
     get:
       tags:
         - restaurants
-      summary: Gets restaurants
+      summary: Gets restaurants ordered by creationDateTime
       description: |
         - Authorization header: **no**
       operationId: getRestaurants
@@ -744,7 +744,7 @@ paths:
     get:
       tags:
         - products
-      summary: Gets products
+      summary: Gets products ordered by name
       description: |
         - Authorization header: **no**
       operationId: getProducts
@@ -1205,7 +1205,7 @@ paths:
     get:
       tags:
         - orders
-      summary: Gets a order by id
+      summary: Gets an order by id
       description: |
         - Authorization header: **no**
       operationId: getOrderById
