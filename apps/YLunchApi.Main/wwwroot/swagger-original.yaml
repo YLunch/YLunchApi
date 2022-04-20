@@ -811,6 +811,18 @@ paths:
           description: To filter the restaurants that are available or not. Default null to get both. A product is available when isActive is true, quantity is null or > 1, expirationDateTime is null or in the future.
           schema:
             type: boolean
+        - in: query
+          name: productIds
+          required: false
+          explode: true
+          description: |
+            To filter the products having the id matching one of this `set` of id.  
+            Repeat this parameter to filter on multiple id.  
+            Duplicates will be ignored.
+          schema:
+            type: array
+            items:
+              type: string
       responses:
         '200':
           description: |
@@ -1042,7 +1054,7 @@ paths:
           explode: true
           description: |
             To filter the orders having their current state matching one of this `set` of states.  
-            Repeat this parameter for multiple to filter on multiple states.  
+            Repeat this parameter to filter on multiple states.  
             Duplicates will be ignored.  
             One of:
               - `0`: Idling,
