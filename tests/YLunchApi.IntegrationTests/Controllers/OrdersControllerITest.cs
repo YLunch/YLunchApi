@@ -293,7 +293,7 @@ public class OrdersControllerITest : ControllerITestBase
         Client.SetAuthorizationHeader(restaurantAdmin1DecodedTokens.AccessToken);
 
         // Act
-        var response = await Client.GetAsync($"restaurants/{restaurant1.Id}/orders");
+        var response = await Client.GetAsync($"restaurants/{restaurant1.Id}/orders?page=1&size=2&minCreationDateTime={DateTime.UtcNow}&maxCreationDateTime={DateTime.UtcNow}&orderStates=0");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -460,7 +460,7 @@ public class OrdersControllerITest : ControllerITestBase
         Client.SetAuthorizationHeader(customerDecodedTokens.AccessToken);
 
         // Act
-        var response = await Client.GetAsync($"orders?restaurantId={restaurant1.Id}&minCreationDateTime={DateTime.UtcNow}&maxCreationDateTime={DateTime.UtcNow}");
+        var response = await Client.GetAsync($"orders?page=1&size=2&restaurantId={restaurant1.Id}&minCreationDateTime={DateTime.UtcNow}&maxCreationDateTime={DateTime.UtcNow}&orderStates=0");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);

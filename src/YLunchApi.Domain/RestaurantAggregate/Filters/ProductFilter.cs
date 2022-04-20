@@ -13,4 +13,6 @@ public class ProductFilter
     public string? RestaurantId { get; set; }
 
     public bool? IsAvailable { get; set; }
+
+    public SortedSet<string>? ProductIds { get; set; }
 }

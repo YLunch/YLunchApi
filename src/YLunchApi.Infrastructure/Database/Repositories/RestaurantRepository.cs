@@ -58,9 +58,12 @@ public class RestaurantRepository : IRestaurantRepository
         var query = FilterByRestaurantAdminId(RestaurantsQueryBase, restaurantFilter.RestaurantAdminId);
         query = FilterByIsPublished(query, restaurantFilter.IsPublished);
         query = FilterByIsCurrentlyOpenToOrder(query, restaurantFilter.IsCurrentlyOpenToOrder);
-        query = query.Skip((restaurantFilter.Page - 1) * restaurantFilter.Size)
-                     .Take(restaurantFilter.Size);
-        return (await query.ToListAsync()).Select(ReformatRestaurant).ToList();
+
+        var restaurants = await query
+                                .Skip((restaurantFilter.Page - 1) * restaurantFilter.Size)
+                                .Take(restaurantFilter.Size)
+                                .ToListAsync();
+        return restaurants.Select(ReformatRestaurant).ToList();
     }
 
     private IOrderedQueryable<Restaurant> RestaurantsQueryBase =>

@@ -322,6 +322,18 @@ public class ProductsControllerITest : ControllerITestBase
         productCreateDto4.Quantity = null;
         var product4 = await CreateProduct(decodedTokens.AccessToken, restaurant.Id, productCreateDto4);
 
+        var productCreateDto5 = ProductMocks.ProductCreateDto;
+        productCreateDto5.Name = "product5";
+        productCreateDto5.ExpirationDateTime = DateTime.UtcNow.AddDays(1);
+        productCreateDto5.Quantity = null;
+        await CreateProduct(decodedTokens.AccessToken, restaurant.Id, productCreateDto5);
+
+        var productCreateDto6 = ProductMocks.ProductCreateDto;
+        productCreateDto6.Name = "product6";
+        productCreateDto6.ExpirationDateTime = DateTime.UtcNow.AddDays(1);
+        productCreateDto6.Quantity = null;
+        await CreateProduct(decodedTokens.AccessToken, restaurant.Id, productCreateDto6);
+
         var expectedProducts = new List<ProductReadDto>
         {
             product3,
@@ -329,7 +341,7 @@ public class ProductsControllerITest : ControllerITestBase
         };
 
         // Act
-        var response = await Client.GetAsync($"restaurants/{restaurant.Id}/products?page=2&size=2&isAvailable=true");
+        var response = await Client.GetAsync($"restaurants/{restaurant.Id}/products?page=1&size=3&isAvailable=true&productIds={product3.Id}&productIds={product4.Id}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);

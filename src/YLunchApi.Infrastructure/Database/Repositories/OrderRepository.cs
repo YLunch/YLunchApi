@@ -39,15 +39,15 @@ public class OrderRepository : IOrderRepository
 
     public async Task<ICollection<Order>> GetOrders(OrderFilter orderFilter)
     {
-        var query = OrdersQueryBase
-                    .Skip((orderFilter.Page - 1) * orderFilter.Size)
-                    .Take(orderFilter.Size);
-        query = FilterByRestaurantId(query, orderFilter.RestaurantId);
+        var query = FilterByRestaurantId(OrdersQueryBase, orderFilter.RestaurantId);
         query = FilterByCustomerId(query, orderFilter.CustomerId);
         query = FilterByDate(query, orderFilter.MinCreationDateTime, orderFilter.MaxCreationDateTime);
         query = FilterByCurrentOrderState(query, orderFilter.OrderStates);
 
-        var orders = await query.ToListAsync();
+        var orders = await query
+                           .Skip((orderFilter.Page - 1) * orderFilter.Size)
+                           .Take(orderFilter.Size)
+                           .ToListAsync();
         return FormatOrders(orders);
     }
 

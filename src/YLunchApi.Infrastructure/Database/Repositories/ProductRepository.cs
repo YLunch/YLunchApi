@@ -45,31 +45,23 @@ public class ProductRepository : IProductRepository
 
     public async Task<ICollection<Product>> GetProducts(ProductFilter productFilter)
     {
-        var query = ProductsQueryBase
-                    .Skip((productFilter.Page - 1) * productFilter.Size)
-                    .Take(productFilter.Size);
-        query = FilterByRestaurantId(query, productFilter.RestaurantId);
+        var query = FilterByRestaurantId(ProductsQueryBase, productFilter.RestaurantId);
         query = FilterByIsAvailable(query, productFilter.IsAvailable);
+        query = FilterByProductIds(query, productFilter.ProductIds);
 
-        var products = await query.ToListAsync();
+        var products = await query
+                             .Skip((productFilter.Page - 1) * productFilter.Size)
+                             .Take(productFilter.Size)
+                             .ToListAsync();
         return products.Select(FormatProduct)
                        .OrderBy(x => x.Name)
                        .ToList();
     }
 
-    private IQueryable<Product> FilterByIsAvailable(IQueryable<Product> query, bool? isAvailable) =>
-        isAvailable switch
-        {
-            true => query.Where(x =>
-                x.IsActive &&
-                (x.Quantity > 1 || x.Quantity == null) &&
-                (x.ExpirationDateTime == null || x.ExpirationDateTime >= _dateTimeProvider.UtcNow)),
-            false => query.Where(x =>
-                !x.IsActive ||
-                x.Quantity == 0 ||
-                x.ExpirationDateTime != null && x.ExpirationDateTime < _dateTimeProvider.UtcNow),
-            null => query
-        };
+    public IQueryable<Product> ProductsQueryBase =>
+        _context.Products
+                .Include(x => x.Allergens)
+                .Include(x => x.ProductTags);
 
     private static IQueryable<Product> FilterByRestaurantId(IQueryable<Product> query, string? restaurantId) =>
         restaurantId switch
@@ -78,10 +70,26 @@ public class ProductRepository : IProductRepository
             _ => query.Where(x => x.RestaurantId == restaurantId)
         };
 
-    public IQueryable<Product> ProductsQueryBase =>
-        _context.Products
-                .Include(x => x.Allergens)
-                .Include(x => x.ProductTags);
+    private IQueryable<Product> FilterByIsAvailable(IQueryable<Product> query, bool? isAvailable) =>
+        isAvailable switch
+        {
+            null => query,
+            true => query.Where(x =>
+                x.IsActive &&
+                (x.Quantity > 1 || x.Quantity == null) &&
+                (x.ExpirationDateTime == null || x.ExpirationDateTime >= _dateTimeProvider.UtcNow)),
+            false => query.Where(x =>
+                !x.IsActive ||
+                x.Quantity == 0 ||
+                x.ExpirationDateTime != null && x.ExpirationDateTime < _dateTimeProvider.UtcNow)
+        };
+
+    private static IQueryable<Product> FilterByProductIds(IQueryable<Product> query, SortedSet<string>? productIds) =>
+        productIds switch
+        {
+            null => query,
+            _ => query.Where(x => productIds.Contains(x.Id))
+        };
 
     private static Product FormatProduct(Product product)
     {
