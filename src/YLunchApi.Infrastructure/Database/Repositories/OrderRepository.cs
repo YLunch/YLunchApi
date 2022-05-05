@@ -31,7 +31,7 @@ public class OrderRepository : IOrderRepository
             product.Quantity = product.Quantity switch
             {
                 0 => AddToSoldOut(ref soldOutProductIds, product),
-                > 0 => product.Quantity - 1, //NOSONAR
+                > 0 => product.Quantity.Value - 1,
                 _ => null
             };
         }
