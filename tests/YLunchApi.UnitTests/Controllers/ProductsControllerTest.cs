@@ -6,10 +6,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using Moq;
 using Xunit;
 using YLunchApi.Domain.CommonAggregate.Dto;
-using YLunchApi.Domain.CommonAggregate.Services;
 using YLunchApi.Domain.Core.Utils;
 using YLunchApi.Domain.RestaurantAggregate.Dto;
 using YLunchApi.Domain.RestaurantAggregate.Filters;
@@ -25,22 +23,6 @@ public class ProductsControllerTest : UnitTestFixture
     {
     }
 
-    #region Utils
-
-    private ProductsController InitProductsController(DateTime? customDateTime = null)
-    {
-        var dateTimeProviderMock = new Mock<IDateTimeProvider>();
-        dateTimeProviderMock.Setup(x => x.UtcNow).Returns(customDateTime ?? DateTime.UtcNow);
-        Fixture.InitFixture(configuration =>
-        {
-            configuration.AccessToken = TokenMocks.ValidRestaurantAdminAccessToken;
-            configuration.DateTimeProvider = dateTimeProviderMock.Object;
-        });
-        return Fixture.GetImplementationFromService<ProductsController>();
-    }
-
-    #endregion
-
     #region CreateProductTests
 
     [Fact]
@@ -49,7 +31,7 @@ public class ProductsControllerTest : UnitTestFixture
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
         var restaurant = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, RestaurantMocks.SimpleRestaurantCreateDto, dateTime);
-        var productsController = InitProductsController(dateTime);
+        var productsController = InitController<ProductsController>(new FixtureConfiguration { AccessToken = TokenMocks.ValidRestaurantAdminAccessToken, DateTime = dateTime });
         var productCreateDto = ProductMocks.ProductCreateDto;
         productCreateDto.ExpirationDateTime = dateTime.AddDays(1);
 
@@ -92,7 +74,7 @@ public class ProductsControllerTest : UnitTestFixture
         restaurantCreateDto.Name = "other restaurant";
         var otherRestaurant = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, restaurantCreateDto, dateTime);
         var restaurant = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, RestaurantMocks.SimpleRestaurantCreateDto, dateTime);
-        var productsController = InitProductsController(dateTime);
+        var productsController = InitController<ProductsController>(new FixtureConfiguration { AccessToken = TokenMocks.ValidRestaurantAdminAccessToken, DateTime = dateTime });
         var productCreateDto = ProductMocks.ProductCreateDto;
 
         // Act
@@ -130,8 +112,9 @@ public class ProductsControllerTest : UnitTestFixture
     public async Task CreateProduct_Should_Return_A_409Conflict()
     {
         // Arrange
-        var restaurant = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, RestaurantMocks.SimpleRestaurantCreateDto, DateTimeMocks.Monday20220321T1000Utc);
-        var productsController = InitProductsController();
+        var dateTime = DateTimeMocks.Monday20220321T1000Utc;
+        var restaurant = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, RestaurantMocks.SimpleRestaurantCreateDto, dateTime);
+        var productsController = InitController<ProductsController>();
         var productCreateDto = ProductMocks.ProductCreateDto;
 
         // Act
@@ -148,7 +131,8 @@ public class ProductsControllerTest : UnitTestFixture
     public async Task CreateProduct_Should_Return_A_404NotFound()
     {
         // Arrange
-        var productsController = InitProductsController();
+        var dateTime = DateTimeMocks.Monday20220321T1000Utc;
+        var productsController = InitController<ProductsController>(new FixtureConfiguration { AccessToken = TokenMocks.ValidRestaurantAdminAccessToken, DateTime = dateTime });
         var productCreateDto = ProductMocks.ProductCreateDto;
 
         // Act
@@ -166,7 +150,7 @@ public class ProductsControllerTest : UnitTestFixture
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
         var restaurant = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, RestaurantMocks.SimpleRestaurantCreateDto, dateTime);
-        var productsController = InitProductsController(dateTime);
+        var productsController = InitController<ProductsController>();
         var initialProductCreateDto = ProductMocks.ProductCreateDto;
         initialProductCreateDto.Name = "first pizza";
 
@@ -200,7 +184,7 @@ public class ProductsControllerTest : UnitTestFixture
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
         var restaurant = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, RestaurantMocks.SimpleRestaurantCreateDto, dateTime);
-        var productsController = InitProductsController(dateTime);
+        var productsController = InitController<ProductsController>(new FixtureConfiguration { DateTime = dateTime });
         var productCreateDto = ProductMocks.ProductCreateDto;
         productCreateDto.ExpirationDateTime = dateTime.AddDays(1);
 
@@ -237,7 +221,7 @@ public class ProductsControllerTest : UnitTestFixture
     public async Task GetProductById_Should_Return_A_404NotFound()
     {
         // Arrange
-        var productsController = InitProductsController();
+        var productsController = InitController<ProductsController>();
         var notExistingProductId = Guid.NewGuid().ToString();
 
         // Act
@@ -261,7 +245,7 @@ public class ProductsControllerTest : UnitTestFixture
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
         var restaurant = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, RestaurantMocks.SimpleRestaurantCreateDto, dateTime);
-        var productsController = InitProductsController(dateTime);
+        var productsController = InitController<ProductsController>(new FixtureConfiguration { DateTime = dateTime });
 
         var productCreateDto1 = ProductMocks.ProductCreateDto;
         productCreateDto1.Name = "product1";
@@ -321,7 +305,7 @@ public class ProductsControllerTest : UnitTestFixture
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
         var restaurant = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, RestaurantMocks.SimpleRestaurantCreateDto, dateTime);
-        var productsController = InitProductsController(dateTime);
+        var productsController = InitController<ProductsController>(new FixtureConfiguration { DateTime = dateTime });
         var productCreateDto1 = ProductMocks.ProductCreateDto;
         productCreateDto1.Name = "product1";
         await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto1, dateTime);
@@ -401,7 +385,7 @@ public class ProductsControllerTest : UnitTestFixture
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
         var restaurant = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, RestaurantMocks.SimpleRestaurantCreateDto, dateTime);
-        var productsController = InitProductsController(dateTime);
+        var productsController = InitController<ProductsController>(new FixtureConfiguration { DateTime = dateTime });
         var productCreateDto1 = ProductMocks.ProductCreateDto;
         productCreateDto1.Name = "product1";
         productCreateDto1.Quantity = 0;
@@ -484,7 +468,7 @@ public class ProductsControllerTest : UnitTestFixture
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
         var restaurant = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, RestaurantMocks.SimpleRestaurantCreateDto, dateTime);
-        var productsController = InitProductsController(dateTime);
+        var productsController = InitController<ProductsController>(new FixtureConfiguration { DateTime = dateTime });
         var productCreateDto1 = ProductMocks.ProductCreateDto;
         productCreateDto1.Name = "product1";
         productCreateDto1.Quantity = 0;
@@ -569,7 +553,7 @@ public class ProductsControllerTest : UnitTestFixture
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
         var restaurant = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, RestaurantMocks.SimpleRestaurantCreateDto, dateTime);
-        var productsController = InitProductsController(dateTime);
+        var productsController = InitController<ProductsController>(new FixtureConfiguration { DateTime = dateTime });
         var productCreateDto1 = ProductMocks.ProductCreateDto;
         productCreateDto1.Name = "product1";
         productCreateDto1.Quantity = 0;
@@ -657,8 +641,7 @@ public class ProductsControllerTest : UnitTestFixture
     public async Task GetProducts_Should_Return_A_404NotFound_When_Restaurant_Not_Found()
     {
         // Assert
-        var dateTime = DateTimeMocks.Monday20220321T1000Utc;
-        var productsController = InitProductsController(dateTime);
+        var productsController = InitController<ProductsController>();
 
         // Act
         var response = await productsController.GetProductsByRestaurantId("NON_EXISTENT_RESTAURANT_ID");

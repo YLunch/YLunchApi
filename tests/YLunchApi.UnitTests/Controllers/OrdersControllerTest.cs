@@ -6,11 +6,9 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using Moq;
 using Xunit;
 using YLunchApi.Authentication.Models;
 using YLunchApi.Domain.CommonAggregate.Dto;
-using YLunchApi.Domain.CommonAggregate.Services;
 using YLunchApi.Domain.Core.Utils;
 using YLunchApi.Domain.RestaurantAggregate.Dto;
 using YLunchApi.Domain.RestaurantAggregate.Filters;
@@ -27,22 +25,6 @@ public class OrdersControllerTest : UnitTestFixture
     {
     }
 
-    #region Utils
-
-    private OrdersController InitOrdersController(string accessToken, DateTime dateTime)
-    {
-        var dateTimeProviderMock = new Mock<IDateTimeProvider>();
-        dateTimeProviderMock.Setup(x => x.UtcNow).Returns(dateTime);
-        Fixture.InitFixture(configuration =>
-        {
-            configuration.AccessToken = accessToken;
-            configuration.DateTimeProvider = dateTimeProviderMock.Object;
-        });
-        return Fixture.GetImplementationFromService<OrdersController>();
-    }
-
-    #endregion
-
     #region CreateOrderTests
 
     [Fact]
@@ -55,20 +37,26 @@ public class OrdersControllerTest : UnitTestFixture
 
         var productCreateDto1 = ProductMocks.ProductCreateDto;
         productCreateDto1.Name = "product1";
+        productCreateDto1.Quantity = 10;
         var product1 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto1, dateTime);
 
         var productCreateDto2 = ProductMocks.ProductCreateDto;
         productCreateDto2.Name = "product2";
+        productCreateDto2.Quantity = null;
         var product2 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto2, dateTime);
 
         var customerId = new ApplicationSecurityToken(TokenMocks.ValidCustomerAccessToken).UserId;
 
-        var ordersController = InitOrdersController(TokenMocks.ValidCustomerAccessToken, dateTime);
+        var ordersController = InitController<OrdersController>(new FixtureConfiguration
+        {
+            AccessToken = TokenMocks.ValidCustomerAccessToken, DateTime = dateTime
+        });
 
         var orderCreateDto = new OrderCreateDto
         {
             ProductIds = new List<string>
             {
+                product1.Id,
                 product1.Id,
                 product2.Id
             },
@@ -103,7 +91,7 @@ public class OrdersControllerTest : UnitTestFixture
                     .Aggregate(true, (acc, x) => acc && new Regex(GuidUtils.Regex).IsMatch(x.Id))
                     .Should().BeTrue();
         responseBody.OrderedProducts.Should().BeEquivalentTo(
-            new List<ProductReadDto> { product1, product2 }
+            new List<ProductReadDto> { product1, product1, product2 }
                 .Select(x =>
                 {
                     var orderedProductReadDto = new OrderedProductReadDto
@@ -130,6 +118,62 @@ public class OrdersControllerTest : UnitTestFixture
         responseBody.CurrentOrderStatus.OrderId.Should().Be(responseBody.Id);
         responseBody.CurrentOrderStatus.DateTime.Should().BeCloseTo(dateTime, TimeSpan.FromSeconds(5));
         responseBody.CurrentOrderStatus.State.Should().Be(OrderState.Idling);
+        var productsController = InitController<ProductsController>(new FixtureConfiguration
+        {
+            DateTime = dateTime
+        });
+
+        var getProductByIdResponse = await productsController.GetProductById(product1.Id);
+        var getProductByIdResponseResult = Assert.IsType<OkObjectResult>(getProductByIdResponse.Result);
+        var updatedProduct1 = Assert.IsType<ProductReadDto>(getProductByIdResponseResult.Value);
+        updatedProduct1.Quantity.Should().Be(8);
+    }
+
+    [Fact]
+    public async Task CreateOrder_Should_Return_A_400BadRequest_When_Products_Are_Sold_Out()
+    {
+        // Arrange
+        var dateTime = DateTimeMocks.Monday20220321T1000Utc;
+        var restaurantCreateDto = RestaurantMocks.PrepareFullRestaurant(RestaurantMocks.SimpleRestaurantCreateDto.Name, dateTime);
+        var restaurant = await CreateRestaurant(TokenMocks.ValidRestaurantAdminAccessToken, restaurantCreateDto, dateTime);
+
+        var productCreateDto1 = ProductMocks.ProductCreateDto;
+        productCreateDto1.Name = "product1";
+        productCreateDto1.Quantity = 1;
+        var product1 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto1, dateTime);
+
+        var productCreateDto2 = ProductMocks.ProductCreateDto;
+        productCreateDto2.Name = "product2";
+        productCreateDto2.Quantity = null;
+        var product2 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto2, dateTime);
+
+        var customerId = new ApplicationSecurityToken(TokenMocks.ValidCustomerAccessToken).UserId;
+
+        var ordersController = InitController<OrdersController>(new FixtureConfiguration
+        {
+            AccessToken = TokenMocks.ValidCustomerAccessToken, DateTime = dateTime
+        });
+
+        var orderCreateDto = new OrderCreateDto
+        {
+            ProductIds = new List<string>
+            {
+                product1.Id,
+                product1.Id,
+                product2.Id
+            },
+            ReservedForDateTime = dateTime.AddHours(1),
+            CustomerComment = "Customer comment"
+        };
+
+        // Act
+        var response = await ordersController.CreateOrder(restaurant.Id, orderCreateDto);
+
+        // Assert
+        var responseResult = Assert.IsType<BadRequestObjectResult>(response.Result);
+        var responseBody = Assert.IsType<ErrorDto>(responseResult.Value);
+
+        responseBody.Should().BeEquivalentTo(new ErrorDto(HttpStatusCode.BadRequest, $"Product(s): {product1.Id} sold out."));
     }
 
     [Fact]
@@ -148,7 +192,10 @@ public class OrdersControllerTest : UnitTestFixture
         productCreateDto2.Name = "product2";
         var product2 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto2, dateTime);
 
-        var ordersController = InitOrdersController(TokenMocks.ValidCustomerAccessToken, dateTime);
+        var ordersController = InitController<OrdersController>(new FixtureConfiguration
+        {
+            AccessToken = TokenMocks.ValidCustomerAccessToken, DateTime = dateTime
+        });
 
         var orderCreateDto = new OrderCreateDto
         {
@@ -187,7 +234,10 @@ public class OrdersControllerTest : UnitTestFixture
         productCreateDto2.Name = "product2";
         var product2 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto2, dateTime);
 
-        var ordersController = InitOrdersController(TokenMocks.ValidCustomerAccessToken, dateTime);
+        var ordersController = InitController<OrdersController>(new FixtureConfiguration
+        {
+            AccessToken = TokenMocks.ValidCustomerAccessToken, DateTime = dateTime
+        });
 
         var orderCreateDto = new OrderCreateDto
         {
@@ -228,7 +278,10 @@ public class OrdersControllerTest : UnitTestFixture
         productCreateDto2.Name = "product2";
         var product2 = await CreateProduct(TokenMocks.ValidRestaurantAdminAccessToken, restaurant.Id, productCreateDto2, dateTime);
 
-        var ordersController = InitOrdersController(TokenMocks.ValidCustomerAccessToken, dateTime);
+        var ordersController = InitController<OrdersController>(new FixtureConfiguration
+        {
+            AccessToken = TokenMocks.ValidCustomerAccessToken, DateTime = dateTime
+        });
 
         var notExistingProductId1 = Guid.NewGuid().ToString();
         var notExistingProductId2 = Guid.NewGuid().ToString();
@@ -290,7 +343,10 @@ public class OrdersControllerTest : UnitTestFixture
         };
         var order = await CreateOrder(TokenMocks.ValidCustomerAccessToken, restaurant.Id, dateTime, orderCreateDto);
 
-        var ordersController = InitOrdersController(TokenMocks.ValidCustomerAccessToken, dateTime);
+        var ordersController = InitController<OrdersController>(new FixtureConfiguration
+        {
+            AccessToken = TokenMocks.ValidCustomerAccessToken, DateTime = dateTime
+        });
 
         // Act
         var response = await ordersController.GetOrderById(order.Id);
@@ -379,7 +435,7 @@ public class OrdersControllerTest : UnitTestFixture
         };
         var order = await CreateOrder(TokenMocks.ValidCustomerAccessToken, restaurant.Id, dateTime, orderCreateDto);
 
-        var ordersController = InitOrdersController(TokenMocks.ValidRestaurantAdminAccessToken, dateTime);
+        var ordersController = InitController<OrdersController>(new FixtureConfiguration { AccessToken = TokenMocks.ValidRestaurantAdminAccessToken, DateTime = dateTime });
 
         // Act
         var response = await ordersController.GetOrderById(order.Id);
@@ -443,7 +499,10 @@ public class OrdersControllerTest : UnitTestFixture
     {
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
-        var ordersController = InitOrdersController(TokenMocks.ValidCustomerAccessToken, dateTime);
+        var ordersController = InitController<OrdersController>(new FixtureConfiguration
+        {
+            AccessToken = TokenMocks.ValidCustomerAccessToken, DateTime = dateTime
+        });
         var notExistingOrderId = Guid.NewGuid().ToString();
 
         // Act
@@ -485,7 +544,7 @@ public class OrdersControllerTest : UnitTestFixture
         };
         var order = await CreateOrder(TokenMocks.ValidCustomerAccessToken, restaurant.Id, dateTime, orderCreateDto);
 
-        var ordersController = InitOrdersController(TokenMocks.ValidCustomer2AccessToken, dateTime);
+        var ordersController = InitController<OrdersController>(new FixtureConfiguration { AccessToken = TokenMocks.ValidCustomer2AccessToken, DateTime = dateTime });
 
         // Act
         var response = await ordersController.GetOrderById(order.Id);
@@ -526,7 +585,7 @@ public class OrdersControllerTest : UnitTestFixture
         };
         var order = await CreateOrder(TokenMocks.ValidCustomerAccessToken, restaurant.Id, dateTime, orderCreateDto);
 
-        var ordersController = InitOrdersController(TokenMocks.ValidRestaurantAdmin2AccessToken, dateTime);
+        var ordersController = InitController<OrdersController>(new FixtureConfiguration { AccessToken = TokenMocks.ValidRestaurantAdmin2AccessToken, DateTime = dateTime });
 
         // Act
         var response = await ordersController.GetOrderById(order.Id);
@@ -622,7 +681,7 @@ public class OrdersControllerTest : UnitTestFixture
             }
         });
 
-        var ordersController = InitOrdersController(TokenMocks.ValidRestaurantAdminAccessToken, dateTime);
+        var ordersController = InitController<OrdersController>(new FixtureConfiguration { AccessToken = TokenMocks.ValidRestaurantAdminAccessToken, DateTime = dateTime });
 
         var addStatusToOrdersResponse = await ordersController.AddStatusToOrders(restaurant1.Id, new AddStatusToOrdersDto
         {
@@ -783,7 +842,7 @@ public class OrdersControllerTest : UnitTestFixture
             }
         });
 
-        await InitOrdersController(TokenMocks.ValidRestaurantAdminAccessToken, dateTime)
+        await InitController<OrdersController>(new FixtureConfiguration { AccessToken = TokenMocks.ValidRestaurantAdminAccessToken, DateTime = dateTime })
             .AddStatusToOrders(restaurant1.Id, new AddStatusToOrdersDto
             {
                 OrderIds = new SortedSet<string>
@@ -794,7 +853,7 @@ public class OrdersControllerTest : UnitTestFixture
                 OrderState = OrderState.Acknowledged
             });
 
-        await InitOrdersController(TokenMocks.ValidRestaurantAdmin2AccessToken, dateTime.AddSeconds(1))
+        await InitController<OrdersController>(new FixtureConfiguration { AccessToken = TokenMocks.ValidRestaurantAdmin2AccessToken, DateTime = dateTime.AddSeconds(1) })
             .AddStatusToOrders(restaurant2.Id, new AddStatusToOrdersDto
             {
                 OrderIds = new SortedSet<string>
@@ -809,7 +868,10 @@ public class OrdersControllerTest : UnitTestFixture
                      .ThenBy(x => x.CurrentOrderStatus.DateTime)
                      .ToList();
 
-        var ordersController = InitOrdersController(TokenMocks.ValidCustomerAccessToken, dateTime);
+        var ordersController = InitController<OrdersController>(new FixtureConfiguration
+        {
+            AccessToken = TokenMocks.ValidCustomerAccessToken, DateTime = dateTime
+        });
 
         // Act
         var response = await ordersController.GetOrdersOfRestaurant(restaurant1.Id, new OrderFilter
@@ -925,7 +987,7 @@ public class OrdersControllerTest : UnitTestFixture
             }
         });
 
-        var ordersController = InitOrdersController(TokenMocks.ValidRestaurantAdminAccessToken, dateTime);
+        var ordersController = InitController<OrdersController>(new FixtureConfiguration { AccessToken = TokenMocks.ValidRestaurantAdminAccessToken, DateTime = dateTime });
 
         var addStatusToOrdersResponse = await ordersController.AddStatusToOrders(restaurant1.Id, new AddStatusToOrdersDto
         {
@@ -1054,7 +1116,7 @@ public class OrdersControllerTest : UnitTestFixture
             }
         });
 
-        var ordersController = InitOrdersController(TokenMocks.ValidRestaurantAdminAccessToken, dateTime);
+        var ordersController = InitController<OrdersController>(new FixtureConfiguration { AccessToken = TokenMocks.ValidRestaurantAdminAccessToken, DateTime = dateTime });
 
         var addStatusToOrdersResponse = await ordersController.AddStatusToOrders(restaurant1.Id, new AddStatusToOrdersDto
         {
@@ -1190,7 +1252,7 @@ public class OrdersControllerTest : UnitTestFixture
             }
         });
 
-        var ordersController = InitOrdersController(TokenMocks.ValidRestaurantAdminAccessToken, dateTime);
+        var ordersController = InitController<OrdersController>(new FixtureConfiguration { AccessToken = TokenMocks.ValidRestaurantAdminAccessToken, DateTime = dateTime });
 
         var addStatusToOrdersResponse = await ordersController.AddStatusToOrders(restaurant1.Id, new AddStatusToOrdersDto
         {
@@ -1320,7 +1382,7 @@ public class OrdersControllerTest : UnitTestFixture
             }
         });
 
-        var ordersController = InitOrdersController(TokenMocks.ValidRestaurantAdminAccessToken, dateTime);
+        var ordersController = InitController<OrdersController>(new FixtureConfiguration { AccessToken = TokenMocks.ValidRestaurantAdminAccessToken, DateTime = dateTime });
 
         var addStatusToOrdersResponse = await ordersController.AddStatusToOrders(restaurant1.Id, new AddStatusToOrdersDto
         {
@@ -1486,7 +1548,7 @@ public class OrdersControllerTest : UnitTestFixture
             }
         });
 
-        var ordersController = InitOrdersController(TokenMocks.ValidRestaurantAdminAccessToken, dateTime);
+        var ordersController = InitController<OrdersController>(new FixtureConfiguration { AccessToken = TokenMocks.ValidRestaurantAdminAccessToken, DateTime = dateTime });
 
         var addStatusToOrdersResponse = await ordersController.AddStatusToOrders(restaurant1.Id, new AddStatusToOrdersDto
         {
@@ -1532,7 +1594,7 @@ public class OrdersControllerTest : UnitTestFixture
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
 
-        var ordersController = InitOrdersController(TokenMocks.ValidRestaurantAdminAccessToken, dateTime);
+        var ordersController = InitController<OrdersController>(new FixtureConfiguration { AccessToken = TokenMocks.ValidRestaurantAdminAccessToken, DateTime = dateTime });
 
         var restaurantId = Guid.NewGuid().ToString();
 
@@ -1673,7 +1735,7 @@ public class OrdersControllerTest : UnitTestFixture
             }
         });
 
-        var addStatusToOrders1Response = await InitOrdersController(TokenMocks.ValidRestaurantAdminAccessToken, dateTime)
+        var addStatusToOrders1Response = await InitController<OrdersController>(new FixtureConfiguration { AccessToken = TokenMocks.ValidRestaurantAdminAccessToken, DateTime = dateTime })
             .AddStatusToOrders(restaurant1.Id, new AddStatusToOrdersDto
             {
                 OrderIds = new SortedSet<string>
@@ -1686,7 +1748,7 @@ public class OrdersControllerTest : UnitTestFixture
         var addStatusToOrders1ResponseResult = Assert.IsType<OkObjectResult>(addStatusToOrders1Response.Result);
         var orders = Assert.IsType<List<OrderReadDto>>(addStatusToOrders1ResponseResult.Value);
 
-        var addStatusToOrders2Response = await InitOrdersController(TokenMocks.ValidRestaurantAdmin2AccessToken, dateTime.AddSeconds(1))
+        var addStatusToOrders2Response = await InitController<OrdersController>(new FixtureConfiguration { AccessToken = TokenMocks.ValidRestaurantAdmin2AccessToken, DateTime = dateTime.AddSeconds(1) })
             .AddStatusToOrders(restaurant2.Id, new AddStatusToOrdersDto
             {
                 OrderIds = new SortedSet<string>
@@ -1705,7 +1767,10 @@ public class OrdersControllerTest : UnitTestFixture
                  .ThenBy(x => x.CurrentOrderStatus.DateTime)
                  .ToList();
 
-        var ordersController = InitOrdersController(TokenMocks.ValidCustomerAccessToken, dateTime);
+        var ordersController = InitController<OrdersController>(new FixtureConfiguration
+        {
+            AccessToken = TokenMocks.ValidCustomerAccessToken, DateTime = dateTime
+        });
 
         // Act
         var response = await ordersController.GetOrdersOfCurrentCustomer();
@@ -1864,7 +1929,7 @@ public class OrdersControllerTest : UnitTestFixture
             }
         });
 
-        var addStatusToOrders1Response = await InitOrdersController(TokenMocks.ValidRestaurantAdminAccessToken, dateTime)
+        var addStatusToOrders1Response = await InitController<OrdersController>(new FixtureConfiguration { AccessToken = TokenMocks.ValidRestaurantAdminAccessToken, DateTime = dateTime })
             .AddStatusToOrders(restaurant1.Id, new AddStatusToOrdersDto
             {
                 OrderIds = new SortedSet<string>
@@ -1877,7 +1942,7 @@ public class OrdersControllerTest : UnitTestFixture
         var addStatusToOrders1ResponseResult = Assert.IsType<OkObjectResult>(addStatusToOrders1Response.Result);
         order3 = Assert.IsType<List<OrderReadDto>>(addStatusToOrders1ResponseResult.Value)[1];
 
-        await InitOrdersController(TokenMocks.ValidRestaurantAdmin2AccessToken, dateTime.AddSeconds(1))
+        await InitController<OrdersController>(new FixtureConfiguration { AccessToken = TokenMocks.ValidRestaurantAdmin2AccessToken, DateTime = dateTime.AddSeconds(1) })
             .AddStatusToOrders(restaurant2.Id, new AddStatusToOrdersDto
             {
                 OrderIds = new SortedSet<string>
@@ -1892,7 +1957,10 @@ public class OrdersControllerTest : UnitTestFixture
                      .ThenBy(x => x.CurrentOrderStatus.DateTime)
                      .ToList();
 
-        var ordersController = InitOrdersController(TokenMocks.ValidCustomerAccessToken, dateTime);
+        var ordersController = InitController<OrdersController>(new FixtureConfiguration
+        {
+            AccessToken = TokenMocks.ValidCustomerAccessToken, DateTime = dateTime
+        });
 
         // Act
         var response = await ordersController.GetOrdersOfCurrentCustomer(new OrderFilter
@@ -2043,7 +2111,7 @@ public class OrdersControllerTest : UnitTestFixture
             }
         });
 
-        var addStatusToOrders1Response = await InitOrdersController(TokenMocks.ValidRestaurantAdminAccessToken, dateTime)
+        var addStatusToOrders1Response = await InitController<OrdersController>(new FixtureConfiguration { AccessToken = TokenMocks.ValidRestaurantAdminAccessToken, DateTime = dateTime })
             .AddStatusToOrders(restaurant1.Id, new AddStatusToOrdersDto
             {
                 OrderIds = new SortedSet<string>
@@ -2056,7 +2124,7 @@ public class OrdersControllerTest : UnitTestFixture
         var addStatusToOrders1ResponseResult = Assert.IsType<OkObjectResult>(addStatusToOrders1Response.Result);
         var orders = Assert.IsType<List<OrderReadDto>>(addStatusToOrders1ResponseResult.Value);
 
-        var addStatusToOrders2Response = await InitOrdersController(TokenMocks.ValidRestaurantAdmin2AccessToken, dateTime.AddSeconds(1))
+        var addStatusToOrders2Response = await InitController<OrdersController>(new FixtureConfiguration { AccessToken = TokenMocks.ValidRestaurantAdmin2AccessToken, DateTime = dateTime.AddSeconds(1) })
             .AddStatusToOrders(restaurant2.Id, new AddStatusToOrdersDto
             {
                 OrderIds = new SortedSet<string>
@@ -2074,7 +2142,10 @@ public class OrdersControllerTest : UnitTestFixture
                  .ThenBy(x => x.CurrentOrderStatus.DateTime)
                  .ToList();
 
-        var ordersController = InitOrdersController(TokenMocks.ValidCustomerAccessToken, dateTime);
+        var ordersController = InitController<OrdersController>(new FixtureConfiguration
+        {
+            AccessToken = TokenMocks.ValidCustomerAccessToken, DateTime = dateTime
+        });
 
         // Act
         var response = await ordersController.GetOrdersOfCurrentCustomer(new OrderFilter
@@ -2228,7 +2299,7 @@ public class OrdersControllerTest : UnitTestFixture
             }
         });
 
-        await InitOrdersController(TokenMocks.ValidRestaurantAdmin2AccessToken, dateTime)
+        await InitController<OrdersController>(new FixtureConfiguration { AccessToken = TokenMocks.ValidRestaurantAdmin2AccessToken, DateTime = dateTime })
             .AddStatusToOrders(restaurant2.Id, new AddStatusToOrdersDto
             {
                 OrderIds = new SortedSet<string>
@@ -2238,7 +2309,10 @@ public class OrdersControllerTest : UnitTestFixture
                 OrderState = OrderState.Acknowledged
             });
 
-        var addStatusToOrdersResponse = await InitOrdersController(TokenMocks.ValidRestaurantAdminAccessToken, dateTime)
+        var addStatusToOrdersResponse = await InitController<OrdersController>(new FixtureConfiguration
+            {
+                AccessToken = TokenMocks.ValidCustomerAccessToken, DateTime = dateTime
+            })
             .AddStatusToOrders(restaurant1.Id, new AddStatusToOrdersDto
             {
                 OrderIds = new SortedSet<string>
@@ -2252,7 +2326,10 @@ public class OrdersControllerTest : UnitTestFixture
         var addStatusToOrdersResponseResult = Assert.IsType<OkObjectResult>(addStatusToOrdersResponse.Result);
         var orders = Assert.IsType<List<OrderReadDto>>(addStatusToOrdersResponseResult.Value);
 
-        var ordersController = InitOrdersController(TokenMocks.ValidCustomerAccessToken, dateTime);
+        var ordersController = InitController<OrdersController>(new FixtureConfiguration
+        {
+            AccessToken = TokenMocks.ValidCustomerAccessToken, DateTime = dateTime
+        });
 
         // Act
         var response = await ordersController.GetOrdersOfCurrentCustomer(new OrderFilter
@@ -2287,7 +2364,7 @@ public class OrdersControllerTest : UnitTestFixture
         // Arrange
         var dateTime = DateTimeMocks.Monday20220321T1000Utc;
 
-        var ordersController = InitOrdersController(TokenMocks.ValidRestaurantAdminAccessToken, dateTime);
+        var ordersController = InitController<OrdersController>(new FixtureConfiguration { AccessToken = TokenMocks.ValidRestaurantAdminAccessToken, DateTime = dateTime });
 
         var restaurantId = Guid.NewGuid().ToString();
 
@@ -2368,7 +2445,7 @@ public class OrdersControllerTest : UnitTestFixture
 
         var orders = new List<OrderReadDto> { order1, order3 };
 
-        var ordersController = InitOrdersController(TokenMocks.ValidRestaurantAdminAccessToken, dateTime);
+        var ordersController = InitController<OrdersController>(new FixtureConfiguration { AccessToken = TokenMocks.ValidRestaurantAdminAccessToken, DateTime = dateTime });
 
         // Act
         var response = await ordersController.AddStatusToOrders(restaurant.Id, new AddStatusToOrdersDto
@@ -2454,7 +2531,7 @@ public class OrdersControllerTest : UnitTestFixture
             }
         });
 
-        var ordersController = InitOrdersController(TokenMocks.ValidRestaurantAdminAccessToken, dateTime);
+        var ordersController = InitController<OrdersController>(new FixtureConfiguration { AccessToken = TokenMocks.ValidRestaurantAdminAccessToken, DateTime = dateTime });
 
         var notExistingRestaurantId = Guid.NewGuid().ToString();
 
@@ -2529,7 +2606,7 @@ public class OrdersControllerTest : UnitTestFixture
             }
         });
 
-        var ordersController = InitOrdersController(TokenMocks.ValidRestaurantAdminAccessToken, dateTime);
+        var ordersController = InitController<OrdersController>(new FixtureConfiguration { AccessToken = TokenMocks.ValidRestaurantAdminAccessToken, DateTime = dateTime });
 
         var notExistingOrderId1 = Guid.NewGuid().ToString();
         var notExistingOrderId2 = Guid.NewGuid().ToString();
@@ -2626,7 +2703,7 @@ public class OrdersControllerTest : UnitTestFixture
             }
         });
 
-        var ordersController = InitOrdersController(TokenMocks.ValidRestaurantAdminAccessToken, dateTime);
+        var ordersController = InitController<OrdersController>(new FixtureConfiguration { AccessToken = TokenMocks.ValidRestaurantAdminAccessToken, DateTime = dateTime });
 
         // Act
         var response = await ordersController.AddStatusToOrders(restaurant1.Id, new AddStatusToOrdersDto

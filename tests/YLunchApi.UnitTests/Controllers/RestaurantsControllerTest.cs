@@ -6,11 +6,9 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using Moq;
 using Xunit;
 using YLunchApi.Authentication.Models;
 using YLunchApi.Domain.CommonAggregate.Dto;
-using YLunchApi.Domain.CommonAggregate.Services;
 using YLunchApi.Domain.Core.Utils;
 using YLunchApi.Domain.RestaurantAggregate.Dto;
 using YLunchApi.Domain.RestaurantAggregate.Filters;
@@ -33,14 +31,11 @@ public class RestaurantsControllerTest : UnitTestFixture
 
     private RestaurantsController InitRestaurantsController(DateTime? customDateTime = null, string? accessToken = null)
     {
-        var dateTimeProviderMock = new Mock<IDateTimeProvider>();
-        dateTimeProviderMock.Setup(x => x.UtcNow).Returns(customDateTime ?? DateTime.UtcNow);
-        Fixture.InitFixture(configuration =>
+        return InitController<RestaurantsController>(new FixtureConfiguration
         {
-            configuration.AccessToken = accessToken ?? TokenMocks.ValidRestaurantAdminAccessToken;
-            configuration.DateTimeProvider = dateTimeProviderMock.Object;
+            AccessToken = accessToken ?? TokenMocks.ValidRestaurantAdminAccessToken,
+            DateTime = customDateTime ?? DateTime.UtcNow
         });
-        return Fixture.GetImplementationFromService<RestaurantsController>();
     }
 
     #endregion

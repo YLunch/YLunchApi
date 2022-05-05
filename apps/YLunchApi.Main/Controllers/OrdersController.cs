@@ -33,6 +33,14 @@ public class OrdersController : ApplicationControllerBase
             var orderReadDto = await _orderService.CreateOrder(CurrentUserId!, restaurantId, orderCreateDto);
             return Created("", orderReadDto);
         }
+        catch (ReservedForDateTimeOutOfOpenToOrderOpeningTimesException)
+        {
+            return BadRequest(new ErrorDto(HttpStatusCode.BadRequest, "ReservedForDateTime must be set when the restaurant is open for orders."));
+        }
+        catch (SoldOutProductsException soldOutProductsException)
+        {
+            return BadRequest(new ErrorDto(HttpStatusCode.BadRequest, $"Product(s): {soldOutProductsException.Message} sold out."));
+        }
         catch (EntityNotFoundException exception)
         {
             return exception.Message switch
@@ -40,10 +48,6 @@ public class OrdersController : ApplicationControllerBase
                 { } m when m.Contains("Product") => NotFound(new ErrorDto(HttpStatusCode.NotFound, exception.Message)),
                 _ => NotFound(new ErrorDto(HttpStatusCode.NotFound, $"Restaurant: {restaurantId} not found."))
             };
-        }
-        catch (ReservedForDateTimeOutOfOpenToOrderOpeningTimesException)
-        {
-            return BadRequest(new ErrorDto(HttpStatusCode.BadRequest, "ReservedForDateTime must be set when the restaurant is open for orders."));
         }
     }
 

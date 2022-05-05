@@ -11,7 +11,7 @@ public static class ProductMocks
         Price = 9.80,
         Description = "tomate, fromage",
         IsActive = true,
-        Quantity = 3,
+        Quantity = 10,
         ProductType = ProductType.Main,
         Allergens = new List<AllergenCreateDto>
         {

@@ -19,6 +19,27 @@ public class UnitTestFixture : IClassFixture<UnitTestFixtureBase>
         fixture.DatabaseId = Guid.NewGuid().ToString();
     }
 
+    #region ControllersInitiation
+
+    protected T InitController<T>(FixtureConfiguration? fixtureConfiguration = null)
+    {
+        return ConfigureFixture(fixtureConfiguration).GetImplementationFromService<T>();
+    }
+
+    private UnitTestFixtureBase ConfigureFixture(FixtureConfiguration? fixtureConfiguration = null)
+    {
+        var dateTimeProviderMock = new Mock<IDateTimeProvider>();
+        dateTimeProviderMock.Setup(x => x.UtcNow).Returns(fixtureConfiguration?.DateTime ?? DateTime.UtcNow);
+        Fixture.InitFixture(configuration =>
+        {
+            configuration.AccessToken = fixtureConfiguration?.AccessToken;
+            configuration.DateTimeProvider = dateTimeProviderMock.Object;
+        });
+        return Fixture;
+    }
+
+    #endregion
+
     protected async Task<RestaurantReadDto> CreateRestaurant(string accessToken, RestaurantCreateDto restaurantCreateDto, DateTime customDateTime)
     {
         var dateTimeProviderMock = new Mock<IDateTimeProvider>();

@@ -12,17 +12,42 @@ public class OrderRepository : IOrderRepository
 {
     private readonly ApplicationDbContext _context;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly IProductRepository _productRepository;
 
-    public OrderRepository(ApplicationDbContext context, IDateTimeProvider dateTimeProvider)
+    public OrderRepository(ApplicationDbContext context, IDateTimeProvider dateTimeProvider, IProductRepository productRepository)
     {
         _context = context;
         _dateTimeProvider = dateTimeProvider;
+        _productRepository = productRepository;
     }
 
     public async Task CreateOrder(Order order)
     {
         await _context.Orders.AddAsync(order);
+        var soldOutProductIds = new SortedSet<string>();
+        foreach (var orderedProduct in order.OrderedProducts)
+        {
+            var product = await _productRepository.GetProductById(orderedProduct.ProductId);
+            product.Quantity = product.Quantity switch
+            {
+                0 => AddToSoldOut(ref soldOutProductIds, product),
+                > 0 => product.Quantity - 1, //NOSONAR
+                _ => null
+            };
+        }
+
+        if (soldOutProductIds.Count > 0)
+        {
+            throw new SoldOutProductsException(string.Join(",", soldOutProductIds));
+        }
+
         await _context.SaveChangesAsync();
+    }
+
+    private static int AddToSoldOut(ref SortedSet<string> soldOutProductIds, Product product)
+    {
+        soldOutProductIds.Add(product.Id);
+        return product.Quantity!.Value;
     }
 
     public async Task<Order> GetOrderById(string orderId)

@@ -1,3 +1,4 @@
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Identity;
 using YLunchApi.Authentication.Repositories;
@@ -15,4 +16,5 @@ public class FixtureConfiguration
     public IUserRepository? UserRepository { get; set; }
     public UserManager<User>? UserManager { get; set; }
     public IDateTimeProvider? DateTimeProvider { get; set; }
+    public DateTime? DateTime { get; set; }
 }
