@@ -10,7 +10,7 @@ public class OpeningTimeCreateDto
 
     [Required]
     [Range(0, 1439, ErrorMessage = "OffsetInMinutes should be less than number of minutes in a day.")]
-    public int? OffsetInMinutes { get; set; }
+    public TimeOnly? OffsetTime { get; set; }
 
     [Required]
     [Range(0, 7 * 24 * 60 - 1, ErrorMessage = "DurationInMinutes should be less than number of minutes in a week.")]

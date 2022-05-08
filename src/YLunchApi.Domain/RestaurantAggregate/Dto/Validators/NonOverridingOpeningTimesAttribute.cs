@@ -14,17 +14,16 @@ public class NonOverridingOpeningTimesAttribute : ValidationAttribute
         }
 
         var orderedOpeningTimes = ((ICollection<OpeningTimeCreateDto>)value)
-                                  .OrderBy(OpeningTimeUtils.StartMinutesFromFirstDayOfWeek)
-                                  .ThenBy(OpeningTimeUtils.EndMinutesFromFirstDayOfWeek)
+                                  .OrderBy(x=>x.OffsetTime)
+                                  .ThenBy(x=>x.OffsetTime!.Value.AddMinutes(x.DurationInMinutes!.Value))
                                   .ToList();
 
         for (var i = 1; i < orderedOpeningTimes.Count; i++)
         {
-            var previousOpeningTimes = orderedOpeningTimes[i - 1];
-            var currentOpeningTimes = orderedOpeningTimes[i];
+            var previousOpeningTime = orderedOpeningTimes[i - 1];
+            var currentOpeningTime = orderedOpeningTimes[i];
 
-            if (OpeningTimeUtils.StartMinutesFromFirstDayOfWeek(currentOpeningTimes) <=
-                OpeningTimeUtils.EndMinutesFromFirstDayOfWeek(previousOpeningTimes))
+            if (currentOpeningTime.OffsetTime!.Value <=previousOpeningTime.OffsetTime!.Value.AddMinutes(previousOpeningTime.DurationInMinutes!.Value))
             {
                 return false;
             }

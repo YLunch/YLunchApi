@@ -28,13 +28,13 @@ public class NonOverridingOpeningTimesAttributeTest
             new()
             {
                 DayOfWeek = utcNow.DayOfWeek,
-                OffsetInMinutes = 2 * 60,
+                OffsetTime = new TimeOnly(11,0),
                 DurationInMinutes = 3 * 60
             },
             new()
             {
                 DayOfWeek = utcNow.DayOfWeek,
-                OffsetInMinutes = 6 * 60,
+                OffsetTime = new TimeOnly(15,0),
                 DurationInMinutes = 3 * 60
             }
         };
@@ -53,13 +53,13 @@ public class NonOverridingOpeningTimesAttributeTest
             new()
             {
                 DayOfWeek = utcNow.DayOfWeek,
-                OffsetInMinutes = 2 * 60,
+                OffsetTime = new TimeOnly(11,0),
                 DurationInMinutes = 3 * 60
             },
             new()
             {
                 DayOfWeek = utcNow.DayOfWeek,
-                OffsetInMinutes = 1 * 60,
+                OffsetTime = new TimeOnly(12,0),
                 DurationInMinutes = 3 * 60
             }
         };

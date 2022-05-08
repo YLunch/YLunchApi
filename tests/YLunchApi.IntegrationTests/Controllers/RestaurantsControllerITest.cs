@@ -62,13 +62,13 @@ public class RestaurantsControllerITest : ControllerITestBase
                 new
                 {
                     utcNow.AddDays(-1).DayOfWeek,
-                    OffsetInMinutes = 0 * 60,
+                    OffsetTime = new TimeOnly(0,0),
                     DurationInMinutes = 23 * 60 + 59
                 },
                 new
                 {
                     utcNow.DayOfWeek,
-                    OffsetInMinutes = 0 * 60,
+                    OffsetTime = new TimeOnly(0,0),
                     DurationInMinutes = 23 * 60 + 59
                 }
             },
@@ -77,13 +77,13 @@ public class RestaurantsControllerITest : ControllerITestBase
                 new
                 {
                     utcNow.AddDays(-1).DayOfWeek,
-                    OffsetInMinutes = 0 * 60,
+                    OffsetTime = new TimeOnly(0,0),
                     DurationInMinutes = 23 * 60 + 59
                 },
                 new
                 {
                     utcNow.DayOfWeek,
-                    OffsetInMinutes = 0 * 60,
+                    OffsetTime = new TimeOnly(0,0),
                     DurationInMinutes = 23 * 60 + 59
                 }
             }
@@ -216,7 +216,7 @@ public class RestaurantsControllerITest : ControllerITestBase
         responseBody.Should().MatchRegex(@"PlaceOpeningTimes.*The DayOfWeek field is required\.");
         responseBody.Should()
                     .MatchRegex(
-                        @"PlaceOpeningTimes.*The OffsetInMinutes field is required\.");
+                        @"PlaceOpeningTimes.*The OffsetTime field is required\.");
         responseBody.Should()
                     .MatchRegex(
                         @"PlaceOpeningTimes.*The DurationInMinutes field is required\.");
@@ -224,7 +224,7 @@ public class RestaurantsControllerITest : ControllerITestBase
         responseBody.Should().MatchRegex(@"OrderOpeningTimes.*The DayOfWeek field is required\.");
         responseBody.Should()
                     .MatchRegex(
-                        @"OrderOpeningTimes.*The OffsetInMinutes field is required\.");
+                        @"OrderOpeningTimes.*The OffsetTime field is required\.");
         responseBody.Should()
                     .MatchRegex(
                         @"OrderOpeningTimes.*The DurationInMinutes field is required\.");
@@ -258,7 +258,7 @@ public class RestaurantsControllerITest : ControllerITestBase
                 new
                 {
                     DayOfWeek = 7,
-                    OffsetInMinutes = 24 * 60,
+                    OffsetTime = new TimeOnly(24,0),
                     DurationInMinutes = 7 * 24 * 60
                 }
             },
@@ -267,7 +267,7 @@ public class RestaurantsControllerITest : ControllerITestBase
                 new
                 {
                     DayOfWeek = 7,
-                    OffsetInMinutes = 24 * 60,
+                    OffsetTime = new TimeOnly(24,0),
                     DurationInMinutes = 7 * 24 * 60
                 }
             }
@@ -289,7 +289,7 @@ public class RestaurantsControllerITest : ControllerITestBase
         responseBody.Should().MatchRegex(@"PlaceOpeningTimes.*Day must be in range 0-6, 0 is sunday, 6 is saturday\.");
         responseBody.Should()
                     .MatchRegex(
-                        @"PlaceOpeningTimes.*OffsetInMinutes should be less than number of minutes in a day\.");
+                        @"PlaceOpeningTimes.*OffsetTime should be less than number of minutes in a day\.");
         responseBody.Should()
                     .MatchRegex(
                         @"PlaceOpeningTimes.*DurationInMinutes should be less than number of minutes in a week\.");
@@ -297,7 +297,7 @@ public class RestaurantsControllerITest : ControllerITestBase
         responseBody.Should().MatchRegex(@"OrderOpeningTimes.*Day must be in range 0-6, 0 is sunday, 6 is saturday\.");
         responseBody.Should()
                     .MatchRegex(
-                        @"OrderOpeningTimes.*OffsetInMinutes should be less than number of minutes in a day\.");
+                        @"OrderOpeningTimes.*OffsetTime should be less than number of minutes in a day\.");
         responseBody.Should()
                     .MatchRegex(
                         @"OrderOpeningTimes.*DurationInMinutes should be less than number of minutes in a week\.");
@@ -326,13 +326,13 @@ public class RestaurantsControllerITest : ControllerITestBase
                 new
                 {
                     DayOfWeek = 1,
-                    OffsetInMinutes = 2 * 60,
+                    OffsetTime = new TimeOnly(2,0),
                     DurationInMinutes = 60
                 },
                 new
                 {
                     DayOfWeek = 1,
-                    OffsetInMinutes = 60,
+                    OffsetTime = new TimeOnly(1,0),
                     DurationInMinutes = 120
                 }
             },
@@ -341,13 +341,13 @@ public class RestaurantsControllerITest : ControllerITestBase
                 new
                 {
                     DayOfWeek = 1,
-                    OffsetInMinutes = 2 * 60,
+                    OffsetTime = new TimeOnly(2,0),
                     DurationInMinutes = 60
                 },
                 new
                 {
                     DayOfWeek = 1,
-                    OffsetInMinutes = 60,
+                    OffsetTime = new TimeOnly(1,0),
                     DurationInMinutes = 120
                 }
             }
@@ -394,7 +394,7 @@ public class RestaurantsControllerITest : ControllerITestBase
                 new()
                 {
                     DayOfWeek = DateTime.UtcNow.DayOfWeek,
-                    OffsetInMinutes = 0,
+                    OffsetTime = new TimeOnly(0, 0),
                     DurationInMinutes = 1439 //23H59
                 }
             },
@@ -403,7 +403,7 @@ public class RestaurantsControllerITest : ControllerITestBase
                 new()
                 {
                     DayOfWeek = DateTime.UtcNow.DayOfWeek,
-                    OffsetInMinutes = 0,
+                    OffsetTime = new TimeOnly(0, 0),
                     DurationInMinutes = 1439 //23H59
                 }
             }
@@ -443,7 +443,7 @@ public class RestaurantsControllerITest : ControllerITestBase
                 new()
                 {
                     DayOfWeek = DateTime.UtcNow.DayOfWeek,
-                    OffsetInMinutes = 0,
+                    OffsetTime = new TimeOnly(0,0),
                     DurationInMinutes = 1439 //23H59
                 }
             },
@@ -452,7 +452,7 @@ public class RestaurantsControllerITest : ControllerITestBase
                 new()
                 {
                     DayOfWeek = DateTime.UtcNow.DayOfWeek,
-                    OffsetInMinutes = 0,
+                    OffsetTime = new TimeOnly(0,0),
                     DurationInMinutes = 1439 //23H59
                 }
             }

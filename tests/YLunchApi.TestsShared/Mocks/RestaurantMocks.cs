@@ -34,13 +34,13 @@ public static class RestaurantMocks
             new()
             {
                 DayOfWeek = dateTime.AddDays(-1).DayOfWeek,
-                OffsetInMinutes = dateTime.Hour * 60 + dateTime.Minute,
+                OffsetTime = TimeOnly.FromDateTime(dateTime.AddDays(-1)),
                 DurationInMinutes = 2 * 60
             },
             new()
             {
                 DayOfWeek = dateTime.DayOfWeek,
-                OffsetInMinutes = dateTime.Hour * 60 + dateTime.Minute,
+                OffsetTime = TimeOnly.FromDateTime(dateTime),
                 DurationInMinutes = 2 * 60
             }
         };
@@ -50,13 +50,13 @@ public static class RestaurantMocks
             new()
             {
                 DayOfWeek = dateTime.AddDays(-1).DayOfWeek,
-                OffsetInMinutes = dateTime.Hour * 60 + dateTime.Minute,
+                OffsetTime = TimeOnly.FromDateTime(dateTime.AddDays(-1)),
                 DurationInMinutes = 2 * 60
             },
             new()
             {
                 DayOfWeek = dateTime.DayOfWeek,
-                OffsetInMinutes = dateTime.Hour * 60 + dateTime.Minute,
+                OffsetTime = TimeOnly.FromDateTime(dateTime),
                 DurationInMinutes = 2 * 60
             }
         };

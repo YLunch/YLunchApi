@@ -62,13 +62,13 @@ public class RestaurantsControllerTest : UnitTestFixture
             new()
             {
                 DayOfWeek = DayOfWeek.Sunday,
-                OffsetInMinutes = 10 * 60,
+                OffsetTime = new TimeOnly(10,0),
                 DurationInMinutes = 2 * 60
             },
             new()
             {
                 DayOfWeek = DayOfWeek.Monday,
-                OffsetInMinutes = 10 * 60,
+                OffsetTime = new TimeOnly(10,0),
                 DurationInMinutes = 2 * 60
             }
         };
@@ -78,13 +78,13 @@ public class RestaurantsControllerTest : UnitTestFixture
             new()
             {
                 DayOfWeek = DayOfWeek.Sunday,
-                OffsetInMinutes = 10 * 60,
+                OffsetTime = new TimeOnly(10,0),
                 DurationInMinutes = 2 * 60
             },
             new()
             {
                 DayOfWeek = DayOfWeek.Monday,
-                OffsetInMinutes = 10 * 60,
+                OffsetTime = new TimeOnly(10,0),
                 DurationInMinutes = 2 * 60
             }
         };
@@ -170,7 +170,7 @@ public class RestaurantsControllerTest : UnitTestFixture
             new()
             {
                 DayOfWeek = DayOfWeek.Monday,
-                OffsetInMinutes = 0,
+                OffsetTime = new TimeOnly(0,0),
                 DurationInMinutes = 1439
             }
         };
@@ -179,7 +179,7 @@ public class RestaurantsControllerTest : UnitTestFixture
             new()
             {
                 DayOfWeek = DayOfWeek.Monday,
-                OffsetInMinutes = 8 * 60,
+                OffsetTime = new TimeOnly(8,0),
                 DurationInMinutes = 2 * 60
             }
         };
@@ -502,7 +502,7 @@ public class RestaurantsControllerTest : UnitTestFixture
             new()
             {
                 DayOfWeek = DayOfWeek.Saturday,
-                OffsetInMinutes = 23 * 60,
+                OffsetTime = new TimeOnly(23,0),
                 DurationInMinutes = 11 * 60
             }
         };
@@ -564,7 +564,7 @@ public class RestaurantsControllerTest : UnitTestFixture
             new()
             {
                 DayOfWeek = DayOfWeek.Tuesday,
-                OffsetInMinutes = 9 * 60,
+                OffsetTime = new TimeOnly(9,0),
                 DurationInMinutes = 2 * 60
             }
         };
@@ -596,7 +596,7 @@ public class RestaurantsControllerTest : UnitTestFixture
             new()
             {
                 DayOfWeek = DayOfWeek.Monday,
-                OffsetInMinutes = 13 * 60,
+                OffsetTime = new TimeOnly(13,0),
                 DurationInMinutes = 2 * 60
             }
         };
@@ -628,7 +628,7 @@ public class RestaurantsControllerTest : UnitTestFixture
             new()
             {
                 DayOfWeek = DayOfWeek.Monday,
-                OffsetInMinutes = 8 * 60,
+                OffsetTime = new TimeOnly(8,0),
                 DurationInMinutes = 1 * 60
             }
         };
@@ -661,7 +661,7 @@ public class RestaurantsControllerTest : UnitTestFixture
             new()
             {
                 DayOfWeek = DayOfWeek.Monday,
-                OffsetInMinutes = 9 * 60,
+                OffsetTime = new TimeOnly(9,0),
                 DurationInMinutes = 3 * 60
             }
         };
@@ -696,7 +696,7 @@ public class RestaurantsControllerTest : UnitTestFixture
             new()
             {
                 DayOfWeek = DayOfWeek.Sunday,
-                OffsetInMinutes = 23 * 60,
+                OffsetTime = new TimeOnly(23,0),
                 DurationInMinutes = 12 * 60
             }
         };
@@ -758,7 +758,7 @@ public class RestaurantsControllerTest : UnitTestFixture
             new()
             {
                 DayOfWeek = DayOfWeek.Tuesday,
-                OffsetInMinutes = 9 * 60,
+                OffsetTime = new TimeOnly(9,0),
                 DurationInMinutes = 2 * 60
             }
         };
@@ -790,7 +790,7 @@ public class RestaurantsControllerTest : UnitTestFixture
             new()
             {
                 DayOfWeek = DayOfWeek.Monday,
-                OffsetInMinutes = 13 * 60,
+                OffsetTime = new TimeOnly(13,0),
                 DurationInMinutes = 2 * 60
             }
         };
@@ -822,7 +822,7 @@ public class RestaurantsControllerTest : UnitTestFixture
             new()
             {
                 DayOfWeek = DayOfWeek.Monday,
-                OffsetInMinutes = 7 * 60,
+                OffsetTime = new TimeOnly(7,0),
                 DurationInMinutes = 2 * 60
             }
         };
@@ -855,7 +855,7 @@ public class RestaurantsControllerTest : UnitTestFixture
             new()
             {
                 DayOfWeek = DayOfWeek.Monday,
-                OffsetInMinutes = 8 * 60,
+                OffsetTime = new TimeOnly(8,0),
                 DurationInMinutes = 3 * 60
             }
         };

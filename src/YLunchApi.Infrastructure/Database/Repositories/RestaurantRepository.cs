@@ -69,8 +69,8 @@ public class RestaurantRepository : IRestaurantRepository
     private IOrderedQueryable<Restaurant> RestaurantsQueryBase =>
         _context.Restaurants
                 .Include(x => x.ClosingDates.OrderBy(y => y.ClosingDateTime))
-                .Include(x => x.PlaceOpeningTimes.OrderBy(y => (int)y.DayOfWeek * 24 * 60 + y.OffsetInMinutes))
-                .Include(x => x.OrderOpeningTimes.OrderBy(y => (int)y.DayOfWeek * 24 * 60 + y.OffsetInMinutes))
+                .Include(x => x.PlaceOpeningTimes.OrderBy(y => y.OffsetTime))
+                .Include(x => x.OrderOpeningTimes.OrderBy(y => y.OffsetTime))
                 .OrderBy(restaurant => restaurant.CreationDateTime);
 
     private static IQueryable<Restaurant> FilterByIsPublished(IQueryable<Restaurant> query, bool? isPublished) =>
@@ -87,12 +87,12 @@ public class RestaurantRepository : IRestaurantRepository
         return isCurrentlyOpenToOrderRestaurants switch
         {
             true => query.Where(x => x.OrderOpeningTimes.Any(y =>
-                (int)y.DayOfWeek * 24 * 60 + y.OffsetInMinutes <= (int)utcNow.DayOfWeek * 1440 + utcNow.Hour * 60 + utcNow.Minute &&
-                (int)utcNow.DayOfWeek * 1440 + utcNow.Hour * 60 + utcNow.Minute <= (int)y.DayOfWeek * 24 * 60 + y.OffsetInMinutes + y.DurationInMinutes)),
+                y.OffsetTime <= TimeOnly.FromDateTime(utcNow) &&
+                TimeOnly.FromDateTime(utcNow) <= y.OffsetTime.AddMinutes(y.DurationInMinutes))),
 
             false => query.Where(x => !x.OrderOpeningTimes.Any(y =>
-                (int)y.DayOfWeek * 24 * 60 + y.OffsetInMinutes <= (int)utcNow.DayOfWeek * 1440 + utcNow.Hour * 60 + utcNow.Minute &&
-                (int)utcNow.DayOfWeek * 1440 + utcNow.Hour * 60 + utcNow.Minute <= (int)y.DayOfWeek * 24 * 60 + y.OffsetInMinutes + y.DurationInMinutes)),
+                y.OffsetTime <= TimeOnly.FromDateTime(utcNow) &&
+                TimeOnly.FromDateTime(utcNow) <= y.OffsetTime.AddMinutes(y.DurationInMinutes))),
 
             null => query
         };
@@ -108,8 +108,8 @@ public class RestaurantRepository : IRestaurantRepository
     private static Restaurant ReformatRestaurant(Restaurant restaurant)
     {
         restaurant.ClosingDates = restaurant.ClosingDates.OrderBy(x => x.ClosingDateTime).ToList();
-        restaurant.PlaceOpeningTimes = OpeningTimeUtils.AscendingOrder(restaurant.PlaceOpeningTimes);
-        restaurant.OrderOpeningTimes = OpeningTimeUtils.AscendingOrder(restaurant.OrderOpeningTimes);
+        restaurant.PlaceOpeningTimes = restaurant.PlaceOpeningTimes.OrderBy(x=>x.OffsetTime).ToList();
+        restaurant.OrderOpeningTimes = restaurant.OrderOpeningTimes.OrderBy(x=>x.OffsetTime).ToList();
         return restaurant;
     }
 }
