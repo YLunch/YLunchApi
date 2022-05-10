@@ -1303,7 +1303,7 @@ paths:
     post:
       tags:
         - orders
-      summary: Add status to multiple ordeers
+      summary: Add status to multiple orders
       description: |
         - Authorization header: **yes**
         - Granted roles:
