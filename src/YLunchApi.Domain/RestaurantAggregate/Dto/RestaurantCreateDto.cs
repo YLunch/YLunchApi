@@ -6,7 +6,7 @@ namespace YLunchApi.Domain.RestaurantAggregate.Dto;
 public class RestaurantCreateDto
 {
     [Required] public string Name { get; set; } = null!;
-
+    
     [Required]
     [RegularExpression(
         @"^0[6-7][0-9]{8}$",
